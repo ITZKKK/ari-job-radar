@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FBF6F2">
+<title>Ari's Job Radar</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23E2577C'/><circle cx='16' cy='16' r='8' fill='none' stroke='white' stroke-width='2.5'/><circle cx='16' cy='16' r='2.5' fill='white'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23E2577C'/><circle cx='16' cy='16' r='8' fill='none' stroke='white' stroke-width='2.5'/><circle cx='16' cy='16' r='2.5' fill='white'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Limelight&display=swap" rel="stylesheet">
+<style>
+/* Miami Beach at golden hour: warm sand paper, flamingo, lagoon, deep-sea ink. */
+:root {
+  --paper: #FBF6F2; --card: #FFFFFF; --ink: #22264A; --soft: #5F6487; --faint: #8C90AD;
+  --line: #EDE4DE; --flamingo: #E2577C; --flamingo-soft: #FDEAF0; --lagoon: #138A86; --lagoon-soft: #E1F4F1;
+  --sun: #D9930F; --sun-soft: #FFF3D9; --focus: #3B5BDB; --shadow: 0 1px 0 rgba(34, 38, 74, .04);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15172C; --card: #1D2040; --ink: #F1EEF4; --soft: #B5B6CE; --faint: #8A8CA8; --line: #2D3058;
+    --flamingo: #FF84A4; --flamingo-soft: #3B1D33; --lagoon: #59CEC6; --lagoon-soft: #15332F;
+    --sun: #F4C25A; --sun-soft: #3A3018; --focus: #8EA7FF; --shadow: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15172C; --card: #1D2040; --ink: #F1EEF4; --soft: #B5B6CE; --faint: #8A8CA8; --line: #2D3058;
+  --flamingo: #FF84A4; --flamingo-soft: #3B1D33; --lagoon: #59CEC6; --lagoon-soft: #15332F;
+  --sun: #F4C25A; --sun-soft: #3A3018; --focus: #8EA7FF; --shadow: none; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 16px/1.55 Figtree, system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 18px; }
+
+/* Top bar */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 0 0; }
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; }
+.brand svg { width: 22px; height: 22px; }
+.updated { color: var(--faint); font-size: 14px; text-align: right; }
+
+/* Greeting */
+.hello { padding: 40px 0 30px; }
+.hello h1 { font-family: Limelight, Georgia, serif; font-weight: 400; margin: 0;
+  font-size: clamp(38px, 7vw, 62px); line-height: 1.05; letter-spacing: .005em; }
+.hello p { margin: 16px 0 0; font-size: 19px; color: var(--soft); max-width: 34em; }
+.hello p strong { color: var(--ink); font-weight: 600; }
+.hello .count { color: var(--flamingo); font-weight: 700; }
+
+/* Navigation */
+nav.tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 4px 0 14px;
+  position: sticky; top: 0; z-index: 5; background: var(--paper); }
+nav.tabs::-webkit-scrollbar { display: none; }
+nav.tabs button { appearance: none; border: 1px solid transparent; background: none; cursor: pointer;
+  padding: 8px 15px; border-radius: 999px; font-weight: 600; font-size: 15px; color: var(--soft); white-space: nowrap; }
+nav.tabs button:hover { color: var(--ink); }
+nav.tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+nav.tabs .n { font-weight: 500; opacity: .7; margin-left: 5px; }
+
+/* Sections */
+section.block { margin: 18px 0 40px; }
+.block-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 14px; }
+.block-head h2 { font-size: 22px; margin: 0; font-weight: 700; letter-spacing: -.005em; }
+.block-head p { margin: 4px 0 0; color: var(--soft); font-size: 15px; }
+.linkbtn { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; color: var(--flamingo);
+  font-weight: 600; font-size: 15px; white-space: nowrap; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+/* Job cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 14px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px 20px 16px;
+  box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+.card.mine { border-color: color-mix(in srgb, var(--sun) 45%, var(--line)); }
+.card.gone { opacity: .62; }
+.where { font-size: 15px; color: var(--soft); display: flex; flex-wrap: wrap; gap: 0 6px; }
+.where .co { color: var(--ink); font-weight: 600; }
+.where .star { color: var(--sun); }
+.card h3 { margin: 0; font-size: 20px; line-height: 1.3; font-weight: 700; }
+.card h3 a { text-decoration: none; }
+.card h3 a:hover { text-decoration: underline; text-decoration-color: var(--flamingo); text-underline-offset: 4px; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--paper); color: var(--soft); }
+.pill.entry { background: var(--lagoon-soft); color: var(--lagoon); }
+.pill.new { background: var(--flamingo-soft); color: var(--flamingo); }
+.pill.warn { background: var(--sun-soft); color: var(--sun); }
+.found { font-size: 14px; color: var(--faint); }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; align-items: center; }
+.act { appearance: none; cursor: pointer; border: 1px solid var(--line); background: transparent; border-radius: 999px;
+  padding: 7px 14px; font-size: 14px; font-weight: 600; color: var(--soft); }
+.act:hover { border-color: var(--soft); color: var(--ink); }
+.act.save[aria-pressed="true"] { background: var(--sun-soft); border-color: transparent; color: var(--sun); }
+.act.applied[aria-pressed="true"] { background: var(--lagoon-soft); border-color: transparent; color: var(--lagoon); }
+.act.view { margin-left: auto; background: var(--ink); color: var(--paper); border-color: var(--ink); text-decoration: none; }
+.act.view:hover { color: var(--paper); opacity: .9; }
+.act.skip { border: 0; padding: 7px 4px; color: var(--faint); }
+.note textarea { width: 100%; min-height: 64px; resize: vertical; font: inherit; font-size: 15px; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+
+/* Filters */
+.filterbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0 0 18px; }
+.search { flex: 1 1 240px; }
+.search input { width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--card);
+  border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; }
+.filters { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; margin: 0 0 20px; }
+.filters[hidden] { display: none; }
+.filters h4 { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--soft); }
+.filters .group + .group { margin-top: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { appearance: none; cursor: pointer; font-size: 14px; font-weight: 600; padding: 6px 13px; border-radius: 999px;
+  border: 1px solid var(--line); background: transparent; color: var(--faint); }
+.chip[aria-pressed="true"] { background: var(--flamingo-soft); border-color: transparent; color: var(--flamingo); }
+label.entry-only { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; color: var(--soft); cursor: pointer; margin-top: 14px; }
+.day { font-size: 15px; font-weight: 600; color: var(--soft); margin: 26px 0 10px; }
+.day:first-child { margin-top: 0; }
+
+/* Lists (employers / places) */
+.list { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.item { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 15px 20px; }
+.item + .item { border-top: 1px solid var(--line); }
+.item .name { font-weight: 600; }
+.item .why { color: var(--soft); font-size: 14px; margin-top: 2px; }
+.item .side { font-size: 14px; color: var(--soft); text-align: right; flex-shrink: 0; }
+.item .side a { color: var(--flamingo); font-weight: 600; }
+.item .changed { color: var(--flamingo); font-weight: 600; }
+
+.empty { background: var(--card); border: 1px dashed var(--line); border-radius: 18px; padding: 26px 22px; color: var(--soft); }
+.empty strong { color: var(--ink); display: block; margin-bottom: 4px; font-size: 17px; }
+
+footer { margin: 48px 0 56px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--soft); font-size: 14px;
+  display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+footer .grow { flex: 1 1 260px; }
+footer button, footer label.btn { appearance: none; cursor: pointer; border: 1px solid var(--line); background: var(--card);
+  border-radius: 999px; padding: 7px 14px; font-weight: 600; font-size: 14px; color: var(--ink); }
+
+@media (max-width: 560px) {
+  .hello { padding: 28px 0 22px; }
+  .hello p { font-size: 17px; }
+  .card { padding: 18px 16px 14px; }
+  .act.view { margin-left: 0; flex: 1 0 100%; text-align: center; order: -1; padding: 10px 14px; }
+  .item { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .item .side { text-align: left; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hello h1 { animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="var(--flamingo)"/><circle cx="16" cy="16" r="8" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="16" cy="16" r="2.5" fill="#fff"/></svg><span id="brand">Job Radar</span></span>
+    <span class="updated" id="updated"></span>
+  </header>
+
+  <section class="hello" aria-live="polite">
+    <h1 id="hello">Hello!</h1>
+    <p id="lede">Getting your jobs ready…</p>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Sections" id="tabs"></nav>
+  <main id="main"></main>
+
+  <footer>
+    <span class="grow" id="foot">Your saved jobs and notes stay on this device. Before switching phone or laptop, tap “Back up my saves”.</span>
+    <button id="export">Back up my saves</button>
+    <label class="btn">Restore a backup<input id="import" type="file" accept="application/json" hidden></label>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const KEY = "ajr.v1";
+const TABS = [["home", "For you"], ["all", "All jobs"], ["saved", "Saved"], ["applied", "Applied"],
+              ["watching", "Who I’m watching"], ["elsewhere", "More places to look"]];
+const MIAMI_PLACES = ["Miami Beach", "Coral Gables", "Doral", "Fort Lauderdale", "Wynwood", "Brickell", "Aventura",
+                      "Boca Raton", "West Palm Beach", "Palm Beach", "Coconut Grove", "Hialeah", "Key Biscayne"];
+let DATA = null;
+const me = load();
+me.jobs = me.jobs || {};
+const lastVisit = me.lastVisit || null;
+const view = { tab: me.tab || "home", q: "", locOff: new Set(me.locOff || []), famOff: new Set(me.famOff || []),
+               entryOnly: !!me.entryOnly, showFilters: false, more: {} };
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+function save() {
+  Object.assign(me, { tab: view.tab, locOff: [...view.locOff], famOff: [...view.famOff], entryOnly: view.entryOnly });
+  try { localStorage.setItem(KEY, JSON.stringify(me)); } catch (e) { /* private window: fine for this visit */ }
+}
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const DAY = 864e5;
+const age = iso => (Date.now() - new Date(iso)) / DAY;
+function ago(iso) {
+  if (!iso) return "";
+  const m = (Date.now() - new Date(iso)) / 6e4;
+  if (m < 60) return "just now";
+  if (m < 60 * 24) return `${Math.round(m / 60)} hour${Math.round(m / 60) === 1 ? "" : "s"} ago`;
+  const d = Math.floor(m / 1440);
+  return d === 1 ? "yesterday" : `${d} days ago`;
+}
+function dayName(iso) {
+  const d = new Date(iso), t = new Date(); t.setHours(0, 0, 0, 0);
+  const diff = Math.floor((t - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / DAY);
+  if (diff <= 0) return "Today"; if (diff === 1) return "Yesterday";
+  if (diff < 7) return d.toLocaleDateString(undefined, { weekday: "long" });
+  return d.toLocaleDateString(undefined, { month: "long", day: "numeric" });
+}
+function greeting() {
+  const h = new Date().getHours();
+  return h < 5 ? "Hi" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+}
+const sinceWords = iso => {
+  const d = age(iso);
+  if (d < 1) return "earlier today";
+  if (d < 2) return "yesterday";
+  if (d < 7) return new Date(iso).toLocaleDateString(undefined, { weekday: "long" });
+  return new Date(iso).toLocaleDateString(undefined, { month: "long", day: "numeric" });
+};
+
+/* ---- Turning raw postings into friendly words ------------------------------ */
+function place(p) {
+  const raw = p.location_raw || "";
+  const has = w => raw.toLowerCase().includes(w);
+  if (p.location === "MIAMI") {
+    const city = MIAMI_PLACES.find(c => has(c.toLowerCase()));
+    return has("new york") ? "Miami or New York" : (city || "Miami");
+  }
+  if (p.location === "NYC") return has("miami") ? "New York or Miami" : (has("remote") ? "New York or remote" : "New York");
+  if (p.location === "REMOTE") return "Remote";
+  if (p.location === "UNKNOWN") return "";
+  let s = raw.split(/[;/|]/)[0].replace(/\boffice\b/i, "").trim();
+  if (s.includes(" - ")) s = s.split(" - ").pop().trim();
+  return s.replace(/,\s*(united states|usa|us)$/i, "");
+}
+function titleParts(p) {
+  // "Billboard: Staff Writer, Latin/Pop" -> brand "Billboard", title "Staff Writer, Latin/Pop"
+  const m = /^([^:]{2,28}):\s+(.+)$/.exec(p.title || "");
+  let company = (p.company || "").split(/\s+[—(]/)[0].trim();
+  if (m) return { title: m[2], brand: m[1].trim(), parent: company };
+  const pipe = /^(.+?)\s+\|\s+(.{2,30})$/.exec(p.title || "");
+  if (pipe) return { title: pipe[1], brand: pipe[2].trim(), parent: company };
+  return { title: p.title, brand: company, parent: "" };
+}
+const famWord = id => (DATA.families.find(f => f.id === id) || {}).label || "";
+const isNew = p => lastVisit && p.first_seen > lastVisit && p.status === "open";
+const jobState = pid => me.jobs[pid] || {};
+
+/* ---- Boot ---------------------------------------------------------------- */
+async function boot() {
+  try {
+    const r = await fetch("data/radar.json?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    DATA = await r.json();
+  } catch (e) {
+    document.getElementById("hello").textContent = "Almost ready.";
+    document.getElementById("lede").textContent = "The radar is doing its first search. Come back in a few minutes and your jobs will be here.";
+    return;
+  }
+  const name = DATA.owner || "there";
+  document.getElementById("brand").textContent = `${name}’s Job Radar`;
+  document.title = `${name}’s Job Radar`;
+  const at = DATA.last_run?.finished_at || DATA.generated_at;
+  document.getElementById("updated").textContent = at ? `Checked ${ago(at)}` : "";
+  greet(name);
+  render();
+  me.lastVisit = new Date().toISOString(); save();
+}
+
+function openJobs() { return DATA.postings.filter(p => p.status === "open" && !jobState(p.pid).hidden); }
+
+function greet(name) {
+  document.getElementById("hello").textContent = `${greeting()}, ${name}.`;
+  const open = openJobs();
+  const fresh = lastVisit ? open.filter(p => p.first_seen > lastVisit) : open.filter(p => age(p.first_seen) < 7);
+  const mine = fresh.filter(p => p.target).length;
+  const when = lastVisit ? `since you last looked ${sinceWords(lastVisit)}` : "this week";
+  let s;
+  if (!fresh.length) s = `Nothing new ${when} — the radar keeps checking three times a day and will email you the moment something comes up. There are <strong>${open.length}</strong> jobs open right now if you’d like to browse.`;
+  else s = `<span class="count">${fresh.length} new job${fresh.length === 1 ? "" : "s"}</span> ${when}` +
+           (mine ? `, including <strong>${mine}</strong> from companies on your list.` : ".") +
+           (fresh.length < open.length ? ` ${open.length} are open in total.` : "");
+  document.getElementById("lede").innerHTML = s;
+}
+
+/* ---- Rendering ------------------------------------------------------------ */
+function counts() {
+  return {
+    all: openJobs().length,
+    saved: Object.values(me.jobs).filter(j => j.saved).length,
+    applied: Object.values(me.jobs).filter(j => j.applied).length,
+  };
+}
+function render() {
+  const c = counts();
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = TABS.map(([id, label]) => `<button role="tab" aria-selected="${view.tab === id}" data-tab="${id}">${label}` +
+    (c[id] ? `<span class="n">${c[id]}</span>` : "") + `</button>`).join("");
+  tabs.querySelectorAll("button").forEach(b => b.onclick = () => { view.tab = b.dataset.tab; save(); render(); window.scrollTo({ top: document.querySelector(".tabs").offsetTop - 4 }); });
+  const main = document.getElementById("main");
+  main.innerHTML = ({ home: homeHTML, all: allHTML, saved: () => trackedHTML("saved"), applied: () => trackedHTML("applied"),
+                      watching: watchingHTML, elsewhere: elsewhereHTML }[view.tab] || homeHTML)();
+  wire(main);
+}
+
+function cardHTML(p) {
+  const j = jobState(p.pid), t = titleParts(p), where = place(p);
+  const pills = [];
+  if (p.status !== "open") pills.push(`<span class="pill">No longer listed</span>`);
+  else if (isNew(p)) pills.push(`<span class="pill new">New</span>`);
+  if (p.seniority === "entry") pills.push(`<span class="pill entry">Entry level</span>`);
+  pills.push(`<span class="pill">${esc(famWord(p.family))}</span>`);
+  if (p.years >= 3) pills.push(`<span class="pill warn">Asks for ${p.years}+ years</span>`);
+  if ((p.flags || []).includes("internship")) pills.push(`<span class="pill">Internship</span>`);
+  return `<article class="card${p.target ? " mine" : ""}${p.status !== "open" ? " gone" : ""}" data-pid="${p.pid}">
+    <div class="where">${p.target ? `<span class="star" aria-label="On your list">★</span>` : ""}<span class="co">${esc(t.brand)}</span>${where ? `<span>· ${esc(where)}</span>` : ""}</div>
+    <h3><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(t.title)}</a></h3>
+    <div class="pills">${pills.join("")}</div>
+    <div class="found">${p.first_seen ? `Found ${ago(p.first_seen)}` : ""}${t.parent && t.parent !== t.brand ? ` · part of ${esc(t.parent)}` : ""}${p.via ? ` · via ${esc(p.via)}` : ""}${j.applied_at ? ` · you applied ${new Date(j.applied_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}` : ""}</div>
+    <div class="acts">
+      <button class="act save" data-act="saved" aria-pressed="${!!j.saved}">${j.saved ? "♥ Saved" : "♡ Save"}</button>
+      <button class="act applied" data-act="applied" aria-pressed="${!!j.applied}">${j.applied ? "✓ Applied" : "I applied"}</button>
+      ${view.tab === "saved" || view.tab === "applied" ? "" : `<button class="act skip" data-act="hidden">Not for me</button>`}
+      <a class="act view" href="${esc(p.url)}" target="_blank" rel="noopener">View job</a>
+    </div>
+    ${j.saved || j.applied ? `<div class="note"><textarea data-note aria-label="Your notes" placeholder="Notes — who you wrote to, the deadline, when to follow up…">${esc(j.note || "")}</textarea></div>` : ""}
+  </article>`;
+}
+
+function block(id, title, sub, items, limit) {
+  if (!items.length) return "";
+  const showAll = view.more[id] || items.length <= limit;
+  const shown = showAll ? items : items.slice(0, limit);
+  return `<section class="block"><div class="block-head"><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ""}</div>
+    ${showAll ? "" : `<button class="linkbtn" data-more="${id}">See all ${items.length}</button>`}</div>
+    <div class="cards">${shown.map(cardHTML).join("")}</div></section>`;
+}
+
+const byNewest = (a, b) => (b.first_seen || "").localeCompare(a.first_seen || "");
+const locRank = p => ({ MIAMI: 0, NYC: 1, REMOTE: 2, FLORIDA: 3, OTHER_US: 4, UNKNOWN: 5 }[p.location] ?? 6);
+const friendly = (a, b) => locRank(a) - locRank(b) || ((a.seniority !== "entry") - (b.seniority !== "entry")) || byNewest(a, b);
+
+function homeHTML() {
+  const open = openJobs();
+  const mine = open.filter(p => p.target).sort(friendly);
+  const week = open.filter(p => !p.target && age(p.first_seen) < 7).sort(friendly);
+  const miami = open.filter(p => !p.target && p.location === "MIAMI" && age(p.first_seen) >= 7).sort(byNewest);
+  let html = block("mine", "From your list", "Open roles at the companies you picked.", mine, 4) +
+             block("week", "New this week", "Everything else that matches, Miami first.", week, 6) +
+             block("miami", "Still open in Miami", "Found earlier but not filled yet.", miami, 4);
+  if (!html) html = `<div class="empty"><strong>A quiet week.</strong>Nothing new matches right now. The radar checks three times a day and emails you as soon as something comes up. Meanwhile, “More places to look” has quick searches on LinkedIn and Indeed.</div>`;
+  return html;
+}
+
+function allHTML() {
+  const locs = DATA.locations.map(l => `<button class="chip" data-loc="${l.id}" aria-pressed="${!view.locOff.has(l.id)}">${esc(l.label)}</button>`).join("");
+  const fams = DATA.families.map(f => `<button class="chip" data-fam="${f.id}" aria-pressed="${!view.famOff.has(f.id)}">${esc(f.label)}</button>`).join("");
+  const active = view.locOff.size + view.famOff.size + (view.entryOnly ? 1 : 0);
+  const q = view.q.trim().toLowerCase();
+  const items = openJobs().filter(p => !view.locOff.has(p.location) && !view.famOff.has(p.family) &&
+      (!view.entryOnly || p.seniority === "entry") &&
+      (!q || `${p.title} ${p.company} ${p.location_raw}`.toLowerCase().includes(q)))
+    .sort((a, b) => dayName(a.first_seen) === dayName(b.first_seen) ? friendly(a, b) : byNewest(a, b));
+  let list = "", cur = null, buf = [];
+  const flush = () => { if (buf.length) list += `<div class="day">${cur}</div><div class="cards">${buf.join("")}</div>`; buf = []; };
+  for (const p of items) { const d = dayName(p.first_seen); if (d !== cur) { flush(); cur = d; } buf.push(cardHTML(p)); }
+  flush();
+  return `<div class="filterbar">
+      <div class="search"><input id="q" type="search" placeholder="Search a job title or company" value="${esc(view.q)}" aria-label="Search"></div>
+      <button class="act" id="ftoggle" aria-expanded="${view.showFilters}">${view.showFilters ? "Hide filters" : "Filters"}${active ? ` (${active})` : ""}</button>
+    </div>
+    <div class="filters" ${view.showFilters ? "" : "hidden"}>
+      <div class="group"><h4>Where</h4><div class="chips">${locs}</div></div>
+      <div class="group"><h4>Kind of role</h4><div class="chips">${fams}</div></div>
+      <label class="entry-only"><input type="checkbox" id="entry" ${view.entryOnly ? "checked" : ""}> Only entry-level roles</label>
+    </div>
+    <div id="results">${list || `<div class="empty"><strong>No jobs match these filters.</strong>Try turning a place or a kind of role back on.</div>`}</div>`;
+}
+
+function trackedHTML(kind) {
+  const have = new Set(DATA.postings.map(p => p.pid));
+  const gone = Object.values(me.jobs).filter(j => j.snap && !have.has(j.snap.pid)).map(j => ({ ...j.snap, status: "closed" }));
+  const items = DATA.postings.concat(gone).filter(p => jobState(p.pid)[kind])
+    .sort((a, b) => (jobState(b.pid).applied_at || b.first_seen || "").localeCompare(jobState(a.pid).applied_at || a.first_seen || ""));
+  if (!items.length) return kind === "saved"
+    ? `<div class="empty"><strong>Nothing saved yet.</strong>Tap “♡ Save” on any job you like and it waits for you here, with a space for notes.</div>`
+    : `<div class="empty"><strong>No applications marked yet.</strong>When you send one, tap “I applied” on the job. It moves here with the date, and you can jot down who you contacted and when to follow up.</div>`;
+  const sub = kind === "saved" ? "Jobs you’ve set aside. Add notes as you go." : "Everything you’ve sent, newest first. Good luck!";
+  return `<section class="block"><div class="block-head"><div><h2>${kind === "saved" ? "Saved for later" : "Your applications"}</h2><p>${sub}</p></div></div>
+    <div class="cards">${items.map(cardHTML).join("")}</div></section>`;
+}
+
+function watchingHTML() {
+  const E = DATA.employers.slice().sort((a, b) => (b.target - a.target) || a.name.localeCompare(b.name));
+  const nice = n => n.split(/\s+[—(]/)[0];
+  const row = (e, side, why) => `<div class="item"><div><div class="name">${e.target ? `<span style="color:var(--sun)">★</span> ` : ""}${esc(nice(e.name))}</div>
+      ${why ? `<div class="why">${why}</div>` : ""}</div><div class="side">${side}</div></div>`;
+  const auto = E.filter(e => ["read", "failing", "pending"].includes(e.mode)).map(e => row(e,
+      e.mode === "read" ? (e.open_relevant ? `${e.open_relevant} open for you` : "Nothing for you right now")
+      : `<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Check their site</a>`,
+      esc(e.group || ""))).join("");
+  const watched = E.filter(e => e.mode === "watched").map(e => {
+    const pg = e.page || {};
+    const changed = pg.changed_at && age(pg.changed_at) < 14;
+    return row(e, `${changed ? `<span class="changed">Updated ${ago(pg.changed_at)}</span> · ` : ""}<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Open page</a>`,
+      changed && (pg.added || [])[0] ? `New on their page: “${esc(pg.added[0])}”` : esc(e.group || ""));
+  }).join("");
+  const hand = E.filter(e => e.mode === "check").map(e => row(e,
+      e.careers_url ? `<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Open their jobs page</a>`
+                    : `<a href="https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(nice(e.name))}" target="_blank" rel="noopener">Find on LinkedIn</a>`,
+      esc(e.note || e.group || ""))).join("");
+  const src = (DATA.aggregators || []).filter(a => a.ok);
+  return `<section class="block"><div class="block-head"><div><h2>Checked for you, three times a day</h2>
+      <p>The radar reads these companies’ job pages and tells you when a role fits.</p></div></div><div class="list">${auto}</div></section>
+    ${watched ? `<section class="block"><div class="block-head"><div><h2>Pages I keep an eye on</h2>
+      <p>These companies don’t have a proper jobs board, so the radar watches their careers page and emails you when it changes.</p></div></div><div class="list">${watched}</div></section>` : ""}
+    ${hand ? `<section class="block"><div class="block-head"><div><h2>Worth checking yourself</h2>
+      <p>They mostly post on LinkedIn or by email. Following them on LinkedIn is the easiest way to hear first.</p></div></div><div class="list">${hand}</div></section>` : ""}
+    ${src.length ? `<p style="color:var(--soft);font-size:14px">Also searching job sites that cover many smaller employers: ${src.map(a => esc(a.name.split(" (")[0])).join(", ")}.</p>` : ""}`;
+}
+
+function elsewhereHTML() {
+  const groups = [["search", "Quick searches", "Sites the radar isn’t allowed to read for you. Each link opens a search of the last 7 days — worth a look once or twice a week."],
+                  ["alert", "Set up these alerts once", "Make a free account on each and save a search for Miami and New York. They’ll email you directly."],
+                  ["newsletter", "Newsletters worth subscribing to", ""]];
+  return groups.map(([k, title, sub]) => {
+    const rows = (DATA.boards || []).filter(b => b.kind === k).map(b => `<div class="item"><div><div class="name">${esc(b.name)}</div>
+      <div class="why">${esc(b.why || "")}</div></div><div class="side"><a href="${esc(b.url)}" target="_blank" rel="noopener">Open</a></div></div>`).join("");
+    return rows ? `<section class="block"><div class="block-head"><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ""}</div></div><div class="list">${rows}</div></section>` : "";
+  }).join("");
+}
+
+/* ---- Interactions ---------------------------------------------------------- */
+function wire(root) {
+  root.querySelectorAll("[data-more]").forEach(b => b.onclick = () => { view.more[b.dataset.more] = true; render(); });
+  root.querySelectorAll(".card").forEach(card => {
+    const pid = card.dataset.pid;
+    card.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
+      const j = me.jobs[pid] = me.jobs[pid] || {};
+      const k = b.dataset.act;
+      j[k] = !j[k];
+      if (k === "applied") { j.applied_at = j.applied ? new Date().toISOString() : null; if (j.applied) j.saved = true; }
+      const p = DATA.postings.find(x => x.pid === pid);
+      if (p) j.snap = { pid, title: p.title, company: p.company, url: p.url, location_raw: p.location_raw, location: p.location,
+                        family: p.family, first_seen: p.first_seen, target: p.target, seniority: p.seniority };
+      save(); render(); greet(DATA.owner || "there");
+      if (k === "hidden") document.getElementById("foot").textContent = "Hidden. It won’t show up again on this device.";
+    });
+    const t = card.querySelector("[data-note]");
+    if (t) t.oninput = () => { (me.jobs[pid] = me.jobs[pid] || {}).note = t.value; save(); };
+  });
+  const tog = root.querySelector("#ftoggle");
+  if (tog) tog.onclick = () => { view.showFilters = !view.showFilters; render(); };
+  const flip = (set, v) => set.has(v) ? set.delete(v) : set.add(v);
+  root.querySelectorAll("[data-loc]").forEach(b => b.onclick = () => { flip(view.locOff, b.dataset.loc); save(); render(); });
+  root.querySelectorAll("[data-fam]").forEach(b => b.onclick = () => { flip(view.famOff, b.dataset.fam); save(); render(); });
+  const en = root.querySelector("#entry");
+  if (en) en.onchange = () => { view.entryOnly = en.checked; save(); render(); };
+  const q = root.querySelector("#q");
+  if (q) q.oninput = () => {
+    view.q = q.value; const pos = q.selectionStart; render();
+    const n = document.getElementById("q"); n.focus(); n.setSelectionRange(pos, pos);
+  };
+}
+
+document.getElementById("export").onclick = () => {
+  const blob = new Blob([JSON.stringify({ exported_at: new Date().toISOString(), jobs: me.jobs }, null, 1)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `job-radar-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  document.getElementById("foot").textContent = "Backup downloaded. Keep the file somewhere safe (Files, iCloud Drive or your email).";
+};
+document.getElementById("import").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const got = JSON.parse(await f.text());
+    if (!got || typeof got.jobs !== "object") throw new Error("not a backup");
+    for (const [k, v] of Object.entries(got.jobs)) {
+      const cur = me.jobs[k] || {};
+      me.jobs[k] = { ...v, ...cur, saved: !!(v.saved || cur.saved), applied: !!(v.applied || cur.applied),
+                     applied_at: cur.applied_at || v.applied_at || null, note: cur.note || v.note || "" };
+    }
+    save(); render(); greet(DATA.owner || "there");
+    document.getElementById("foot").textContent = `Welcome back — restored ${Object.keys(got.jobs).length} saved jobs.`;
+  } catch (err) {
+    document.getElementById("foot").textContent = "That file isn’t a Job Radar backup. Choose the .json file that “Back up my saves” downloaded.";
+  }
+};
+boot();
+</script>
+</body>
+</html>

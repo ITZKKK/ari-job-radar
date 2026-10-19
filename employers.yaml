@@ -1,0 +1,477 @@
+# Employers the radar watches. The single source of truth for employer
+# coverage: add a row here, never in code.
+#
+# Easiest way to add one:   python scripts/add_employer.py "Name" "<careers URL>"
+# (it reads the job-board platform off the URL and appends a row).
+#
+# Fields
+#   id          short unique slug
+#   name        shown on the dashboard and in emails
+#   group       what kind of employer (free text, shown under the name)
+#   city        where its relevant jobs mostly are
+#   target      true = on Ari's own list; gets a ★ everywhere
+#   ats         job-board platform: greenhouse | lever | ashby | smartrecruiters | workday |
+#               workable | bamboohr | recruitee | breezy | oracle | ukg   (read automatically)
+#               none | teamtailor | jobvite | avature | successfactors | email | ...  (not readable)
+#   ats_token / ats_site / ats_dc / ats_host   the board's identifiers
+#   verified    true once the board was checked to be THIS employer's (unverified rows are not read)
+#   queries     server-side keyword searches, for huge boards (Workday / Oracle / SmartRecruiters)
+#   must_match  regex; keep only postings mentioning it (a brand on a parent company's board)
+#   careers_url the human careers page (linked on the dashboard)
+#   watch_url   page to watch for changes when there is no readable board (defaults to careers_url)
+#   aliases     other names job sites use for it (so aggregator finds get the ★)
+#   target_match  regex; on a parent's board, only postings matching it count as Ari's pick (★)
+#   note        anything Ari should know
+#
+# Research behind every row: 19 Oct 2026 (see README, "Employer research").
+
+employers:
+
+# ---------------------------------------------------------------------------
+# Ari's own list
+# ---------------------------------------------------------------------------
+  - id: the-drum
+    name: The Drum
+    group: Marketing-industry media
+    city: London / New York / Miami
+    target: true
+    ats: workable
+    ats_token: the-drum
+    verified: true
+    careers_url: https://apply.workable.com/the-drum/
+    aliases: [The Drum, Carnyx Group, Drum]
+
+  - id: the-infatuation
+    name: The Infatuation
+    group: Restaurant media (owned by JPMorgan Chase)
+    city: New York / national
+    target: true
+    ats: oracle
+    ats_token: jpmc.fa.oraclecloud.com
+    ats_site: CX_1001
+    queries: [infatuation]
+    must_match: infatuation
+    verified: true
+    careers_url: https://www.theinfatuation.com/careers
+    aliases: [The Infatuation, Infatuation]
+
+  - id: pmc
+    name: Penske Media — Eater, Thrillist, Robb Report, WWD, Variety
+    group: Magazines & digital media (bought Eater and Thrillist from Vox Media, June 2026)
+    city: New York / Los Angeles / national
+    target: true
+    ats: greenhouse
+    ats_token: pmc
+    verified: true
+    target_match: 'eater|thrillist'   # Ari picked Eater; only those brands get her ★
+    careers_url: https://job-boards.greenhouse.io/pmc
+    aliases: [Penske Media, Penske Media Corporation, PMC, Eater, Thrillist, Robb Report, WWD, Variety, Billboard, Rolling Stone, PMX Global]
+
+  - id: vice
+    name: VICE Media
+    group: Digital media
+    city: New York / Los Angeles
+    target: true
+    ats: unknown
+    watch: false
+    note: No public job board found (its old Workday and Greenhouse boards are gone as of Oct 2026). Follow VICE on LinkedIn.
+    aliases: [VICE, VICE Media, VICE Media Group, Vice Media LLC, Refinery29]
+
+  - id: time-out
+    name: Time Out (Time Out Miami)
+    group: City guides & events
+    city: Miami / New York
+    target: true
+    ats: teamtailor
+    careers_url: https://careers.timeout.com/jobs
+    note: Board is mostly Time Out Market hospitality jobs; the radar watches it for editorial ones.
+    aliases: [Time Out, Time Out Group, Time Out Miami, Time Out New York]
+
+  - id: miami-new-times
+    name: Miami New Times
+    group: Alt-weekly (Voice Media Group)
+    city: Miami
+    target: true
+    ats: email
+    careers_url: https://www.miaminewtimes.com/about/careers/
+    note: Posts openings on its own careers page and takes applications by email; often freelance calls.
+    aliases: [Miami New Times, Voice Media Group, New Times]
+
+  - id: voice-media-group
+    name: Voice Media Group (Miami New Times' parent)
+    group: Alt-weekly group
+    city: Miami / Denver / Phoenix
+    ats: email
+    careers_url: https://www.voicemediagroup.com/open-positions/
+    aliases: [Voice Media Group, VMG]
+
+  - id: haute-living
+    name: Haute Living
+    group: Luxury lifestyle (Haute Media Group)
+    city: Miami / New York
+    target: true
+    ats: none
+    careers_url: https://hauteliving.com/careers
+    note: No job board found; roles appear on LinkedIn / Indeed. Follow Haute Living on LinkedIn.
+    aliases: [Haute Living, Haute Media Group, Haute Media, Haute Residence]
+
+  - id: world-red-eye
+    name: World Red Eye
+    group: Miami nightlife & society media
+    city: Miami
+    target: true
+    ats: none
+    watch: false
+    note: No careers page; posts on Mediabistro / ZipRecruiter. The job-search sources catch it when it does.
+    aliases: [World Red Eye, WorldRedEye]
+
+  - id: ocean-drive
+    name: Ocean Drive Magazine
+    group: Miami luxury magazine
+    city: Miami
+    target: true
+    ats: none
+    watch: false
+    note: No public job board; openings go out by email and through the University of Miami communication jobs board.
+    aliases: [Ocean Drive, Ocean Drive Magazine, Ocean Drive Media Group]
+
+  - id: modern-luxury
+    name: Modern Luxury (Modern Luxury Miami)
+    group: Luxury city magazines
+    city: Miami / national
+    target: true
+    ats: none
+    careers_url: https://www.modernluxury.com/careers
+    note: No job board found; check LinkedIn.
+    aliases: [Modern Luxury, Modern Luxury Media, Modern Luxury Miami]
+
+# ---------------------------------------------------------------------------
+# Miami media
+# ---------------------------------------------------------------------------
+  - id: axios
+    name: Axios (incl. Axios Miami)
+    group: Digital news
+    city: Local newsrooms / Washington / New York
+    ats: greenhouse
+    ats_token: axios
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/axios
+    aliases: [Axios, Axios Media, Axios Local, Axios Miami]
+
+  - id: miami-herald
+    name: Miami Herald / el Nuevo Herald (McClatchy)
+    group: Newspaper
+    city: Miami / McClatchy markets
+    ats: ukg
+    ats_token: https://mcclatchy.rec.pro.ukg.net/MCC1008MCLTC/JobBoard/ff11d963-22db-4278-a2b7-709f3b882262
+    verified: true
+    careers_url: https://mcclatchy.rec.pro.ukg.net/MCC1008MCLTC/JobBoard/ff11d963-22db-4278-a2b7-709f3b882262
+    aliases: [Miami Herald, el Nuevo Herald, McClatchy, The McClatchy Company]
+
+  - id: nbcuniversal
+    name: NBCUniversal (Telemundo, NBC 6 Miami, NBC News)
+    group: TV & digital news
+    city: Miami / New York
+    ats: smartrecruiters
+    ats_token: NBCUniversal3
+    queries: [writer, editor, editorial, reporter, producer, "social media", content, Telemundo, copywriter, communications]
+    verified: true
+    careers_url: https://www.nbcunicareers.com
+    aliases: [NBCUniversal, Telemundo, NBC Universal, NBCUniversal Media, NBC News, Telemundo Network Group]
+
+  - id: televisaunivision
+    name: TelevisaUnivision
+    group: Spanish-language TV & digital (HQ'd in Miami/Doral)
+    city: Miami / New York
+    ats: workday
+    ats_token: univision
+    ats_dc: wd1
+    ats_site: External
+    verified: true
+    careers_url: https://corporate.televisaunivision.com/careers/
+    aliases: [TelevisaUnivision, Univision, Univision Communications, Televisa Univision]
+
+  - id: wlrn
+    name: WLRN (South Florida public media)
+    group: Public radio & news
+    city: Miami
+    ats: none
+    careers_url: https://www.wlrn.org/jobs
+    aliases: [WLRN, Friends of WLRN]
+
+  - id: cbs-news-miami
+    name: CBS News Miami (Paramount)
+    group: TV news
+    city: Miami
+    ats: successfactors
+    watch: false
+    careers_url: https://careers.paramount.com/go/CBS-News/8710900/
+    note: Paramount's careers site can't be read automatically; open the CBS News list and look for Miami.
+    aliases: [Paramount, CBS News, CBS News Miami, Paramount Skydance, WFOR]
+
+  - id: wplg
+    name: WPLG Local 10 (Graham Media Group)
+    group: TV news
+    city: Miami
+    ats: email
+    careers_url: https://www.local10.com/careers/
+    aliases: [WPLG, Local 10, Graham Media Group]
+
+  - id: fever
+    name: Fever (Secret Miami / Secret Media Network)
+    group: Events & city-guide media
+    city: Miami / New York / global
+    ats: greenhouse
+    ats_token: feverup
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/feverup
+    aliases: [Fever, Feverup, Fever Labs, Secret Media Network, Secret Miami, Secret NYC]
+
+# ---------------------------------------------------------------------------
+# National magazines & digital media
+# ---------------------------------------------------------------------------
+  - id: vox-media
+    name: Vox Media (The Cut, Vox, podcasts)
+    group: Digital media
+    city: New York / national
+    ats: greenhouse
+    ats_token: voxmedia
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/voxmedia
+    aliases: [Vox Media, Vox Media LLC, New York Magazine, The Cut, Vox, Curbed]
+
+  - id: conde-nast
+    name: Condé Nast (Bon Appétit, Vogue, Traveler, GQ…)
+    group: Magazines
+    city: New York
+    ats: workday
+    ats_token: condenast
+    ats_dc: wd5
+    ats_site: CondeCareers
+    verified: false
+    watch: false
+    careers_url: https://condenast.wd5.myworkdayjobs.com/en-US/CondeCareers
+    note: Its Workday board redirected to Workday's error page on 19 Oct 2026. Re-check; when it loads, set verified to true.
+    aliases: [Condé Nast, Conde Nast, Bon Appétit, Bon Appetit, Vogue, Condé Nast Traveler, Architectural Digest, The New Yorker, WIRED, GQ]
+
+  - id: hearst
+    name: Hearst (Magazines & Television)
+    group: Magazines & TV
+    city: New York / national
+    ats: oracle
+    ats_token: eevd.fa.us6.oraclecloud.com
+    ats_site: CX_1
+    queries: [""]
+    verified: true
+    careers_url: https://www.hearst.com/careers
+    aliases: [Hearst, Hearst Magazines, Hearst Communications, Hearst Television, Elle, Cosmopolitan, Esquire, Town & Country, Food Network Magazine, Delish]
+
+  - id: people-inc
+    name: People Inc. (People, Food & Wine, Travel + Leisure…)
+    group: Magazines & digital (formerly Dotdash Meredith)
+    city: New York / national
+    ats: workday
+    ats_token: meredith
+    ats_dc: wd5
+    ats_site: EXT
+    verified: true
+    careers_url: https://meredith.wd5.myworkdayjobs.com/EXT
+    aliases: [People Inc., People Inc, Dotdash Meredith, Dotdash, Meredith, Food & Wine, Travel + Leisure, Southern Living, Allrecipes, Serious Eats]
+
+  - id: bdg
+    name: Bustle Digital Group (Bustle, Nylon, Elite Daily…)
+    group: Digital media
+    city: New York
+    ats: lever
+    ats_token: BDG
+    verified: true
+    careers_url: https://jobs.lever.co/BDG
+    aliases: [Bustle Digital Group, BDG, Bustle, Nylon, Elite Daily, The Zoe Report, Inverse, Romper]
+
+  - id: buzzfeed
+    name: BuzzFeed (incl. HuffPost)
+    group: Digital media
+    city: New York / Los Angeles
+    ats: unknown
+    watch: false
+    careers_url: https://www.buzzfeed.com/about/jobs
+    note: Its Greenhouse board was removed (404, 19 Oct 2026). Check the careers page.
+    aliases: [BuzzFeed, BuzzFeed Inc, HuffPost, Tasty]
+
+  - id: business-insider
+    name: Business Insider
+    group: Digital news
+    city: New York
+    ats: greenhouse
+    ats_token: insider
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/insider
+    aliases: [Business Insider, Insider, Insider Inc]
+
+  - id: morning-brew
+    name: Morning Brew
+    group: Newsletters & digital media
+    city: New York
+    ats: lever
+    ats_token: morningbrew
+    verified: true
+    careers_url: https://jobs.lever.co/morningbrew
+    aliases: [Morning Brew, Morning Brew Inc]
+
+  - id: forbes
+    name: Forbes
+    group: Business media
+    city: New York / Jersey City
+    ats: greenhouse
+    ats_token: forbes
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/forbes
+    aliases: [Forbes, Forbes Media]
+
+  - id: semafor
+    name: Semafor
+    group: Digital news
+    city: New York / Washington
+    ats: greenhouse
+    ats_token: semafor
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/semafor
+    aliases: [Semafor]
+
+  - id: nyt
+    name: The New York Times
+    group: Newspaper & digital
+    city: New York
+    ats: greenhouse
+    ats_token: thenewyorktimes
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/thenewyorktimes
+    aliases: [The New York Times, New York Times, The New York Times Company, NYT, Wirecutter, NYT Cooking]
+
+  - id: dow-jones
+    name: Dow Jones (Wall Street Journal, Barron's)
+    group: Business news
+    city: New York
+    ats: workday
+    ats_token: dowjones
+    ats_dc: wd1
+    ats_site: Dow_Jones_Career
+    verified: true
+    careers_url: https://dowjones.wd1.myworkdayjobs.com/Dow_Jones_Career
+    aliases: [Dow Jones, The Wall Street Journal, Wall Street Journal, WSJ, Barron's, Dow Jones & Company]
+
+  - id: red-ventures
+    name: Red Ventures (The Points Guy, Bankrate…)
+    group: Digital media
+    city: Charlotte / New York / remote
+    ats: greenhouse
+    ats_token: redventures
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/redventures
+    aliases: [Red Ventures, The Points Guy, Bankrate, Healthline]
+
+  - id: ad-age
+    name: Ad Age (Crain Communications)
+    group: Marketing-industry media
+    city: New York / Chicago
+    ats: workday
+    ats_token: crain
+    ats_dc: wd1
+    ats_site: Crain_Careers
+    ats_host: https://wd1.myworkdaysite.com
+    verified: true
+    careers_url: https://wd1.myworkdaysite.com/recruiting/crain/Crain_Careers
+    aliases: [Crain Communications, Ad Age, Advertising Age, Crain]
+
+  - id: michelin-guide
+    name: Michelin Guide
+    group: Restaurant & hotel guide
+    city: New York / global
+    ats: workday
+    ats_token: michelinhr
+    ats_dc: wd3
+    ats_site: Michelin
+    queries: [guide, editor, writer, inspector, "social media", content]
+    must_match: 'guide|inspector'
+    verified: true
+    careers_url: https://michelinhr.wd3.myworkdayjobs.com/Michelin
+    aliases: [Michelin Guide, Michelin, MICHELIN Guide]
+
+  - id: opentable
+    name: OpenTable
+    group: Restaurant tech (content & social roles)
+    city: San Francisco / New York
+    ats: greenhouse
+    ats_token: opentable
+    verified: true
+    careers_url: https://job-boards.greenhouse.io/opentable
+    aliases: [OpenTable]
+
+  - id: atlas-obscura
+    name: Atlas Obscura
+    group: Travel media
+    city: New York / remote
+    ats: none
+    careers_url: https://www.atlasobscura.com/jobs
+    aliases: [Atlas Obscura]
+
+  - id: theskimm
+    name: theSkimm (Ziff Davis)
+    group: Newsletters
+    city: New York
+    ats: jobvite
+    careers_url: https://jobs.jobvite.com/everyday-health-consumer/jobs
+    aliases: [theSkimm, The Skimm, Skimm]
+
+  - id: puck
+    name: Puck
+    group: Digital news
+    city: New York / Los Angeles
+    ats: jazzhr
+    careers_url: https://pucknews.applytojob.com
+    aliases: [Puck, Puck News]
+
+  - id: resy
+    name: Resy (American Express)
+    group: Restaurant tech & editorial
+    city: New York / Miami
+    ats: eightfold
+    watch: false
+    careers_url: "https://aexp.eightfold.ai/careers?query=resy&domain=aexp.com"
+    note: On American Express's huge board; this link opens it filtered to Resy.
+    aliases: [Resy]
+
+  - id: bloomberg
+    name: Bloomberg
+    group: Business news
+    city: New York
+    ats: avature
+    watch: false
+    careers_url: https://bloomberg.avature.net/careers/SearchJobs
+    note: Bloomberg's board can't be read automatically; search "editorial" there.
+    aliases: [Bloomberg, Bloomberg LP, Bloomberg Media]
+
+  - id: digiday
+    name: Digiday
+    group: Marketing-industry media
+    city: New York
+    ats: none
+    careers_url: https://careers.digiday.com
+    aliases: [Digiday, Digiday Media]
+
+  - id: static-media
+    name: Static Media (Tasting Table, Mashed, The List…)
+    group: Digital media
+    city: Remote
+    ats: none
+    watch: false
+    note: Mostly freelance writer roles, posted on Mediabistro / Indeed.
+    aliases: [Static Media, Tasting Table, Mashed, The List]
+
+  - id: cultured
+    name: Cultured Magazine
+    group: Art & culture magazine
+    city: Miami / New York
+    ats: none
+    watch: false
+    aliases: [Cultured, Cultured Magazine]

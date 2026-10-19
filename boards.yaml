@@ -1,0 +1,51 @@
+# The "More places to look" page: job sites the radar must not read automatically
+# (their terms forbid it), as one-click searches, plus the email alerts and
+# newsletters worth subscribing to. Edit freely; the dashboard shows this list
+# as it is. `kind`: search = a saved search to open; alert = subscribe once and
+# the site emails Ari; newsletter = a curated jobs newsletter.
+
+boards:
+  - name: LinkedIn — editorial, Miami, past week
+    kind: search
+    url: "https://www.linkedin.com/jobs/search/?keywords=editorial%20OR%20editor%20OR%20writer%20OR%20reporter&location=Miami%2C%20Florida%2C%20United%20States&f_TPR=r604800&f_E=2%2C3"
+    why: Most media and agency jobs in Miami are posted here first. Entry level + associate, last 7 days.
+  - name: LinkedIn — social media & content, Miami, past week
+    kind: search
+    url: "https://www.linkedin.com/jobs/search/?keywords=social%20media%20OR%20content%20creator%20OR%20copywriter&location=Miami%2C%20Florida%2C%20United%20States&f_TPR=r604800&f_E=2%2C3"
+    why: Same, for the social / content / copywriting side.
+  - name: LinkedIn — editorial, New York, past week
+    kind: search
+    url: "https://www.linkedin.com/jobs/search/?keywords=editorial%20assistant%20OR%20associate%20editor%20OR%20staff%20writer&location=New%20York%2C%20New%20York%2C%20United%20States&f_TPR=r604800&f_E=2%2C3"
+    why: NYC is where most national publications hire.
+  - name: Indeed — editor / writer, Miami, past week
+    kind: search
+    url: "https://www.indeed.com/jobs?q=editor+OR+writer+OR+reporter+OR+%22editorial+coordinator%22&l=Miami%2C+FL&fromage=7"
+    why: Catches small local employers that never use LinkedIn.
+  - name: Indeed — social media / content, Miami, past week
+    kind: search
+    url: "https://www.indeed.com/jobs?q=%22social+media%22+OR+%22content+creator%22+OR+copywriter&l=Miami%2C+FL&fromage=7"
+    why: Same, for social / content.
+  - name: JournalismJobs.com
+    kind: alert
+    url: "https://www.journalismjobs.com/job-notifications"
+    why: The biggest newsroom job board. Free daily email alert (needs an account).
+  - name: Mediabistro
+    kind: alert
+    url: "https://www.mediabistro.com/jobs/"
+    why: Media, content and social jobs; create a free account and save a search for Miami + New York.
+  - name: ONA job board (Online News Association)
+    kind: alert
+    url: "https://journalists.org/jobs"
+    why: Digital newsroom jobs and early-career fellowships; set up the email alert.
+  - name: NAHJ Career Center
+    kind: alert
+    url: "https://nahjcareers.org"
+    why: National Association of Hispanic Journalists — strong for Miami / Spanish-language media. (The radar also tries to read its feed.)
+  - name: Poynter media jobs
+    kind: search
+    url: "https://www.poynter.org/media-jobs/"
+    why: Newsroom roles across the US.
+  - name: "Journalism jobs and a photo of my dog (newsletter)"
+    kind: newsletter
+    url: "https://journojobs.substack.com"
+    why: Free weekly round-up of media jobs (NYT, The Atlantic, Bloomberg...). Subscribe with the email.

@@ -1,0 +1,227 @@
+# Ari's Job Radar — what counts as a relevant job, and where alerts go.
+#
+# Everything a non-programmer would want to change lives in this file and in
+# employers.yaml. Edit on github.com (pencil icon) and commit: the next scheduled
+# run picks it up. No code changes needed.
+
+owner:
+  name: Ari
+  timezone: America/New_York
+
+crawl:
+  user_agent: "ari-job-radar/1.0 (personal job-search monitor; one request per second)"
+  requests_per_second: 1.0
+  timeout_seconds: 25
+  # A posting that disappears from a board that was read successfully is marked
+  # closed. Closed postings stay visible on the dashboard this many days.
+  keep_closed_days: 30
+  # Postings that are not relevant are remembered (so a later rule change does
+  # not re-announce them as new) but forgotten after this many days unseen.
+  forget_irrelevant_after_days: 45
+
+# ---------------------------------------------------------------------------
+# Locations. Each posting's location text is sorted into one bucket.
+# The first bucket that matches wins, so order matters.
+# ---------------------------------------------------------------------------
+locations:
+  buckets:
+    - id: MIAMI
+      label: Miami & South Florida
+      match: ["miami", "miami beach", "coral gables", "doral", "brickell", "wynwood",
+              "fort lauderdale", "ft. lauderdale", "ft lauderdale", "hollywood, fl",
+              "boca raton", "aventura", "key biscayne", "south florida", "west palm",
+              "palm beach", "hialeah", "coconut grove", "sunny isles", "bal harbour"]
+    - id: NYC
+      label: New York
+      match: ["new york", "nyc", "manhattan", "brooklyn", "queens", "jersey city", "hoboken"]
+    - id: REMOTE
+      label: Remote
+      match: ["remote", "anywhere", "work from home", "wfh", "distributed", "virtual"]
+    - id: FLORIDA
+      label: Elsewhere in Florida
+      match: [", fl", "florida", "orlando", "tampa", "jacksonville", "st. petersburg"]
+  # Locations that mark a job as outside the US. Such a job is dropped only when
+  # it names a foreign place AND carries no US marker ("London or New York" is
+  # kept). Unknown / blank locations are always kept.
+  foreign: ["london", "united kingdom", " uk", "england", "manchester", "edinburgh", "dublin",
+            "ireland", "paris", "france", "berlin", "germany", "madrid", "barcelona", "spain",
+            "milan", "rome", "italy", "amsterdam", "netherlands", "toronto", "vancouver",
+            "montreal", "canada", "mexico", "bogot", "colombia", "buenos aires", "argentina",
+            "são paulo", "sao paulo", "brazil", "sydney", "melbourne", "australia",
+            "singapore", "hong kong", "tokyo", "japan", "india", "bangalore", "bengaluru",
+            "mumbai", "delhi", "dubai", "uae", "tel aviv", "israel", "manila", "philippines",
+            "lisbon", "portugal", "warsaw", "poland", "stockholm", "copenhagen", "zurich",
+            "emea", "apac", "latam", "europe", "middle east", "gulf region", "asia", "africa", "santiago", "chile", "lima", "peru", "rio de janeiro", "mexico city", "prague", "casablanca", "morocco", "brussels", "belgium", "rotterdam", "lisboa", "vienna", "austria", "athens", "greece", "istanbul", "turkey", "cairo", "riyadh", "doha", "qatar", "abu dhabi", "taipei", "taiwan", "korea", "bangkok", "thailand", "vietnam", "hanoi", "ho chi minh", "nigeria", "kenya", "south africa", "johannesburg", "medellín", "medellin", "guadalajara", "monterrey", "são paulo", "lagos", "nairobi", "cape town", "seoul",
+            "shanghai", "beijing", "kuala lumpur", "jakarta", "auckland", "belfast", "glasgow"]
+  us_markers: ["united states", "usa", "u.s.", " us", "us-", "(us)", "remote - us",
+               ", ny", ", fl", ", ca", ", il", ", tx", ", ma", ", dc", ", ga", ", wa", ", nj",
+               "new york", "miami", "los angeles", "chicago", "washington", "atlanta",
+               "boston", "austin", "san francisco", "nationwide",
+               "alabama", "alaska", "arizona", "arkansas", "california", "colorado", "connecticut", "delaware",
+               "georgia", "hawaii", "idaho", "illinois", "indiana", "iowa", "kansas", "kentucky", "louisiana",
+               "maine", "maryland", "massachusetts", "michigan", "minnesota", "mississippi", "missouri",
+               "montana", "nebraska", "nevada", "new hampshire", "new jersey", "new mexico", "north carolina",
+               "north dakota", "ohio", "oklahoma", "oregon", "pennsylvania", "rhode island", "south carolina",
+               "south dakota", "tennessee", "texas", "utah", "vermont", "virginia", "west virginia", "wisconsin",
+               "wyoming", "puerto rico"]
+  # Buckets that appear on the dashboard by default. OTHER_US = any other US city.
+  show: [MIAMI, NYC, REMOTE, FLORIDA, OTHER_US, UNKNOWN]
+  # Buckets that trigger an email.
+  email: [MIAMI, NYC, REMOTE, UNKNOWN]
+
+# ---------------------------------------------------------------------------
+# Role families. Matched against the job TITLE (case-insensitive regex).
+# tier "core" = what Ari wants most; "also" = acceptable (she said social /
+# marketing / PR / copywriting "works too").
+# ---------------------------------------------------------------------------
+roles:
+  families:
+    - id: editorial
+      label: Writing & editing
+      tier: core
+      patterns:
+        - '\beditor(s|ial)?\b'
+        - '\bcopy ?edit'
+        - '\b(staff|content|freelance|food|travel|lifestyle|features?|news|newsletter|seo|commerce|shopping|entertainment|culture|beauty|fashion|style|real estate|dining|restaurant)?\s?writer\b'
+        - '\breporter\b'
+        - '\bjournalis[tm]'
+        - '\bcorrespondent\b'
+        - '\bfact[- ]?check'
+        - '\b(editorial|news|research) (assistant|associate|coordinator|fellow|researcher)\b'
+        - '\b(associate|digital|news|segment|social|web|podcast|audience|editorial) producer\b'
+        - '\baudience (editor|associate|growth|development|engagement)\b'
+        - '\bnewsletter\b'
+        - '\b(story|copy|news|content) desk\b'
+        - '\b(editorial|reporting|journalism|news|newsroom|writing|audience|video|content|fact[- ]checking|investigative|investigations?|photo|production) fellow(ship)?s?\b'
+        - '^(forbes|axios|semafor|vox|nyt|times|bloomberg|reuters|propublica|insider)\b.*\bfellowship\b'
+        - '\bfellow(ship)?s?\b.*\b(editorial|journalism|reporting|news|newsroom|media)\b'
+    - id: content
+      label: Content creation
+      tier: core
+      patterns:
+        - '\bcontent (creator|producer|writer|strategist|coordinator|associate|specialist|lead|editor|manager|marketing|marketer)\b'
+        - '\bcreator\b'
+        - '\bvideo (producer|creator|journalist)\b'
+        - '\bstoryteller|\bstorytelling\b'
+        - '\bscript ?writer|\bscriptwriter\b'
+    - id: social
+      label: Social media
+      tier: also
+      patterns:
+        - '\bsocial (media|content|strategist|editor|producer|coordinator|manager|specialist|lead|associate)\b'
+        - '\bcommunity (manager|coordinator|associate)\b'
+        - '\b(tiktok|instagram|youtube)\b'
+        - '\binfluencer\b'
+    - id: pr_comms
+      label: PR & communications
+      tier: also
+      patterns:
+        - '\bpublic relations\b|\bpr (coordinator|associate|assistant|specialist|manager|account)\b'
+        - '\bpublicist\b'
+        - '\bcommunications? (coordinator|associate|assistant|specialist|manager|lead)\b'
+        - '\bmedia relations\b|\bpress (officer|assistant|associate)\b'
+    - id: marketing_copy
+      label: Marketing & copywriting
+      tier: also
+      patterns:
+        - '\bcopy ?writer|\bcopywriting\b'
+        - '\bmarketing (coordinator|associate|assistant|specialist)\b'
+        - '\bbrand (coordinator|associate|assistant|specialist|marketing)\b'
+        - '\bevents?( operations| marketing| programming| content)? (coordinator|associate|assistant|producer)\b'
+        - '\bpartnerships? (coordinator|associate|assistant)\b'
+  # Titles matching any of these are never relevant, even if a family matched.
+  exclude:
+    - '\b(software|data|machine learning|ml|backend|frontend|full[- ]?stack|devops|site reliability|security|platform|qa|test) (engineer|developer|scientist|analyst)\b'
+    - '\bengineer(ing)?\b'
+    - '\btechnical writer\b|\bdocumentation\b'
+    - '\b(medical|grant|proposal|clinical|regulatory|legal|rfp) writer\b'
+    - '\b(ad|advertising|media|account|inside|outside|field) sales\b|\bsales (representative|executive|manager|director|associate)\b'
+    - '\baccount executive\b(?!.*\b(pr|public relations)\b)'
+    - '\bmedia buyer\b|\bprogrammatic\b'
+    - '\b(finance|financial) (manager|analyst|director|associate|specialist|planning|operations)\b|\baccountant\b|\baccounting\b|\baccounts (payable|receivable)\b|\bpayroll\b|\bhr\b|\bhuman resources\b|\brecruit(er|ing)\b|\btalent acquisition\b'
+    - '\bpaid (social|search|media)\b|\bperformance marketing\b|\bgrowth marketing\b|\bsales associate\b|\bmerchandiser\b'
+    - '\bdriver\b|\bwarehouse\b|\bcashier\b|\bline cook\b|\bdishwasher\b|\bserver\b|\bbartender\b|\bhost(ess)?\b'
+    - '\bnurse\b|\bphysician\b|\btherapist\b'
+
+# ---------------------------------------------------------------------------
+# Seniority, read from the title (and "X+ years" in the description when the
+# board provides one).
+# ---------------------------------------------------------------------------
+seniority:
+  entry_markers: '\b(assistant|coordinator|associate|junior|jr\.?|entry[- ]level|fellow(ship)?|apprentice|trainee|intern(ship)?|i)\b|\bgraduate\b|\bearly career\b'
+  senior_markers: '\b(senior|sr\.?|lead|principal|director|head|chief|vp|vice president|executive (editor|producer)|managing editor|deputy|editor[- ]in[- ]chief|editor at large|iii|iv|supervis(or|ing)|manager)\b'
+  # Show senior titles at all? false = drop them (they are not what she can get yet).
+  keep_senior: false
+  # "Manager" titles (social media manager, content manager) are often 2–4 years.
+  # true = treat "... Manager" as mid-level instead of senior.
+  manager_is_mid: true
+  # Internships: true keeps them (flagged), false drops them.
+  keep_internships: false
+  # Hide a posting whose description asks for at least this many years.
+  max_years_required: 5
+
+# ---------------------------------------------------------------------------
+# Email digest. Sent after a crawl that found something new and relevant.
+# ---------------------------------------------------------------------------
+alerts:
+  enabled: true
+  # Which role tiers to email: core, also
+  tiers: [core, also]
+  max_per_email: 40
+  # Include "careers page changed" notices for employers with no readable board.
+  include_page_changes: true
+  subject_prefix: "[Job Radar]"
+
+# ---------------------------------------------------------------------------
+# Aggregate sources: job-search APIs and feeds that cover many employers at
+# once (this is how small Miami employers with no job board get caught).
+# A source whose key is missing is skipped silently. min_hours_between keeps
+# rate-limited sources to one call a day.
+#
+# Deliberately NOT here: LinkedIn, Indeed, JournalismJobs, Mediabistro. Their
+# terms forbid automated reading. They are on the dashboard's "Check by hand"
+# page as one-click searches, and Ari subscribes to their own email alerts.
+# ---------------------------------------------------------------------------
+aggregators:
+  adzuna:
+    # Free key (developer.adzuna.com): 250 calls/day, 2,500/month. Secrets:
+    # ADZUNA_APP_ID, ADZUNA_APP_KEY. Each run uses len(where) x pages calls.
+    enabled: true
+    where: ["Miami, FL", "New York, NY"]
+    distance_km: 40
+    # Any of these words (title or description); classify.py then keeps only
+    # matching titles.
+    what_or: "editor editorial writer reporter journalist copywriter publicist content social producer"
+    max_days_old: 10
+    pages: 3
+    min_hours_between: 5
+  jsearch:
+    # Google for Jobs via RapidAPI — the only terms-compliant way to see jobs
+    # posted on LinkedIn / Indeed. Free plan = 200 calls/month, so: once a day,
+    # one call per query (3 x 30 = 90/month). Secret: JSEARCH_RAPIDAPI_KEY.
+    enabled: true
+    queries:
+      - "editorial assistant OR editorial coordinator OR staff writer OR reporter in Miami, FL"
+      - "social media coordinator OR content creator OR copywriter OR PR coordinator in Miami, FL"
+      - "editorial assistant OR associate editor OR staff writer OR editorial coordinator in New York, NY"
+    date_posted: 3days
+    min_hours_between: 20
+  remotive:
+    # Remote-only. Their limit is ~4 calls a day, so once a day.
+    enabled: true
+    categories: ["writing", "marketing"]
+    min_hours_between: 20
+  rss:
+    enabled: true
+    feeds:
+      - id: wwr_marketing
+        name: We Work Remotely (marketing)
+        url: https://weworkremotely.com/categories/remote-sales-and-marketing-jobs.rss
+        default_location: Remote
+        title_format: "company: title"
+      - id: nahj
+        name: NAHJ Career Center
+        url: https://nahjcareers.org/listing-feeds/?feedId=10
+        default_location: ""
+        title_format: "title"
+    min_hours_between: 5
