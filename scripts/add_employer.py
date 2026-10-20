@@ -13,8 +13,8 @@ trust). A board that doesn't answer, or any other URL, is added as a careers
 page to watch for changes. `--no-check` skips the call and writes
 verified: false; flip it by hand once you've seen the board load.
 
-The same function runs in GitHub Actions when Ari uses the dashboard's "Add a
-company" button (scripts/handle_request.py), so every rule about what gets
+The same function runs inside the crawl when Ari uses the dashboard's "Add a
+company" button (src/inbox.py reads her note), so every rule about what gets
 written lives here, once:
 
   * the row is appended as text (never `yaml.safe_dump`: that would strip the
@@ -124,10 +124,17 @@ def _board_answers(row: dict) -> bool:
         return False
 
 
+INBOX_HEADER = ("# Companies added from the dashboard. src/inbox.py writes this file and the\n"
+                "# crawl reads it together with employers.yaml; edit employers.yaml for the rest.\n"
+                "employers:\n")
+
+
 def add_employer(name: str, url: str | None = None, *, target: bool = False,
-                 linkedin_url: str | None = None, note: str | None = None,
-                 path: str | None = None, check: bool = True) -> dict:
-    """Append (or complete) an employer row. Returns
+                 linkedin_url: str | None = None, note: str | None = None, inbox_id: str | None = None,
+                 path: str | None = None, known: list[dict] | None = None, check: bool = True) -> dict:
+    """Append (or complete) an employer row in `path`. `known` are rows kept
+    elsewhere (employers.yaml, when writing the inbox file): checked for
+    duplicates, never written. Returns
     {id, created, mode: read|watch|manual, ats, updated: [field, ...], message}."""
     path = path or employers_path()
     name = " ".join((name or "").split())
@@ -142,13 +149,18 @@ def add_employer(name: str, url: str | None = None, *, target: bool = False,
     if linkedin_url and not _LINKEDIN.match(linkedin_url):
         raise ValueError("The LinkedIn link should look like https://www.linkedin.com/company/<name>/")
 
-    text = open(path, encoding="utf-8").read()
+    text = open(path, encoding="utf-8").read() if os.path.exists(path) else INBOX_HEADER
     rows = (yaml.safe_load(text) or {}).get("employers") or []
     eid = slug(name) or "employer"
     d = detect_from_url(url) if url else {"ats": "none"}
 
     # --- already on the list: complete the row, never duplicate it ---------------
     ex = _find_existing(rows, eid, name, url, d)
+    if not ex and known:
+        other = _find_existing(list(known), eid, name, url, d)
+        if other:            # kept by hand elsewhere: nothing to write
+            return {"id": other["id"], "created": False, "mode": _mode(other), "ats": other.get("ats"),
+                    "updated": [], "message": f"{other['name']} is already on the list."}
     if ex:
         span = _row_span(text, ex["id"])
         updated = []
@@ -165,13 +177,20 @@ def add_employer(name: str, url: str | None = None, *, target: bool = False,
                 else:
                     add.append("    target: true")
                 updated.append("target")
+            if inbox_id and ex.get("inbox_id") != inbox_id:
+                # The note's id lets the dashboard show "In the radar" for her own entry.
+                if re.search(r"^    inbox_id:", block, re.M):
+                    block = re.sub(r"^    inbox_id:.*$", f"    inbox_id: {_q(inbox_id)}", block, count=1, flags=re.M)
+                else:
+                    add.append(f"    inbox_id: {_q(inbox_id)}")
+                updated.append("inbox_id")
             if add:
                 block = block[:id_end - start] + "\n" + "\n".join(add) + block[id_end - start:]
             if updated:
                 text = text[:start] + block + text[end:]
                 with open(path, "w", encoding="utf-8") as f:
                     f.write(text)
-        what = " and ".join(updated)
+        what = " and ".join(u for u in updated if u != "inbox_id")
         wanted = (linkedin_url and not ex.get("linkedin_url")) or (target and not ex.get("target"))
         if wanted and not span:
             # The row exists but its `- id:` line isn't where the editor expects
@@ -220,12 +239,16 @@ def add_employer(name: str, url: str | None = None, *, target: bool = False,
     if linkedin_url:
         lines.append(f"    linkedin_url: {_q(linkedin_url)}")
         row["linkedin_url"] = linkedin_url
+    if inbox_id:
+        lines.append(f"    inbox_id: {_q(inbox_id)}")
+        row["inbox_id"] = inbox_id
     if note:
         lines.append(f"    note: {_q(note)}")
     lines += [f"    aliases: [{_q(name)}]", ""]
 
     if not text.endswith("\n"):
         text += "\n"
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(text + "\n".join(lines))
     return {"id": eid, "created": True, "mode": _mode(row), "ats": d["ats"], "updated": [],

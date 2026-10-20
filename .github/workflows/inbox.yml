@@ -1,0 +1,48 @@
+name: inbox
+
+# Every 15 minutes: is there a note in the dashboard's inbox (the ntfy.sh
+# topic in config.yaml) newer than the last crawl? Then start a crawl now
+# instead of waiting for the next scheduled one. The crawl itself reads and
+# acts on the notes (src/inbox.py); this only decides whether to hurry.
+# Public repos get Actions minutes for free; a run here takes ~10 seconds.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: inbox
+  cancel-in-progress: true
+
+jobs:
+  look:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: config.yaml
+          sparse-checkout-cone-mode: false
+      - name: Start a crawl if a note is waiting
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          topic=$(grep -E '^\s*ntfy_topic:' config.yaml | head -1 | awk '{print $2}' | tr -d '"'"'")
+          server=$(grep -E '^\s*server:' config.yaml | head -1 | awk '{print $2}' | tr -d '"'"'")
+          [ -n "$topic" ] || { echo "no inbox configured"; exit 0; }
+          url="${server:-https://ntfy.sh}/$topic"
+          # Notes older than the newest real crawl are that crawl's business (it
+          # reads the inbox first thing); a queued crawl will read newer ones too.
+          # Push-triggered runs only re-export the dashboard and never read the inbox.
+          read -r last_at status <<< "$(gh run list -R "$GITHUB_REPOSITORY" --workflow radar.yml --limit 15 --json createdAt,status,event -q '[.[] | select(.event == "schedule" or .event == "workflow_dispatch")][0] | "\(.createdAt) \(.status)"')"
+          since=$(date -u -d "${last_at:-1970-01-01T00:00:00Z}" +%s)
+          n=$(curl -sf --max-time 20 "$url/json?poll=1&since=$since" | grep -c '"event":"message"' || true)
+          echo "notes since the last crawl (${last_at:-never}, $status): $n"
+          case "$status" in queued|waiting|pending|requested) echo "a crawl is already queued"; exit 0;; esac
+          if [ "${n:-0}" -gt 0 ]; then
+            gh workflow run radar.yml --ref main -R "$GITHUB_REPOSITORY" && echo "crawl started"
+          fi

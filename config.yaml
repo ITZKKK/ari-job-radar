@@ -257,17 +257,22 @@ aggregators:
     min_hours_between: 5
 
 # ---------------------------------------------------------------------------
-# The GitHub repo the radar lives in. Two buttons on the dashboard open issue
-# forms here ("Add a company", "Check for new jobs now"); the `requests`
-# workflow acts on them. Only the GitHub usernames below may use them (anyone
-# else gets a polite "ask Itz" reply). Case does not matter. To let Ari use the
-# buttons: she makes a free GitHub account and her username goes on this list.
+# The GitHub repo the radar lives in.
 # ---------------------------------------------------------------------------
 github:
+  # Only for the dashboard's address in emails when SITE_URL isn't set.
   repo: ITZKKK/ari-job-radar
-  allowed_users: [ITZKKK]
-  # Optional. The address of the relay (relay/worker.js on Cloudflare) that
-  # lets Ari add companies and start a crawl from the dashboard WITHOUT a
-  # GitHub account: the page posts to it with a passcode and it opens the
-  # issue on her behalf. Empty = the buttons use GitHub issue forms instead.
-  relay_url: ""
+
+# ---------------------------------------------------------------------------
+# The dashboard's inbox. "Add a company" and "Check for new jobs now" on the
+# page drop a signed note into this topic on ntfy.sh (a free public message
+# relay, no account needed). Every crawl reads it first, and
+# .github/workflows/inbox.yml looks every 15 minutes and starts a crawl early
+# when a note is waiting. Notes are signed with the passcode in the repo
+# secret RADAR_PASSCODE (the one Ari types once on the page), so knowing the
+# topic name is not enough. To rotate: change the topic and/or the secret,
+# and give Ari the new passcode.
+# ---------------------------------------------------------------------------
+inbox:
+  server: https://ntfy.sh
+  ntfy_topic: ari-job-radar-dbda73628b94bb13124e

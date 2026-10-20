@@ -43,6 +43,7 @@ jobs:
           ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
           ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
           JSEARCH_RAPIDAPI_KEY: ${{ secrets.JSEARCH_RAPIDAPI_KEY }}
+          RADAR_PASSCODE: ${{ secrets.RADAR_PASSCODE }}
         run: python src/crawl.py
 
       - name: Refresh dashboard data only (config or page edited)
@@ -71,7 +72,7 @@ jobs:
         run: |
           git config user.name  "job-radar"
           git config user.email "actions@github.com"
-          git add data/
+          git add data/                      # incl. data/inbox_employers.yaml, written from the dashboard's inbox
           if git diff --staged --quiet; then echo "no changes"; exit 0; fi
           git commit -m "radar $(date -u +%FT%TZ)"
           for i in 1 2 3; do git pull --rebase -X ours && git push && break; sleep 5; done

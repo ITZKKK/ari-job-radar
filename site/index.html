@@ -245,7 +245,7 @@ const MIAMI_PLACES = ["Miami Beach", "Coral Gables", "Doral", "Fort Lauderdale",
 let DATA = null;
 const me = load();
 me.jobs = me.jobs || {};
-me.companies = me.companies || {};   // companies she added herself (kept on this device; also sent to the radar when a relay exists)
+me.companies = me.companies || {};   // companies she added herself (kept on this device; also sent to the radar's inbox)
 Object.values(me.companies).forEach(c => delete c.sending);   // a send cut off by a closed tab must not look "in progress" forever
 const lastVisit = me.lastVisit || null;
 const view = { tab: me.tab || "home", q: "", locOff: new Set(me.locOff || []), famOff: new Set(me.famOff || []),
@@ -328,22 +328,42 @@ const hash = s => { let h = 5381; for (const c of s) h = ((h * 33) ^ c.charCodeA
 const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
 const showErr = (form, msg) => { const e = form.querySelector("[data-err]"); if (e) { e.textContent = msg || ""; e.hidden = !msg; } };
 
-/* ---- Talking to the radar without GitHub: an optional relay ----------------
-   When config.yaml names a relay (a tiny Cloudflare Worker, see relay/), the
-   page POSTs requests there with a passcode and the worker opens the GitHub
-   issue on her behalf. Without one, companies stay on this device. */
-async function relay(payload) {
-  let r;
-  try {
-    r = await fetch(DATA.requests.relay_url, { method: "POST", headers: { "content-type": "application/json" },
-                                                body: JSON.stringify({ ...payload, passcode: me.passcode || "" }) });
-  } catch (e) { throw new Error("couldn’t connect — check your internet and try again"); }
-  let d = {}; try { d = await r.json(); } catch (e) { /* no body */ }
-  if (r.status === 401) { delete me.passcode; save(); throw new Error("the passcode wasn’t accepted — try again and type it carefully"); }
-  if (!r.ok || !d.ok) throw new Error(d.error || `no answer (${r.status})`);
-  return d;
+/* ---- The radar's inbox: how the page reaches the crawler without GitHub ----
+   A note goes to a topic on ntfy.sh (free, no account); every crawl reads it
+   and a poller hurries one along within ~15 minutes. Notes are signed with
+   her passcode (HMAC), so the passcode never leaves this device and nobody
+   who finds the topic can add companies. Mirrors src/inbox.py exactly. */
+const hasInbox = () => !!(DATA.inbox && DATA.inbox.url && window.crypto?.subtle);
+const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+const squash = s => String(s ?? "").split(/\s+/).filter(Boolean).join(" ");
+async function signNote(n) {
+  if (!me.passcode) throw new Error("the passcode is missing");
+  const canon = ["1", n.kind, n.id, n.at, n.company, n.website, n.careers, n.linkedin].map(squash).concat([n.target ? "1" : "0"]).join("\n");
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(me.passcode), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return hex(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(canon)));
 }
-const hasRelay = () => !!DATA.requests?.relay_url;
+const noteId = () => crypto.randomUUID ? crypto.randomUUID().replace(/-/g, "") : hash(String(Math.random())) + hash(String(Date.now()));
+async function sendNote(n) {
+  // No notes field: the topic and the repo are public, and her notes are hers.
+  const note = { v: 1, kind: n.kind, id: n.id || noteId(), at: n.at || new Date().toISOString(), company: n.company || "",
+                 website: n.website || "", careers: n.careers || "", linkedin: n.linkedin || "", target: !!n.target };
+  note.sig = await signNote(note);
+  let r;
+  try { r = await fetch(DATA.inbox.url, { method: "POST", body: JSON.stringify(note) }); }   // a text body: no preflight
+  catch (e) { throw new Error("couldn’t connect — check your internet and try again"); }
+  if (!r.ok) throw new Error(`the inbox didn’t take it (${r.status})`);
+  return note;
+}
+const nameKey = s => nice(s).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+// Is a company she added one the radar now watches? By her note's id, the row's id, or its name / aliases.
+function inRadar(c) {
+  const k = nameKey(c.name), id = slugify(c.name);
+  return DATA.employers.find(e => (c.msg_id && e.inbox_id === c.msg_id) || e.id === id ||
+                                  [e.name, ...(e.aliases || [])].some(n => nameKey(n) === k)) || null;
+}
+// What the crawl reported back about her note: acted on, or refused and why.
+const radarSaw = c => !!(c.msg_id && (DATA.inbox?.done || []).includes(c.msg_id));
+const refusedWhy = c => (c.msg_id && DATA.inbox?.rejected?.[c.msg_id]) || "";
 
 /* ---- Boot ---------------------------------------------------------------- */
 async function boot() {
@@ -359,8 +379,12 @@ async function boot() {
   // The radar file may be a few minutes older than this page: every new key is optional.
   DATA.work_modes ??= DEFAULT_WORK_MODES;
   DATA.fits ??= DEFAULT_FITS;
-  DATA.requests ??= deriveRequests();
+  DATA.inbox ??= null;
   DATA.totals ??= null;
+  // Companies saved by an earlier version of this page kept the jobs page as `url`.
+  Object.values(me.companies).forEach(c => { if (c.url && !c.careers) { c.careers = c.url; delete c.url; } });
+  // The radar refused a note of hers for its signature: the passcode was mistyped, so ask again.
+  if (Object.values(me.companies).some(c => refusedWhy(c) === "signature")) delete me.passcode;
   // Forget filters for places or kinds that no longer exist in the file.
   const keep = (set, ids) => new Set([...set].filter(id => ids.includes(id)));
   view.locOff = keep(view.locOff, DATA.locations.map(l => l.id));
@@ -375,41 +399,25 @@ async function boot() {
   greet(name);
   render();
   me.lastVisit = new Date().toISOString(); save();
+  resendPending();
 }
 
-// On GitHub Pages the repo is known from the address: user.github.io/repo/ -> github.com/user/repo
-function deriveRequests() {
-  const m = /^([^.]+)\.github\.io$/i.exec(location.hostname), repo = location.pathname.split("/").filter(Boolean)[0];
-  if (!m || !repo) return null;
-  const base = `https://github.com/${m[1]}/${repo}`;
-  return { repo_url: base, add_company_url: `${base}/issues/new?template=add-company.yml`,
-           refresh_url: `${base}/issues/new?template=refresh.md`, actions_url: `${base}/actions/workflows/radar.yml` };
-}
 function refreshLinks() {
-  const rq = DATA.requests || {}, a = document.getElementById("refresh"), note = document.getElementById("refreshnote");
-  if (rq.relay_url) {
-    // No GitHub needed: the relay starts the crawl.
-    a.href = "#"; a.removeAttribute("target"); a.hidden = false;
-    a.onclick = async e => {
-      e.preventDefault();
-      if (!me.passcode) {
-        const c = window.prompt("The radar’s passcode (Itz gave you this):");
-        if (!c || !c.trim()) return;
-        me.passcode = c.trim(); save();
-      }
-      foot("Asking the radar to check now…");
-      try { await relay({ kind: "refresh" }); foot("On it — the radar is checking now. Come back in about 5 minutes and reload."); }
-      catch (err) { foot(`Couldn’t reach the radar: ${err.message}.`); }
-    };
-    note.textContent = "“Check for new jobs now” starts a fresh search right away; it takes about 5 minutes.";
-    note.hidden = false;
-    return;
-  }
-  if (!rq.refresh_url) return;
-  a.href = rq.refresh_url; a.hidden = false;
-  a.onclick = () => { document.getElementById("foot").textContent = "GitHub is opening in a new tab — tap the green “Create” button there, then come back in about 5 minutes."; };
-  note.innerHTML = `“Check for new jobs now” takes about 5 minutes and asks you to sign in to GitHub.` +
-    (rq.actions_url ? ` You can watch it work on the <a href="${esc(rq.actions_url)}" target="_blank" rel="noopener">Actions page</a>.` : "");
+  const a = document.getElementById("refresh"), note = document.getElementById("refreshnote");
+  if (!hasInbox()) return;              // no inbox, no way to ask: the button stays hidden
+  a.href = "#"; a.removeAttribute("target"); a.hidden = false;
+  a.onclick = async e => {
+    e.preventDefault();
+    if (!me.passcode) {
+      const c = window.prompt("The radar’s passcode (Itz gave you this):");
+      if (!c || !c.trim()) return;
+      me.passcode = c.trim(); save();
+    }
+    foot("Asking the radar to check now…");
+    try { await sendNote({ kind: "refresh" }); foot("Asked. The radar usually starts within 15 minutes and takes 2 more — reload after that."); }
+    catch (err) { foot(`Couldn’t reach the radar: ${err.message}.`); }
+  };
+  note.textContent = "“Check for new jobs now” asks the radar for a fresh search; it usually starts within 15 minutes.";
   note.hidden = false;
 }
 
@@ -605,66 +613,90 @@ function trackedHTML(kind) {
   return `<section class="block">${head}${form}${body}</section>`;
 }
 
-/* Companies she adds herself: kept here with quick links; also sent to the
-   radar (which then watches their page) when a relay is configured. */
+/* Companies she adds herself: kept here with quick links, and sent to the
+   radar's inbox so it starts watching their jobs page. */
 function companyFormHTML() {
-  const needCode = hasRelay() && !me.passcode;
+  const needCode = hasInbox() && !me.passcode;
   return `<form class="panel addform" id="coform" autocomplete="off">
     <label class="f">Company name <input type="text" name="name" required maxlength="80" placeholder="World Red Eye"></label>
     <div class="two">
-      <label class="f">Website or careers page <input type="url" name="url" inputmode="url" placeholder="https://worldredeye.com"></label>
+      <label class="f">Website <input type="url" name="website" inputmode="url" placeholder="https://worldredeye.com"></label>
+      <label class="f">Jobs or application page <input type="url" name="careers" inputmode="url" placeholder="https://worldredeye.com/careers"></label>
+    </div>
+    <div class="two">
       <label class="f">LinkedIn page <input type="url" name="linkedin" inputmode="url" placeholder="https://www.linkedin.com/company/world-red-eye/"></label>
+      <label class="f">Notes (stay on this device) <input type="text" name="note" maxlength="200" placeholder="Who you know there, what they post…"></label>
     </div>
     <label class="entry-only"><input type="checkbox" name="target"> <span>One of my picks (give it a ★)</span></label>
     ${needCode ? `<label class="f">Radar passcode <input type="text" name="passcode" required placeholder="Itz gave you this"></label>` : ""}
-    <p class="cap">${hasRelay() ? "The radar will start checking this company’s page on its next run."
-                                : "Kept on this device, with its jobs page and LinkedIn one tap away."}</p>
+    <p class="cap">${hasInbox() ? "The radar starts checking its jobs page within about 15 minutes." : "Kept on this device, with its pages one tap away."}</p>
     <div class="err" data-err hidden></div>
     <div class="acts"><button class="act primary" type="submit">Add company</button><button class="act" type="button" data-cancel>Cancel</button></div>
   </form>`;
 }
 function submitCompany(fd) {
   const get = k => String(fd.get(k) || "").trim();
-  const name = get("name"), url = get("url"), linkedin = get("linkedin"), target = !!fd.get("target"), code = get("passcode");
+  const name = get("name"), website = get("website"), careers = get("careers"), linkedin = get("linkedin"), note = get("note"),
+        target = !!fd.get("target"), code = get("passcode");
   if (!name) return "Give it a name.";
-  if (url && !/^https?:\/\//i.test(url)) return "The website should start with http:// or https://";
+  for (const u of [website, careers]) if (u && !/^https?:\/\//i.test(u)) return "Web addresses should start with http:// or https://";
   if (linkedin && !/^https?:\/\/(www\.)?linkedin\.com\/company\/[\w%.-]+\/?$/i.test(linkedin)) return "The LinkedIn link should look like https://www.linkedin.com/company/<name>/";
   if (code) me.passcode = code;
-  const id = slugify(name) || "company", now = new Date().toISOString();
-  // Re-adding resets the status, so the row reports THIS attempt.
-  const c = me.companies[id] = { ...(me.companies[id] || {}), id, name, url, linkedin, target, added_at: me.companies[id]?.added_at || now,
-                                 error: "", sent_at: "", request_url: "", sending: hasRelay() };
+  const id = slugify(name) || "company", now = new Date().toISOString(), old = me.companies[id] || {};
+  // Re-adding keeps the note's id (a retry is the same note) but reports THIS attempt.
+  const c = me.companies[id] = { id, name, website, careers, linkedin, note, target, added_at: old.added_at || now,
+                                 msg_id: old.msg_id || noteId(), first_sent_at: "", sent_at: "", error: "", sending: hasInbox() };
   view.addCo = false; save(); render();
-  if (hasRelay()) sendCompany(c);
+  if (hasInbox()) sendCompany(c);
   else foot("Added — it’s at the top of Who I’m watching.");
   return "";
 }
-async function sendCompany(c) {
+async function sendCompany(c, quiet) {
+  c.sending = true;
   try {
-    const r = await relay({ kind: "add-company", company: c.name, url: c.url, linkedin: c.linkedin, target: c.target });
-    c.sent_at = new Date().toISOString(); c.request_url = r.issue_url || ""; c.error = "";
-    foot("Added — the radar will check it from its next run.");
-  } catch (e) { c.error = e.message; foot(`Added here, but the radar couldn’t be told: ${e.message}.`); }
+    await sendNote({ kind: "add-company", id: c.msg_id, company: c.name, website: c.website, careers: c.careers,
+                     linkedin: c.linkedin, target: c.target });
+    c.sent_at = new Date().toISOString(); c.first_sent_at ||= c.sent_at; c.error = "";
+    if (!quiet) foot("Added — the radar picks it up within about 15 minutes.");
+  } catch (e) {
+    c.error = e.message;
+    if (!quiet) foot(`Added here, but the radar couldn’t be told: ${e.message}.`);
+  }
   delete c.sending; save(); render();
 }
+// A note the radar hasn't answered is sent again on each visit (ntfy keeps a note
+// 12 hours): never sent, failed, or sent over an hour ago; given up after 3 days.
+async function resendPending() {
+  if (!hasInbox() || !me.passcode) return;
+  const due = Object.values(me.companies).filter(c => !inRadar(c) && !radarSaw(c) && !refusedWhy(c) && !c.sending &&
+    age(c.added_at) < 3 && (c.error || !c.sent_at || age(c.sent_at) > 1 / 24)).slice(0, 3);
+  for (const c of due) await sendCompany(c, true);
+}
 function companyRowHTML(c) {
-  const rq = DATA.requests || {};
+  const e = inRadar(c);
   const links = [];
-  if (c.url) links.push(`<a href="${esc(c.url)}" target="_blank" rel="noopener">Open their jobs page</a>`);
+  if (c.careers) links.push(`<a href="${esc(c.careers)}" target="_blank" rel="noopener">Jobs page</a>`);
+  if (c.website) links.push(`<a href="${esc(c.website)}" target="_blank" rel="noopener">Website</a>`);
   if (c.linkedin) links.push(`<a href="${esc(c.linkedin.replace(/\/+$/, ""))}/jobs/" target="_blank" rel="noopener">LinkedIn jobs</a>`);
   if (!links.length) links.push(`<a href="https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(c.name)}" target="_blank" rel="noopener">Find on LinkedIn</a>`);
   links.push(`<button class="linkbtn" data-rmco="${esc(c.id)}">Remove</button>`);
-  let why;
-  if (c.sending) why = "Telling the radar…";
-  else if (c.sent_at) why = "The radar is adding it — it’ll be checked from the next run.";
-  else if (c.error) why = `Saved here, but the radar couldn’t be told: ${esc(c.error)}. Tap Remove and add it again to retry.`;
-  else if (rq.add_company_url) {
-    // No relay: the owner can push it to the radar from GitHub with one click.
-    // A form's checkbox can't be pre-ticked from a link, so the ★ rides in the title (handle_request.py reads it).
-    const q = new URLSearchParams({ title: `Add company: ${c.name}${c.target ? " ★" : ""}`, company: c.name, url: c.url || "", linkedin: c.linkedin || "" });
-    why = `Saved on this device. <a href="${esc(rq.add_company_url)}&${esc(q.toString())}" target="_blank" rel="noopener">Ask the radar to watch it too</a> (needs GitHub).`;
-  } else why = "Saved on this device.";
-  return `<div class="item"><div><div class="name">${c.target ? `<span style="color:var(--sun)">★</span> ` : ""}${esc(c.name)}</div><div class="why">${why}</div></div>
+  const refused = refusedWhy(c), no = `<span class="pill warn">Not in radar</span>`;
+  let pill, why;
+  if (e) {
+    pill = `<span class="pill entry">In the radar</span>`;
+    why = e.mode === "read" ? "The radar reads its job board." : e.mode === "watched" ? "The radar watches its careers page."
+        : "On the radar’s list; it has no page the radar can read, so the links are the way to check.";
+  } else if (!hasInbox()) { pill = no; why = "Send Itz the name and he’ll add it."; }
+  else if (c.sending) { pill = `<span class="pill">Sending…</span>`; why = "Telling the radar…"; }
+  else if (refused === "signature") { pill = no; why = "The radar didn’t accept it — the passcode was probably mistyped. Tap Remove, add it again and type the passcode carefully."; }
+  else if (refused) { pill = no; why = `The radar couldn’t use it (${esc(refused)}). Tap Remove and add it again.`; }
+  else if (radarSaw(c)) { pill = `<span class="pill entry">In the radar</span>`; why = "The radar has it, listed under another name."; }
+  else if (c.error) { pill = no; why = `Couldn’t reach the radar: ${esc(c.error)}. It’ll try again next time you open this page.`; }
+  else if (!c.sent_at) { pill = `<span class="pill">Not sent yet</span>`; why = "It goes to the radar next time you open this page with internet."; }
+  else if (age(c.first_sent_at || c.sent_at) < 1) { pill = `<span class="pill">Sent</span>`; why = "The radar picks it up within about 15 minutes; this becomes “In the radar” after its next check."; }
+  else { pill = no; why = "Sent a day ago, but the radar hasn’t picked it up — tell Itz the name."; }
+  return `<div class="item"><div><div class="name">${c.target ? `<span style="color:var(--sun)">★</span> ` : ""}${esc(c.name)} ${pill}</div>
+      <div class="why">${why}${c.note ? ` · ${esc(c.note)}` : ""}</div></div>
     <div class="side">${links.join(" · ")}</div></div>`;
 }
 
@@ -691,7 +723,7 @@ function watchingHTML() {
   const src = (DATA.aggregators || []).filter(a => a.ok);
   const C = Object.values(me.companies).sort((a, b) => (b.added_at || "").localeCompare(a.added_at || ""));
   const yours = `<section class="block"><div class="block-head"><div><h2>Companies you added</h2>
-      <p>${hasRelay() ? "Add one and the radar starts checking its jobs page." : "Keep the ones you care about one tap away."}</p></div>
+      <p>${hasInbox() ? "Add one and the radar starts checking its jobs page." : "Keep the ones you care about one tap away. “Not in radar” means Itz still has to add it."}</p></div>
       <button class="linkbtn" data-addco aria-expanded="${view.addCo}">${view.addCo ? "Close" : "Add a company"}</button></div>
       ${view.addCo ? companyFormHTML() : ""}
       ${C.length ? `<div class="list">${C.map(companyRowHTML).join("")}</div>`

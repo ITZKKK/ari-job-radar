@@ -31,7 +31,7 @@ import httpx
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src import adapters, aggregators, store, watch  # noqa: E402
+from src import adapters, aggregators, inbox, store, watch  # noqa: E402
 from src.classify import Rules, classify, fit, remote_in_head, visible, work_mode  # noqa: E402
 
 ROOT = store.ROOT
@@ -41,6 +41,18 @@ AGGREGATOR_CLOSE_DAYS = 7
 def load_yaml(name: str) -> dict:
     with open(os.path.join(ROOT, name)) as f:
         return yaml.safe_load(f)
+
+
+def load_employers() -> list[dict]:
+    """employers.yaml (kept by hand) plus data/inbox_employers.yaml (written by
+    the crawl from the dashboard's inbox). On the same id the hand row wins."""
+    hand = load_yaml("employers.yaml")["employers"]
+    ids = {e["id"] for e in hand}
+    extra = []
+    if os.path.exists(inbox.INBOX_EMPLOYERS):
+        with open(inbox.INBOX_EMPLOYERS) as f:
+            extra = [e for e in ((yaml.safe_load(f) or {}).get("employers") or []) if e.get("id") not in ids]
+    return hand + extra
 
 
 def pid_for(source_id: str, job_id: str) -> str:
@@ -96,7 +108,7 @@ def employer_matcher(employers: list[dict]):
 def run(only: str | None = None, dry_run: bool = False, state_path: str = store.STATE_PATH,
         radar_path: str = store.RADAR_PATH, fetchers=None) -> dict:
     cfg = load_yaml("config.yaml")
-    employers = load_yaml("employers.yaml")["employers"]
+    employers = load_employers()
     boards = (load_yaml("boards.yaml") or {}).get("boards", []) if os.path.exists(
         os.path.join(ROOT, "boards.yaml")) else []
     rules = Rules(cfg)
@@ -104,6 +116,23 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
     first_ever = not state["postings"]
     ts = store.now_iso()
     t0 = time.time()
+
+    # The dashboard's inbox first, so a company Ari just added is crawled in this
+    # very run. Only on Actions (or RADAR_INBOX=1): a laptop run must not eat her
+    # notes into a state file that never gets pushed.
+    inbox_counts = None
+    on_actions = os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("RADAR_INBOX") == "1"
+    if not only and not dry_run and on_actions and os.environ.get("RADAR_PASSCODE"):
+        hand = load_yaml("employers.yaml")["employers"]
+        with httpx.Client(headers={"User-Agent": cfg["crawl"]["user_agent"]},
+                          timeout=cfg["crawl"]["timeout_seconds"], follow_redirects=True) as ic:
+            inbox_counts = inbox.process(state, ic, cfg, os.environ["RADAR_PASSCODE"], known=hand)
+        print(f"inbox: {inbox_counts['received']} notes · {inbox_counts['added']} companies added · "
+              f"{inbox_counts['updated']} already listed · {inbox_counts['refresh']} refresh · "
+              f"{inbox_counts['rejected']} refused · {inbox_counts['failed']} failed"
+              f"{' · ' + inbox_counts['error'] if inbox_counts['error'] else ''}", flush=True)
+        if inbox_counts["added"] or inbox_counts["updated"]:
+            employers = load_employers()                               # rows were just written
 
     selected = employers
     if only:
@@ -256,6 +285,8 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
 
     run_row = {"started_at": ts, "finished_at": store.now_iso(),
                "duration_s": round(time.time() - t0), "first_run": first_ever, **counts}
+    if inbox_counts:
+        run_row["inbox"] = inbox_counts
     if not dry_run and not only:
         state["runs"] = (state["runs"] + [run_row])[-120:]
     if first_ever:
@@ -302,7 +333,7 @@ def write_summary(state: dict, counts: dict, run_row: dict) -> None:
 
 def export_only() -> None:
     cfg = load_yaml("config.yaml")
-    employers = load_yaml("employers.yaml")["employers"]
+    employers = load_employers()
     boards = (load_yaml("boards.yaml") or {}).get("boards", [])
     export(store.load(), cfg, employers, boards, store.RADAR_PATH)
     print("dashboard data re-exported (no crawl)")
@@ -391,6 +422,8 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
             "id": e["id"], "name": e["name"], "group": e.get("group"),
             "target": bool(e.get("target")), "city": e.get("city"),
             "careers_url": e.get("careers_url"), "linkedin_url": e.get("linkedin_url"),
+            # So the page can tell "In the radar" for a company she added herself.
+            "inbox_id": e.get("inbox_id"), "aliases": [str(a) for a in (e.get("aliases") or [])],
             "ats": e.get("ats"), "mode": mode,
             "note": e.get("note"), "open_relevant": sum(
                 1 for p in shown if p["employer_id"] == e["id"] and p["status"] == "open"),
@@ -424,30 +457,13 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
                  {"id": "stretch", "label": "Stretch (3–4 years, or a manager role)"}],
         "families": [{"id": f["id"], "label": f["label"], "tier": f["tier"]}
                      for f in cfg["roles"]["families"]],
-        "requests": request_links(cfg),
+        "inbox": {"url": inbox.topic_url(cfg), **inbox.public(state)} if inbox.topic_url(cfg) else None,
         "totals": totals,
         "postings": shown,
         "employers": emp_out,
         "aggregators": aggs_out,
         "boards": boards,
     }, path)
-
-
-def request_links(cfg: dict) -> dict | None:
-    """Where the dashboard's "Add a company" and "Check for new jobs now"
-    buttons go: issue forms on the repo (handled by requests.yml)."""
-    repo = (cfg.get("github") or {}).get("repo") or os.environ.get("GITHUB_REPOSITORY", "")
-    if "/" not in repo:
-        return None
-    base = f"https://github.com/{repo}"
-    out = {"repo_url": base,
-           "add_company_url": f"{base}/issues/new?template=add-company.yml",
-           "refresh_url": f"{base}/issues/new?template=refresh.md",
-           "actions_url": f"{base}/actions/workflows/radar.yml"}
-    relay = str((cfg.get("github") or {}).get("relay_url") or "").strip()
-    if relay.startswith("https://"):
-        out["relay_url"] = relay           # the page then talks to the relay, not GitHub
-    return out
 
 
 if __name__ == "__main__":

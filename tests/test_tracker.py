@@ -12,6 +12,7 @@ import os
 import re
 import shutil
 import sys
+import time
 
 import pytest
 import yaml
@@ -21,8 +22,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 
 import add_employer as add_emp  # noqa: E402
-import handle_request as hreq  # noqa: E402
-from src import adapters, crawl, notify, store  # noqa: E402
+from src import adapters, crawl, inbox, notify, store  # noqa: E402
 from src.adapters import RawPosting  # noqa: E402
 from src.classify import Rules, classify, visible, work_mode, years_required  # noqa: E402
 
@@ -358,9 +358,9 @@ def test_crawl_lifecycle(tmp_path, monkeypatch):
     assert by_title["Editorial Coordinator"]["fit"] == "early" and by_title["Reporter"]["fit"] == "open"
     assert [w["id"] for w in radar["work_modes"]] == ["remote", "hybrid", "onsite", "unknown"]
     assert [f["id"] for f in radar["fits"]] == ["early", "open", "stretch"]
-    assert radar["requests"]["add_company_url"].endswith("template=add-company.yml")
-    assert radar["requests"]["refresh_url"].endswith("template=refresh.md")
-    assert set(radar["requests"]) == {"repo_url", "add_company_url", "refresh_url", "actions_url"}
+    assert radar["inbox"]["url"] == "https://ntfy.sh/" + CFG["inbox"]["ntfy_topic"] and "requests" not in radar
+    e = {x["id"]: x for x in radar["employers"]}["the-drum"]
+    assert e["aliases"] and "inbox_id" in e        # the page matches her own entries on these
     assert radar["totals"]["open_all"] == 3 and radar["totals"]["open_shown"] == 2
     assert radar["totals"]["by_location_all"] == {"NYC": 2, "MIAMI": 1}
     assert radar["totals"]["open_all"] >= radar["totals"]["open_shown"]
@@ -369,35 +369,128 @@ def test_crawl_lifecycle(tmp_path, monkeypatch):
     assert "linkedin_url" in drum and drum["open_relevant"] == 2   # Reporter + Newsletter Writer, not Staff Writer
 
 
-def test_relay_worker_matches_the_parser():
-    # relay/worker.js builds the issue body by hand; it must stay parseable by handle_request.
-    js = open(os.path.join(ROOT, "relay", "worker.js"), encoding="utf-8").read()
-    labels = dict(re.findall(r'(\w+): "([^"]+)"', re.search(r"const LABELS = \{([^}]+)\}", js).group(1)))
-    assert labels == hreq.LABELS
-    assert re.search(r'const TARGET_OPTION = "([^"]+)"', js).group(1) == hreq.TARGET_OPTION
-    body = "Sent from the dashboard.\n\n" + "\n\n".join([
-        f"### {labels['company']}\n\nWorld Red Eye", f"### {labels['url']}\n\n_No response_",
-        f"### {labels['linkedin']}\n\nhttps://www.linkedin.com/company/world-red-eye/",
-        f"### {labels['target']}\n\n- [x] {hreq.TARGET_OPTION}"])
-    got = hreq.parse_issue_form(body)
-    assert got[labels["company"].lower()] == "World Red Eye" and got[labels["url"].lower()] == ""
-    assert got[labels["linkedin"].lower()].endswith("/world-red-eye/") and got[labels["target"].lower()] is True
+# ---------------------------------------------------------------------------
+# The dashboard's inbox (ntfy.sh notes signed with the passcode)
+# ---------------------------------------------------------------------------
+
+class TextResp:
+    def __init__(self, text, status=200):
+        self.text, self.status_code = text, status
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise RuntimeError(f"HTTP {self.status_code}")
 
 
-def test_handle_request_star_in_title(tmp_path):
-    # The dashboard's prefilled GitHub link can't tick the ★ box, so it rides in the title.
+class InboxClient:
+    def __init__(self, lines):
+        self.lines, self.calls = lines, []
+
+    def get(self, url, params=None, **kw):
+        self.calls.append((url, params))
+        return TextResp("\n".join(self.lines))
+
+
+def _note(passcode, **kw):
+    n = {"v": 1, "kind": "add-company", "id": "n1", "at": "2026-10-20T12:00:00Z", "company": "", "website": "",
+         "careers": "", "linkedin": "", "target": False, "note": "", **kw}
+    n["sig"] = inbox.sign(n, passcode)
+    return n
+
+
+def _env(n, nid, t):
+    return json.dumps({"id": nid, "time": t, "event": "message", "topic": "t", "message": json.dumps(n)})
+
+
+def test_inbox_signature():
+    # Pins the exact canonical form site/index.html signs; change both or neither.
+    n = {"v": 1, "kind": "add-company", "id": "abc123", "at": "2026-10-20T12:00:00.000Z", "company": "World  Red Eye",
+         "website": "https://worldredeye.com", "careers": "", "linkedin": "https://www.linkedin.com/company/world-red-eye/",
+         "target": True, "note": ""}
+    assert inbox.canonical(n) == ("1\nadd-company\nabc123\n2026-10-20T12:00:00.000Z\nWorld Red Eye\n"
+                                  "https://worldredeye.com\n\nhttps://www.linkedin.com/company/world-red-eye/\n1")
+    sig = inbox.sign(n, "walnut-quartz")
+    assert len(sig) == 64 and inbox.verify({**n, "sig": sig.upper()}, "walnut-quartz")
+    assert not inbox.verify({**n, "sig": sig}, "other")
+    assert not inbox.verify({**n, "company": "Other", "sig": sig}, "walnut-quartz")
+    assert not inbox.verify(n, "walnut-quartz") and not inbox.verify({**n, "sig": sig}, "")
+
+
+def test_inbox_process(tmp_path):
+    hand = yaml.safe_load(open(EMPLOYERS_YAML))["employers"]
+    p = str(tmp_path / "data" / "inbox_employers.yaml")          # does not exist yet: created on first add
+    cfg = {**CFG, "inbox": {"ntfy_topic": "t-abc"}}
+    t0 = int(time.time()) - 100
+    good = _note("pw", id="n1", company="Acme Weekly", careers="https://acme.example/jobs",
+                 linkedin="https://www.linkedin.com/company/acme-weekly/", target=True)
+    forged = _note("wrong", id="n2", company="Evil Co", website="https://evil.example")
+    known = _note("pw", id="n3", company="World Red Eye", linkedin="https://www.linkedin.com/company/world-red-eye/")
+    refresh = _note("pw", id="n4", kind="refresh")
+    stale = _note("pw", id="n5", company="Old News")
+    badurl = _note("pw", id="n6", company="Typo Co", careers="worldredeye.com/jobs")
+    lines = [_env(stale, "x0", t0 - 48 * 3600), _env(good, "x1", t0),
+             json.dumps({"id": "k", "time": t0, "event": "keepalive", "topic": "t"}),
+             _env(forged, "x2", t0 + 1), _env(known, "x3", t0 + 2), _env(refresh, "x4", t0 + 3),
+             _env(badurl, "x5", t0 + 4), "not json at all"]
+    quiet = lambda *a: None  # noqa: E731
+    state = store.empty()
+    client = InboxClient(lines)
+    c = inbox.process(state, client, cfg, "pw", path=p, known=hand, check=False, log=quiet)
+    assert c == {"received": 6, "added": 1, "updated": 1, "refresh": 1, "rejected": 2, "failed": 0, "error": ""}
+    assert client.calls == [("https://ntfy.sh/t-abc/json", {"poll": "1", "since": "12h"})]
+    rows = {e["id"]: e for e in yaml.safe_load(open(p))["employers"]}
+    assert set(rows) == {"acme-weekly"}                            # the hand file is never written
+    acme = rows["acme-weekly"]
+    assert acme["inbox_id"] == "n1" and acme["target"] is True and acme["careers_url"] == "https://acme.example/jobs"
+    assert acme["linkedin_url"].endswith("/acme-weekly/") and "note" not in acme
+    assert yaml.safe_load(open(EMPLOYERS_YAML)) == {"employers": hand}
+    # Verified notes are done; refused ones are remembered with the reason, never as done.
+    assert set(state["inbox"]["done"]) == {"n1", "n3", "n4"} and state["inbox"]["since"] == str(t0 + 4)
+    assert state["inbox"]["rejected"]["n2"]["why"] == "signature" and "web address" in state["inbox"]["rejected"]["n6"]["why"]
+    pub = inbox.public(state)
+    assert set(pub["done"]) == {"n1", "n3", "n4"} and pub["rejected"] == {"n2": "signature", "n6": state["inbox"]["rejected"]["n6"]["why"]}
+    # A replay of the same notes changes nothing, and the next read starts where this one ended.
+    client2 = InboxClient(lines)
+    c2 = inbox.process(state, client2, cfg, "pw", path=p, known=hand, check=False, log=quiet)
+    assert (c2["added"], c2["updated"], c2["refresh"]) == (0, 0, 0) and client2.calls[0][1]["since"] == str(t0 + 4)
+    # The same note, properly signed this time: accepted, and no longer "refused".
+    fixed = _note("pw", id="n2", company="Evil Co", website="https://evil.example")
+    inbox.process(state, InboxClient([_env(fixed, "x9", t0 + 5)]), cfg, "pw", path=p, known=hand, check=False, log=quiet)
+    assert "n2" in state["inbox"]["done"] and "n2" not in state["inbox"]["rejected"]
+    # No topic, or no passcode: silently nothing. A dead server: an error line, never an exception.
+    assert inbox.process(store.empty(), InboxClient(lines), {**CFG, "inbox": {}}, "pw")["received"] == 0
+    assert inbox.process(store.empty(), InboxClient(lines), cfg, "")["received"] == 0
+
+    class Dead:
+        def get(self, *a, **k):
+            raise OSError("boom")
+    assert inbox.process(store.empty(), Dead(), cfg, "pw", log=quiet)["error"].startswith("OSError")
+    # Our own failure (an unreadable file) is counted and left for the next crawl, not raised.
+    (tmp_path / "broken.yaml").write_text("employers: [\n")
+    c3 = inbox.process(store.empty(), InboxClient([_env(good, "x1", t0)]), cfg, "pw", path=str(tmp_path / "broken.yaml"),
+                       known=hand, check=False, log=quiet)
+    assert c3["failed"] == 1 and c3["added"] == 0
+
+
+def test_load_employers_merges_the_inbox_file(tmp_path, monkeypatch):
+    inbox_file = tmp_path / "inbox_employers.yaml"
+    inbox_file.write_text(add_emp.INBOX_HEADER + '\n  - id: fresh-co\n    name: "Fresh Co"\n    ats: none\n'
+                          '\n  - id: world-red-eye\n    name: "Impostor"\n    ats: none\n')
+    monkeypatch.setattr(inbox, "INBOX_EMPLOYERS", str(inbox_file))
+    got = crawl.load_employers()
+    ids = [e["id"] for e in got]
+    assert "fresh-co" in ids and ids.count("world-red-eye") == 1
+    assert next(e for e in got if e["id"] == "world-red-eye")["name"] == "World Red Eye"   # the hand row wins
+
+
+def test_add_employer_inbox_id(tmp_path):
     p = _employers_copy(tmp_path)
-    r = hreq.handle({"title": "Add company: Star Weekly ★", "body": "", "user": "ITZKKK", "labels": ""}, CFG, path=p, check=False)
-    assert r["kind"] == "add-company" and r["changed"]
-    row = {e["id"]: e for e in yaml.safe_load(open(p))["employers"]}["star-weekly"]
-    assert row["name"] == "Star Weekly" and row["target"] is True
-
-
-def test_request_links_relay():
-    assert "relay_url" not in crawl.request_links({"github": {"repo": "a/b"}})
-    got = crawl.request_links({"github": {"repo": "a/b", "relay_url": " https://r.example.workers.dev "}})
-    assert got["relay_url"] == "https://r.example.workers.dev" and got["refresh_url"].startswith("https://github.com/a/b/")
-    assert "relay_url" not in crawl.request_links({"github": {"repo": "a/b", "relay_url": "http://insecure.example"}})
+    rows = lambda: {r["id"]: r for r in yaml.safe_load(open(p))["employers"]}  # noqa: E731
+    r = add_emp.add_employer("Fresh Co", "https://fresh.example/jobs", inbox_id="m1", path=p, check=False)
+    assert r["created"] and rows()["fresh-co"]["inbox_id"] == "m1"
+    r = add_emp.add_employer("Fresh Co", inbox_id="m2", path=p, check=False)
+    assert not r["created"] and r["updated"] == ["inbox_id"] and rows()["fresh-co"]["inbox_id"] == "m2"
+    assert r["message"] == "Fresh Co is already on the list."     # the id is bookkeeping, not news
 
 
 def test_export_backfills_old_state(tmp_path):
@@ -534,48 +627,6 @@ def test_add_employer(tmp_path):
         add_emp.add_employer("Bad", linkedin_url="https://linkedin.com/in/someone", path=p, check=False)
     with pytest.raises(ValueError):
         add_emp.add_employer("x" * 81, path=p, check=False)
-
-
-SAMPLE_BODY = ("### Company name\n\nWorld Red Eye\n\n### Website or careers page\n\nhttps://worldredeye.com\n\n"
-               "### LinkedIn page\n\n_No response_\n\n### Your list\n\n- [x] This is one of my picks (give it a ★)")
-
-
-def test_parse_issue_form():
-    assert hreq.parse_issue_form(SAMPLE_BODY) == {
-        "company name": "World Red Eye", "website or careers page": "https://worldredeye.com",
-        "linkedin page": "", "your list": True}
-    assert hreq.parse_issue_form("") == {} and hreq.parse_issue_form(None) == {}
-    unticked = SAMPLE_BODY.replace("- [x]", "- [ ]").replace("\n", "\r\n")
-    assert hreq.parse_issue_form(unticked)["your list"] is False
-    # The template's labels are the parser's keys.
-    tpl = yaml.safe_load(open(os.path.join(ROOT, ".github", "ISSUE_TEMPLATE", "add-company.yml")))
-    assert {b["id"]: b["attributes"]["label"] for b in tpl["body"] if b["type"] != "markdown"} == hreq.LABELS
-
-
-def test_handle_request(tmp_path):
-    p = _employers_copy(tmp_path)
-    body = SAMPLE_BODY.replace("World Red Eye", "Acme Weekly").replace("worldredeye.com", "acmeweekly.example")
-
-    r = hreq.handle({"title": "Add company: Acme Weekly", "body": body, "user": "stranger", "labels": "add-company"},
-                    CFG, path=p, check=False)
-    assert r["kind"] == "declined" and not r["changed"] and not r["dispatch"]
-    assert r["close_reason"] == "not planned" and "allow-list" in r["comment"]
-    assert "acme-weekly" not in open(p).read()
-
-    r = hreq.handle({"title": "Refresh now", "body": "", "user": "itzkkk", "labels": "refresh"}, CFG, path=p)
-    assert r["kind"] == "refresh" and r["dispatch"] and not r["changed"] and r["close_reason"] == "completed"
-    assert "5 minutes" in r["comment"] and "itzkkk.github.io/ari-job-radar" in r["comment"]
-
-    r = hreq.handle({"title": "Add company: Acme Weekly", "body": body, "user": "ITZKKK", "labels": ""}, CFG, path=p, check=False)
-    assert r["kind"] == "add-company" and r["changed"] and r["dispatch"] and r["close_reason"] == "completed"
-    row = {x["id"]: x for x in yaml.safe_load(open(p))["employers"]}["acme-weekly"]
-    assert row["target"] is True and row["careers_url"] == "https://acmeweekly.example"
-
-    r = hreq.handle({"title": "Add company: Acme Weekly", "body": body, "user": "ITZKKK", "labels": ""}, CFG, path=p, check=False)
-    assert r["kind"] == "add-company" and not r["changed"] and not r["dispatch"] and "already on the list" in r["comment"]
-
-    assert hreq.handle({"title": "Hello?", "body": "hi", "user": "ITZKKK", "labels": ""}, CFG, path=p)["kind"] == "ignore"
-    assert hreq.detect_kind("something odd", "add-company") == "add-company"      # label as fallback
 
 
 def test_rss_and_adzuna_shapes(monkeypatch):

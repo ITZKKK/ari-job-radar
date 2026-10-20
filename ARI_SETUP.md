@@ -1,9 +1,10 @@
 # Ari's part — about 25 minutes
 
 Itz runs the radar. You do four things: create a free email-sending account
-(this lets the radar email you), make a free GitHub account (this unlocks the
-two buttons on your radar), answer a few questions so it only shows jobs you'd
-actually take, and optionally sign up for a handful of job alerts.
+(this lets the radar email you), get the radar's passcode from Itz (this lets
+you add companies and ask for a fresh search right on your radar), answer a
+few questions so it only shows jobs you'd actually take, and optionally sign
+up for a handful of job alerts.
 
 ---
 
@@ -36,19 +37,14 @@ That's it. You'll get a "your radar is live" email once Itz finishes setup.
 
 ---
 
-## 2. Only if Itz asks: make a free GitHub account (3 minutes)
+## 2. Get the radar's passcode from Itz (10 seconds)
 
-Adding jobs and companies on your radar needs no account at all. Two things
-do need to reach the radar's home on GitHub: having it *watch* a company's
-page for you, and **Check for new jobs now**. If Itz gives you a **passcode**,
-you're done — the page asks for it once and both work right there. If he
-hasn't, those two open a short form on GitHub instead, so:
-
-1. Go to **github.com** → **Sign up**. Any email is fine; pick a username.
-2. Confirm your email.
-3. Send Itz your username. He adds it to the radar's allow-list.
-
-Until then the forms still open, but the radar will politely refuse.
+No account needed for anything on your radar. Two things talk to the radar
+itself: having it *watch* a company you add, and **Check for new jobs now**.
+Both just need the passcode Itz gives you; the page asks for it once and
+remembers it on that phone or laptop. (Without it, a company you add still
+sits on your page with its links; it just says **Not in radar**, and you can
+send Itz the name.)
 
 ---
 
@@ -111,7 +107,7 @@ them, but they'll email you directly. Each is free:
 - Tap **♡ Save** on anything interesting and **I applied** once you've sent it. A notes box appears for who you wrote to, the deadline and when to follow up, and a small menu lets you say where it stands (Heard back, Interview, Offer…); the **Applied** tab groups your applications by that. **Not for me** hides a job.
 - **Stats** shows the numbers behind what you see: open jobs, new this week, how many are elsewhere in the US, your applications, and whether the radar itself is working.
 - Found a job yourself, on LinkedIn or Indeed? **Add a job I found** (Saved or Applied tab) keeps it with the rest: title, company, link, and a tick if you've already applied. Then notes and stages work like for any other job.
-- **Who I'm watching** lists the companies the radar checks for you, and which ones are worth checking yourself. **Add a company** there takes a name, website if you know it, LinkedIn page if you like, and a tick if it's one of your picks. It appears at the top with its jobs page one tap away; with the passcode (step 2) the radar also starts checking its page from the next run.
-- **Check for new jobs now** (top of the page) makes the radar run right away. Give it about 5 minutes, then reload. (Needs the passcode, or a GitHub sign-in — see step 2.)
+- **Who I'm watching** lists the companies the radar checks for you, and which ones are worth checking yourself. **Add a company** there takes a name, its website, its jobs or application page, its LinkedIn page, a note, and a tick if it's one of your picks. It appears at the top with those links one tap away, and within about 15 minutes it says **In the radar**: the radar is now checking it too. If it says **Not in radar**, send Itz the name.
+- **Check for new jobs now** (top of the page) asks the radar for a fresh search. It usually starts within 15 minutes and takes 2 more; reload after that. (Needs the passcode from step 2.)
 - **More places to look** has one-tap LinkedIn and Indeed searches for the last week, plus the alerts and newsletters above.
 - Your saves stay on the phone or laptop you use. Before switching, tap **Back up my saves** at the bottom, then **Restore a backup** on the new one.

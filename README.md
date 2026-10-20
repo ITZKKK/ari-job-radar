@@ -117,52 +117,33 @@ once more. The first run that has email credentials sends Ari a single
 
 On iPhone, she can open it in Safari → **Share** → **Add to Home Screen**, and it behaves like an app.
 
-### 9. The two dashboard buttons (Add a company, Check for new jobs now)
+### 9. The dashboard's inbox: Add a company / Check for new jobs now, with no GitHub for anyone
 
-On the page itself Ari can **add a job she found** (Saved / Applied tabs) and
-**add a company** (Who I'm watching). Both stay on her device, like her saves,
-and need no account. For the radar to *act* on a company (watch its page) or
-to crawl right now, the request has to reach this repo. Two ways:
+On the page Ari can **add a job she found** (Saved / Applied tabs) and **add
+a company** (Who I'm watching), with website, jobs page, LinkedIn page, notes
+and a ★. Those live on her device like her saves. To make the radar *act*
+(watch the company's page, or crawl right now) the page drops a signed note
+into the radar's **inbox**: a topic on [ntfy.sh](https://ntfy.sh), a free
+public message relay that needs no account. Every crawl reads the inbox
+first (`src/inbox.py`), and `.github/workflows/inbox.yml` looks every 15
+minutes and starts a crawl early when a note is waiting. A company she adds
+is in `employers.yaml` and being checked within about 15 minutes, and her
+page shows **In the radar** next to it.
 
-**a. Through GitHub (the default).** The request becomes a GitHub issue (the
-page's "Ask the radar to watch it too" link, or the Refresh button) and the
-**requests** workflow acts on it within a few minutes and replies on the
-issue. Anyone can open an issue on a public repo, so only the GitHub usernames
-in `config.yaml` → `github.allowed_users` are obeyed (everyone else gets a
-polite "ask Itz" and the issue is closed). Needs a GitHub account.
+Because the topic is public, every note is signed (HMAC-SHA256) with a
+passcode she types once on the page; the crawl checks the signature against
+the repo secret `RADAR_PASSCODE`. The passcode never leaves her device, and
+knowing the topic name is not enough to add anything. Already set up:
 
-- Repo → **Issues** → **Labels** → create `add-company` and `refresh` (the
-  forms apply them; the title decides even if the labels are missing).
-- When Ari has a GitHub account, add her username to `allowed_users`.
-
-**b. Through a relay: no GitHub account for Ari (about 15 minutes, free).**
-`relay/worker.js` is a small Cloudflare Worker that holds a token for this
-one repo and opens the issue on her behalf; the page sends it a passcode she
-types once. Set it up like this:
-
-1. GitHub → your avatar → **Settings** → **Developer settings** → **Personal
-   access tokens** → **Fine-grained tokens** → **Generate new token**. Name
-   `ari-job-radar relay`; Repository access: **Only select repositories** →
-   `ari-job-radar`; Repository permissions: **Issues → Read and write**
-   (nothing else). Generate and copy the token.
-2. **cloudflare.com** → sign up (free) → **Workers & Pages** → **Create** →
-   **Start with Hello World** → **Deploy** → **Edit code**. Replace everything
-   with the contents of `relay/worker.js` → **Deploy**.
-3. The worker's **Settings** → **Variables and secrets**: add secrets
-   `GITHUB_TOKEN` (the token) and `PASSCODE` (three or four words you'll
-   tell Ari; it is the only thing between the internet and your issue list,
-   so not a single word), and plain variables `REPO` = `ITZKKK/ari-job-radar`,
-   `ALLOW_ORIGIN` = `https://itzkkk.github.io`.
-4. Copy the worker's address (`https://<name>.<account>.workers.dev`) into
-   `config.yaml` → `github.relay_url` and commit. The next deploy switches
-   both buttons over: no GitHub sign-in, just the passcode.
-5. Tell Ari the passcode. The page asks for it once and remembers it.
-
-The issues the relay opens are authored by the token's owner (you), so
-`allowed_users` needs nothing new. To revoke access later, delete the token.
-The worker pauses 1.5 s on a wrong passcode; for extra safety, Cloudflare →
-**Security** → **WAF** → **Rate limiting rules** can cap the worker's
-hostname at, say, 10 requests a minute (one rule is free).
+- `config.yaml` → `inbox.ntfy_topic` is the topic; the secret
+  `RADAR_PASSCODE` holds the passcode. To rotate either, change it and give
+  Ari the new passcode (the page asks again).
+- No passcode on the page → she can still add companies; they show
+  **Not in radar** so she can send you the names and you add them with
+  `python scripts/add_employer.py "Name" "<url>"`.
+- A note the radar hasn't picked up within an hour is re-sent the next time
+  she opens the page; one it still hasn't picked up after a day shows
+  **Not in radar — tell Itz**, so nothing fails silently.
 
 ---
 
@@ -225,9 +206,9 @@ couple of minutes.
 
 | To… | Edit |
 |---|---|
-| add an employer | open an issue with the **Add a company** form (the dashboard button), or edit `employers.yaml`, or run `python scripts/add_employer.py "Name" "<careers URL>"` |
+| add an employer | the dashboard's **Add a company** (lands in `data/inbox_employers.yaml`), or edit `employers.yaml`, or run `python scripts/add_employer.py "Name" "<careers URL>"` |
 | change locations (Miami / remote only), role types, seniority, early-career rules, years cap | `config.yaml` |
-| let someone use the dashboard buttons | `config.yaml` → `github.allowed_users` |
+| change the inbox topic or passcode | `config.yaml` → `inbox.ntfy_topic`; secret `RADAR_PASSCODE` |
 | change who gets email / when | secrets (`ALERT_TO`) and `config.yaml` → `alerts` |
 | change the crawl times | `.github/workflows/radar.yml` → `cron` (UTC) |
 | add a "More places to look" link | `boards.yaml` |
@@ -244,7 +225,7 @@ GitHub emails you.
 cd ~/Desktop/"Ari's tracker"/ari-job-radar
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt pytest
-python -m pytest -q                                   # 104 tests, no network needed
+python -m pytest -q                                   # 103 tests, no network needed
 python src/crawl.py --only "the-drum" --dry-run       # one employer, writes nothing
 cp .env.example .env    # fill in to test email locally
 python src/notify.py --test
@@ -279,11 +260,11 @@ src/crawl.py         the crawl and its state machine; writes data/state.json + d
 src/watch.py         careers-page change watcher
 src/notify.py        the email
 scripts/add_employer.py       add a row to employers.yaml from a URL (CLI and the function behind the button)
-scripts/handle_request.py     acts on an "Add a company" / "Refresh now" issue
 site/index.html      the dashboard (one static page)
 .github/workflows/radar.yml      schedule + publish
-.github/workflows/requests.yml   the two dashboard buttons (issue → employers.yaml edit / crawl)
-.github/ISSUE_TEMPLATE/          the "Add a company" form and the "Refresh now" template
-tests/test_tracker.py         104 tests, incl. real job titles from 19 Oct 2026
+.github/workflows/inbox.yml   every 15 min: a note in the inbox? start a crawl
+src/inbox.py                  reads the dashboard's inbox (ntfy.sh) and adds the companies
+data/inbox_employers.yaml     companies Ari added from the dashboard (written by the crawl)
+tests/test_tracker.py         103 tests, incl. real job titles from 19 Oct 2026
 ARI_SETUP.md         Ari's part: Resend in 5 minutes, alerts to subscribe to, questions
 ```

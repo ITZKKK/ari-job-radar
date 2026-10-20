@@ -22,6 +22,8 @@
 #   aliases     other names job sites use for it (so aggregator finds get the ★)
 #   target_match  regex; on a parent's board, only postings matching it count as Ari's pick (★)
 #   linkedin_url  the company's LinkedIn page (shown as a "LinkedIn jobs" link; never fetched)
+#   inbox_id    set when the row came from the dashboard's inbox (src/inbox.py), so the
+#               page can show Ari "In the radar" next to the company she added
 #   home        MIAMI = this employer's jobs can only be in Miami, so a posting
 #               that states no location is treated as Miami. Opt-in: set it only
 #               on Miami-only rows (not on a parent with boards in 30 markets).
