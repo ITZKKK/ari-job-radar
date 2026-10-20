@@ -109,6 +109,21 @@ section.block { margin: 18px 0 40px; }
 .stage select, .stage input { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper);
   border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; max-width: 100%; }
 .stage input { flex: 1 1 160px; min-width: 0; }
+.pill.you { background: var(--sun-soft); color: var(--sun); }
+.act.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.act.primary:hover { color: var(--paper); opacity: .9; }
+
+/* "Add a job I found" / "Add a company" forms */
+.addform { display: grid; gap: 12px; margin: 0 0 18px; }
+.addform .f { display: grid; gap: 4px; font-size: 14px; color: var(--soft); }
+.addform input[type="text"], .addform input[type="url"] { width: 100%; font: inherit; font-size: 15px; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.addform .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.addform label.entry-only { margin-top: 0; align-self: end; padding-bottom: 8px; }
+.addform .err { color: var(--flamingo); font-size: 14px; font-weight: 600; }
+.addform .acts { margin-top: 0; }
+.item .side button.linkbtn { font-size: 14px; }
+@media (max-width: 560px) { .addform .two { grid-template-columns: 1fr; } .addform label.entry-only { padding-bottom: 0; } }
 
 /* Filters */
 .filterbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0 0 18px; }
@@ -230,9 +245,12 @@ const MIAMI_PLACES = ["Miami Beach", "Coral Gables", "Doral", "Fort Lauderdale",
 let DATA = null;
 const me = load();
 me.jobs = me.jobs || {};
+me.companies = me.companies || {};   // companies she added herself (kept on this device; also sent to the radar when a relay exists)
+Object.values(me.companies).forEach(c => delete c.sending);   // a send cut off by a closed tab must not look "in progress" forever
 const lastVisit = me.lastVisit || null;
 const view = { tab: me.tab || "home", q: "", locOff: new Set(me.locOff || []), famOff: new Set(me.famOff || []),
-               wmOff: new Set(me.wmOff || []), fitOnly: me.fitOnly ?? !!me.entryOnly, showFilters: false, more: {} };
+               wmOff: new Set(me.wmOff || []), fitOnly: me.fitOnly ?? !!me.entryOnly, showFilters: false, more: {},
+               addJob: false, addCo: false };
 
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
 function save() {
@@ -303,8 +321,29 @@ const chipModes = () => DATA.work_modes.filter(w => w.id !== "unknown");
 // Older radar files have no `fit`: guess it from the years asked and the title level.
 const fitOf = p => p.fit || (p.years >= 3 ? "stretch" : p.seniority === "entry" ? "early" : "open");
 const stageOf = j => j.stage === "other" ? ((j.stage_other || "").trim() || "Other") : (j.stage || "Applied");
-const isNew = p => lastVisit && p.first_seen > lastVisit && p.status === "open";
+const isNew = p => lastVisit && p.first_seen > lastVisit && p.status === "open" && !p.mine;
 const jobState = pid => me.jobs[pid] || {};
+const foot = msg => { document.getElementById("foot").textContent = msg; };
+const hash = s => { let h = 5381; for (const c of s) h = ((h * 33) ^ c.charCodeAt(0)) >>> 0; return h.toString(36); };
+const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+const showErr = (form, msg) => { const e = form.querySelector("[data-err]"); if (e) { e.textContent = msg || ""; e.hidden = !msg; } };
+
+/* ---- Talking to the radar without GitHub: an optional relay ----------------
+   When config.yaml names a relay (a tiny Cloudflare Worker, see relay/), the
+   page POSTs requests there with a passcode and the worker opens the GitHub
+   issue on her behalf. Without one, companies stay on this device. */
+async function relay(payload) {
+  let r;
+  try {
+    r = await fetch(DATA.requests.relay_url, { method: "POST", headers: { "content-type": "application/json" },
+                                                body: JSON.stringify({ ...payload, passcode: me.passcode || "" }) });
+  } catch (e) { throw new Error("couldn’t connect — check your internet and try again"); }
+  let d = {}; try { d = await r.json(); } catch (e) { /* no body */ }
+  if (r.status === 401) { delete me.passcode; save(); throw new Error("the passcode wasn’t accepted — try again and type it carefully"); }
+  if (!r.ok || !d.ok) throw new Error(d.error || `no answer (${r.status})`);
+  return d;
+}
+const hasRelay = () => !!DATA.requests?.relay_url;
 
 /* ---- Boot ---------------------------------------------------------------- */
 async function boot() {
@@ -348,6 +387,24 @@ function deriveRequests() {
 }
 function refreshLinks() {
   const rq = DATA.requests || {}, a = document.getElementById("refresh"), note = document.getElementById("refreshnote");
+  if (rq.relay_url) {
+    // No GitHub needed: the relay starts the crawl.
+    a.href = "#"; a.removeAttribute("target"); a.hidden = false;
+    a.onclick = async e => {
+      e.preventDefault();
+      if (!me.passcode) {
+        const c = window.prompt("The radar’s passcode (Itz gave you this):");
+        if (!c || !c.trim()) return;
+        me.passcode = c.trim(); save();
+      }
+      foot("Asking the radar to check now…");
+      try { await relay({ kind: "refresh" }); foot("On it — the radar is checking now. Come back in about 5 minutes and reload."); }
+      catch (err) { foot(`Couldn’t reach the radar: ${err.message}.`); }
+    };
+    note.textContent = "“Check for new jobs now” starts a fresh search right away; it takes about 5 minutes.";
+    note.hidden = false;
+    return;
+  }
   if (!rq.refresh_url) return;
   a.href = rq.refresh_url; a.hidden = false;
   a.onclick = () => { document.getElementById("foot").textContent = "GitHub is opening in a new tab — tap the green “Create” button there, then come back in about 5 minutes."; };
@@ -393,16 +450,21 @@ function render() {
 }
 
 function cardHTML(p) {
-  const j = jobState(p.pid), t = titleParts(p), where = place(p), f = fitOf(p), mode = wm(p);
+  // A job she typed in is shown exactly as typed; the radar's "Brand: Title" splitting is for boards.
+  const j = jobState(p.pid), t = p.mine ? { title: p.title, brand: p.company, parent: "" } : titleParts(p),
+        where = place(p), f = fitOf(p), mode = wm(p);
   const pills = [];
-  if (p.status !== "open") pills.push(`<span class="pill">No longer listed</span>`);
-  else if (isNew(p)) pills.push(`<span class="pill new">New</span>`);
-  if (f === "early") pills.push(`<span class="pill entry">Early career</span>`);
-  else if (f === "stretch") pills.push(`<span class="pill warn">${p.years >= 3 ? `Stretch · asks for ${p.years}+ years` : "Stretch · manager role"}</span>`);
-  pills.push(`<span class="pill">${esc(famWord(p.family))}</span>`);
-  if (f !== "stretch" && p.years >= 3) pills.push(`<span class="pill warn">Asks for ${p.years}+ years</span>`);
-  if (mode !== "unknown" && wmWord(mode)) pills.push(`<span class="pill">${esc(wmWord(mode))}</span>`);
-  if ((p.flags || []).includes("internship")) pills.push(`<span class="pill">Internship</span>`);
+  if (p.mine) pills.push(`<span class="pill you">Added by you</span>`);   // a job she found herself: no radar labels
+  else {
+    if (p.status !== "open") pills.push(`<span class="pill">No longer listed</span>`);
+    else if (isNew(p)) pills.push(`<span class="pill new">New</span>`);
+    if (f === "early") pills.push(`<span class="pill entry">Early career</span>`);
+    else if (f === "stretch") pills.push(`<span class="pill warn">${p.years >= 3 ? `Stretch · asks for ${p.years}+ years` : "Stretch · manager role"}</span>`);
+    if (famWord(p.family)) pills.push(`<span class="pill">${esc(famWord(p.family))}</span>`);
+    if (f !== "stretch" && p.years >= 3) pills.push(`<span class="pill warn">Asks for ${p.years}+ years</span>`);
+    if (mode !== "unknown" && wmWord(mode)) pills.push(`<span class="pill">${esc(wmWord(mode))}</span>`);
+    if ((p.flags || []).includes("internship")) pills.push(`<span class="pill">Internship</span>`);
+  }
   if (j.applied && j.stage && j.stage !== "Applied") {
     const s = stageOf(j);
     pills.push(`<span class="pill ${STAGE_CLASS[s] || ""}" data-stagepill>${esc(s)}</span>`);
@@ -413,14 +475,15 @@ function cardHTML(p) {
       ${j.stage === "other" ? `<input data-stage-other type="text" aria-label="What happened?" placeholder="e.g. Writing test" value="${esc(j.stage_other || "")}">` : ""}</div>` : "";
   return `<article class="card${p.target ? " mine" : ""}${p.status !== "open" ? " gone" : ""}" data-pid="${p.pid}">
     <div class="where">${p.target ? `<span class="star" aria-label="On your list">★</span>` : ""}<span class="co">${esc(t.brand)}</span>${where ? `<span>· ${esc(where)}</span>` : ""}</div>
-    <h3><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(t.title)}</a></h3>
+    <h3>${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(t.title)}</a>` : esc(t.title)}</h3>
     <div class="pills">${pills.join("")}</div>
-    <div class="found">${p.first_seen ? `Found ${ago(p.first_seen)}` : ""}${t.parent && t.parent !== t.brand ? ` · part of ${esc(t.parent)}` : ""}${p.via ? ` · via ${esc(p.via)}` : ""}${j.applied_at ? ` · you applied ${new Date(j.applied_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}` : ""}</div>
+    <div class="found">${p.mine ? `Added ${ago(p.first_seen)}` : p.first_seen ? `Found ${ago(p.first_seen)}` : ""}${t.parent && t.parent !== t.brand ? ` · part of ${esc(t.parent)}` : ""}${p.via ? ` · via ${esc(p.via)}` : ""}${j.applied_at ? ` · you applied ${new Date(j.applied_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}` : ""}</div>
     <div class="acts">
       <button class="act save" data-act="saved" aria-pressed="${!!j.saved}">${j.saved ? "♥ Saved" : "♡ Save"}</button>
       <button class="act applied" data-act="applied" aria-pressed="${!!j.applied}">${j.applied ? "✓ Applied" : "I applied"}</button>
-      ${view.tab === "saved" || view.tab === "applied" ? "" : `<button class="act skip" data-act="hidden">Not for me</button>`}
-      <a class="act view" href="${esc(p.url)}" target="_blank" rel="noopener">View job</a>
+      ${p.mine ? `<button class="act skip" data-act="remove">Remove</button>`
+               : view.tab === "saved" || view.tab === "applied" ? "" : `<button class="act skip" data-act="hidden">Not for me</button>`}
+      ${p.url ? `<a class="act view" href="${esc(p.url)}" target="_blank" rel="noopener">View job</a>` : ""}
     </div>
     ${stage}
     ${j.saved || j.applied ? `<div class="note"><textarea data-note aria-label="Your notes" placeholder="Notes — who you wrote to, the deadline, when to follow up…">${esc(j.note || "")}</textarea></div>` : ""}
@@ -483,14 +546,53 @@ function allHTML() {
     <div id="results">${list || `<div class="empty"><strong>No jobs match these filters.</strong>Try turning a place or a kind of role back on.${onlyHere ? " The radar shows Miami and fully remote jobs only." : ""}</div>`}</div>`;
 }
 
+/* Jobs she adds herself live only in her saves (snap.mine): a job spotted on
+   LinkedIn or Indeed can be tracked like any the radar found. */
+function jobFormHTML(kind) {
+  return `<form class="panel addform" id="jobform" autocomplete="off">
+    <div class="two">
+      <label class="f">Job title <input type="text" name="title" required maxlength="120" placeholder="Editorial Assistant"></label>
+      <label class="f">Company <input type="text" name="company" required maxlength="80" placeholder="World Red Eye"></label>
+    </div>
+    <label class="f">Link to the job <input type="url" name="url" inputmode="url" placeholder="https://…"></label>
+    <div class="two">
+      <label class="f">Where <input type="text" name="where" maxlength="60" placeholder="Miami, or Remote"></label>
+      <label class="entry-only"><input type="checkbox" name="applied" ${kind === "applied" ? "checked" : ""}> <span>I’ve already applied</span></label>
+    </div>
+    <div class="err" data-err hidden></div>
+    <div class="acts"><button class="act primary" type="submit">Save job</button><button class="act" type="button" data-cancel>Cancel</button></div>
+  </form>`;
+}
+function submitJob(fd) {
+  const get = k => String(fd.get(k) || "").trim();
+  const title = get("title"), company = get("company"), url = get("url"), where = get("where");
+  if (!title || !company) return "Give it a job title and a company.";
+  if (url && !/^https?:\/\//i.test(url)) return "The link should start with http:// or https://";
+  const pid = "my-" + hash((url || `${title}|${company}`).toLowerCase());
+  const now = new Date().toISOString();
+  const j = me.jobs[pid] = me.jobs[pid] || {};
+  j.saved = true;
+  j.snap = { pid, mine: true, title, company, url, location_raw: where, location: "TYPED", family: null,
+             first_seen: j.snap?.first_seen || now, target: false, status: "open" };
+  if (fd.get("applied") && !j.applied) { j.applied = true; j.applied_at = now; j.stage = "Applied"; j.stage_other = ""; j.stage_at = now; }
+  view.addJob = false; save(); render();
+  foot(j.applied ? "Saved and marked as applied — it’s in Your applications." : "Saved — it’s in your Saved list, with room for notes.");
+  return "";
+}
+
 function trackedHTML(kind) {
   const have = new Set(DATA.postings.map(p => p.pid));
-  const gone = Object.values(me.jobs).filter(j => j.snap && !have.has(j.snap.pid)).map(j => ({ ...j.snap, status: "closed" }));
+  // Jobs that left the radar keep showing from their snapshot; jobs she added herself live only in the snapshot.
+  const gone = Object.values(me.jobs).filter(j => j.snap && !have.has(j.snap.pid)).map(j => ({ ...j.snap, status: j.snap.mine ? "open" : "closed" }));
   const when = p => { const j = jobState(p.pid); return (kind === "applied" && j.stage_at) || j.applied_at || p.first_seen || ""; };
   const items = DATA.postings.concat(gone).filter(p => jobState(p.pid)[kind]).sort((a, b) => when(b).localeCompare(when(a)));
-  if (!items.length) return kind === "saved"
-    ? `<div class="empty"><strong>Nothing saved yet.</strong>Tap “♡ Save” on any job you like and it waits for you here, with a space for notes.</div>`
-    : `<div class="empty"><strong>No applications marked yet.</strong>When you send one, tap “I applied” on the job. It moves here with the date, and you can jot down who you contacted and when to follow up.</div>`;
+  const sub = kind === "saved" ? "Jobs you’ve set aside. Add notes as you go." : "Everything you’ve sent, by where it stands. Good luck!";
+  const head = `<div class="block-head"><div><h2>${kind === "saved" ? "Saved for later" : "Your applications"}</h2><p>${sub}</p></div>
+    <button class="linkbtn" data-addjob aria-expanded="${view.addJob}">${view.addJob ? "Close" : "Add a job I found"}</button></div>`;
+  const form = view.addJob ? jobFormHTML(kind) : "";
+  if (!items.length) return `<section class="block">${head}${form}${kind === "saved"
+    ? `<div class="empty"><strong>Nothing saved yet.</strong>Tap “♡ Save” on any job you like and it waits for you here, with a space for notes. Spotted one on LinkedIn or Indeed? “Add a job I found” keeps track of it too.</div>`
+    : `<div class="empty"><strong>No applications marked yet.</strong>When you send one, tap “I applied” on the job. It moves here with the date, and you can jot down who you contacted and when to follow up. Applied somewhere the radar didn’t find? “Add a job I found” puts it here.</div>`}</section>`;
   let body;
   if (kind === "applied") {
     // Group by stage, in the order of the dropdown; each custom "Other…" answer gets its own heading.
@@ -500,8 +602,70 @@ function trackedHTML(kind) {
     body = [...groups.keys()].sort((a, b) => order(a) - order(b) || a.localeCompare(b))
       .map(s => `<div class="day">${esc(s)}</div><div class="cards">${groups.get(s).map(cardHTML).join("")}</div>`).join("");
   } else body = `<div class="cards">${items.map(cardHTML).join("")}</div>`;
-  const sub = kind === "saved" ? "Jobs you’ve set aside. Add notes as you go." : "Everything you’ve sent, by where it stands. Good luck!";
-  return `<section class="block"><div class="block-head"><div><h2>${kind === "saved" ? "Saved for later" : "Your applications"}</h2><p>${sub}</p></div></div>${body}</section>`;
+  return `<section class="block">${head}${form}${body}</section>`;
+}
+
+/* Companies she adds herself: kept here with quick links; also sent to the
+   radar (which then watches their page) when a relay is configured. */
+function companyFormHTML() {
+  const needCode = hasRelay() && !me.passcode;
+  return `<form class="panel addform" id="coform" autocomplete="off">
+    <label class="f">Company name <input type="text" name="name" required maxlength="80" placeholder="World Red Eye"></label>
+    <div class="two">
+      <label class="f">Website or careers page <input type="url" name="url" inputmode="url" placeholder="https://worldredeye.com"></label>
+      <label class="f">LinkedIn page <input type="url" name="linkedin" inputmode="url" placeholder="https://www.linkedin.com/company/world-red-eye/"></label>
+    </div>
+    <label class="entry-only"><input type="checkbox" name="target"> <span>One of my picks (give it a ★)</span></label>
+    ${needCode ? `<label class="f">Radar passcode <input type="text" name="passcode" required placeholder="Itz gave you this"></label>` : ""}
+    <p class="cap">${hasRelay() ? "The radar will start checking this company’s page on its next run."
+                                : "Kept on this device, with its jobs page and LinkedIn one tap away."}</p>
+    <div class="err" data-err hidden></div>
+    <div class="acts"><button class="act primary" type="submit">Add company</button><button class="act" type="button" data-cancel>Cancel</button></div>
+  </form>`;
+}
+function submitCompany(fd) {
+  const get = k => String(fd.get(k) || "").trim();
+  const name = get("name"), url = get("url"), linkedin = get("linkedin"), target = !!fd.get("target"), code = get("passcode");
+  if (!name) return "Give it a name.";
+  if (url && !/^https?:\/\//i.test(url)) return "The website should start with http:// or https://";
+  if (linkedin && !/^https?:\/\/(www\.)?linkedin\.com\/company\/[\w%.-]+\/?$/i.test(linkedin)) return "The LinkedIn link should look like https://www.linkedin.com/company/<name>/";
+  if (code) me.passcode = code;
+  const id = slugify(name) || "company", now = new Date().toISOString();
+  // Re-adding resets the status, so the row reports THIS attempt.
+  const c = me.companies[id] = { ...(me.companies[id] || {}), id, name, url, linkedin, target, added_at: me.companies[id]?.added_at || now,
+                                 error: "", sent_at: "", request_url: "", sending: hasRelay() };
+  view.addCo = false; save(); render();
+  if (hasRelay()) sendCompany(c);
+  else foot("Added — it’s at the top of Who I’m watching.");
+  return "";
+}
+async function sendCompany(c) {
+  try {
+    const r = await relay({ kind: "add-company", company: c.name, url: c.url, linkedin: c.linkedin, target: c.target });
+    c.sent_at = new Date().toISOString(); c.request_url = r.issue_url || ""; c.error = "";
+    foot("Added — the radar will check it from its next run.");
+  } catch (e) { c.error = e.message; foot(`Added here, but the radar couldn’t be told: ${e.message}.`); }
+  delete c.sending; save(); render();
+}
+function companyRowHTML(c) {
+  const rq = DATA.requests || {};
+  const links = [];
+  if (c.url) links.push(`<a href="${esc(c.url)}" target="_blank" rel="noopener">Open their jobs page</a>`);
+  if (c.linkedin) links.push(`<a href="${esc(c.linkedin.replace(/\/+$/, ""))}/jobs/" target="_blank" rel="noopener">LinkedIn jobs</a>`);
+  if (!links.length) links.push(`<a href="https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(c.name)}" target="_blank" rel="noopener">Find on LinkedIn</a>`);
+  links.push(`<button class="linkbtn" data-rmco="${esc(c.id)}">Remove</button>`);
+  let why;
+  if (c.sending) why = "Telling the radar…";
+  else if (c.sent_at) why = "The radar is adding it — it’ll be checked from the next run.";
+  else if (c.error) why = `Saved here, but the radar couldn’t be told: ${esc(c.error)}. Tap Remove and add it again to retry.`;
+  else if (rq.add_company_url) {
+    // No relay: the owner can push it to the radar from GitHub with one click.
+    // A form's checkbox can't be pre-ticked from a link, so the ★ rides in the title (handle_request.py reads it).
+    const q = new URLSearchParams({ title: `Add company: ${c.name}${c.target ? " ★" : ""}`, company: c.name, url: c.url || "", linkedin: c.linkedin || "" });
+    why = `Saved on this device. <a href="${esc(rq.add_company_url)}&${esc(q.toString())}" target="_blank" rel="noopener">Ask the radar to watch it too</a> (needs GitHub).`;
+  } else why = "Saved on this device.";
+  return `<div class="item"><div><div class="name">${c.target ? `<span style="color:var(--sun)">★</span> ` : ""}${esc(c.name)}</div><div class="why">${why}</div></div>
+    <div class="side">${links.join(" · ")}</div></div>`;
 }
 
 function watchingHTML() {
@@ -525,9 +689,15 @@ function watchingHTML() {
                     : li(e) || `<a href="https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(nice(e.name))}" target="_blank" rel="noopener">Find on LinkedIn</a>`,
       esc(e.note || e.group || ""))).join("");
   const src = (DATA.aggregators || []).filter(a => a.ok);
-  const add = DATA.requests?.add_company_url ? `<a class="linkbtn" href="${esc(DATA.requests.add_company_url)}" target="_blank" rel="noopener">Add a company</a>` : "";
-  return `<section class="block"><div class="block-head"><div><h2>Checked for you, three times a day</h2>
-      <p>The radar reads these companies’ job pages and tells you when a role fits.</p></div>${add}</div><div class="list">${auto}</div></section>
+  const C = Object.values(me.companies).sort((a, b) => (b.added_at || "").localeCompare(a.added_at || ""));
+  const yours = `<section class="block"><div class="block-head"><div><h2>Companies you added</h2>
+      <p>${hasRelay() ? "Add one and the radar starts checking its jobs page." : "Keep the ones you care about one tap away."}</p></div>
+      <button class="linkbtn" data-addco aria-expanded="${view.addCo}">${view.addCo ? "Close" : "Add a company"}</button></div>
+      ${view.addCo ? companyFormHTML() : ""}
+      ${C.length ? `<div class="list">${C.map(companyRowHTML).join("")}</div>`
+                 : view.addCo ? "" : `<div class="empty"><strong>None yet.</strong>Spotted a company you’d love to write for? Add it here with its website or LinkedIn page.</div>`}</section>`;
+  return `${yours}<section class="block"><div class="block-head"><div><h2>Checked for you, three times a day</h2>
+      <p>The radar reads these companies’ job pages and tells you when a role fits.</p></div></div><div class="list">${auto}</div></section>
     ${watched ? `<section class="block"><div class="block-head"><div><h2>Pages I keep an eye on</h2>
       <p>These companies don’t have a proper jobs board, so the radar watches their careers page and emails you when it changes.</p></div></div><div class="list">${watched}</div></section>` : ""}
     ${hand ? `<section class="block"><div class="block-head"><div><h2>Worth checking yourself</h2>
@@ -650,8 +820,9 @@ function wire(root) {
   root.querySelectorAll(".card").forEach(card => {
     const pid = card.dataset.pid;
     card.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
-      const j = me.jobs[pid] = me.jobs[pid] || {};
       const k = b.dataset.act;
+      if (k === "remove") { delete me.jobs[pid]; save(); render(); foot("Removed."); return; }
+      const j = me.jobs[pid] = me.jobs[pid] || {};
       j[k] = !j[k];
       if (k === "applied") {
         if (j.applied) { j.applied_at = new Date().toISOString(); j.saved = true; j.stage = "Applied"; j.stage_other = ""; j.stage_at = j.applied_at; }
@@ -661,6 +832,8 @@ function wire(root) {
       if (p) j.snap = { pid, title: p.title, company: p.company, url: p.url, location_raw: p.location_raw, location: p.location,
                         family: p.family, first_seen: p.first_seen, target: p.target, seniority: p.seniority,
                         work_mode: p.work_mode, fit: p.fit, years: p.years };
+      // A job she added lives only in her saves: un-saving it (while not applied) is the same as removing it.
+      if (j.snap?.mine && !j.saved && !j.applied) { delete me.jobs[pid]; foot("Removed."); }
       save(); render(); greet(DATA.owner || "there");
       if (k === "hidden") document.getElementById("foot").textContent = "Hidden. It won’t show up again on this device.";
     });
@@ -684,6 +857,15 @@ function wire(root) {
   });
   const tog = root.querySelector("#ftoggle");
   if (tog) tog.onclick = () => { view.showFilters = !view.showFilters; render(); };
+  // The two "add" forms: a validation message stays in the form; success re-renders.
+  root.querySelectorAll("[data-addjob]").forEach(b => b.onclick = () => { view.addJob = !view.addJob; render(); if (view.addJob) document.querySelector("#jobform input")?.focus(); });
+  root.querySelectorAll("[data-addco]").forEach(b => b.onclick = () => { view.addCo = !view.addCo; render(); if (view.addCo) document.querySelector("#coform input")?.focus(); });
+  root.querySelectorAll("[data-cancel]").forEach(b => b.onclick = () => { view.addJob = view.addCo = false; render(); });
+  const jf = root.querySelector("#jobform");
+  if (jf) jf.onsubmit = e => { e.preventDefault(); const err = submitJob(new FormData(jf)); if (err) showErr(jf, err); };
+  const cf = root.querySelector("#coform");
+  if (cf) cf.onsubmit = e => { e.preventDefault(); const err = submitCompany(new FormData(cf)); if (err) showErr(cf, err); };
+  root.querySelectorAll("[data-rmco]").forEach(b => b.onclick = () => { delete me.companies[b.dataset.rmco]; save(); render(); foot("Removed."); });
   const flip = (set, v) => set.has(v) ? set.delete(v) : set.add(v);
   root.querySelectorAll("[data-loc]").forEach(b => b.onclick = () => { flip(view.locOff, b.dataset.loc); save(); render(); });
   root.querySelectorAll("[data-fam]").forEach(b => b.onclick = () => { flip(view.famOff, b.dataset.fam); save(); render(); });
@@ -698,7 +880,7 @@ function wire(root) {
 }
 
 document.getElementById("export").onclick = () => {
-  const blob = new Blob([JSON.stringify({ exported_at: new Date().toISOString(), jobs: me.jobs }, null, 1)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify({ exported_at: new Date().toISOString(), jobs: me.jobs, companies: me.companies }, null, 1)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `job-radar-backup-${new Date().toISOString().slice(0, 10)}.json`;
@@ -717,8 +899,11 @@ document.getElementById("import").onchange = async e => {
                      applied_at: cur.applied_at || v.applied_at || null, note: cur.note || v.note || "" };
       if (st.stage) Object.assign(me.jobs[k], { stage: st.stage, stage_other: st.stage_other || "", stage_at: st.stage_at || null });
     }
+    const cos = got.companies && typeof got.companies === "object" ? got.companies : {};
+    for (const [k, v] of Object.entries(cos)) me.companies[k] = { ...v, ...(me.companies[k] || {}) }; // what's on this device wins
     save(); render(); greet(DATA.owner || "there");
-    document.getElementById("foot").textContent = `Welcome back — restored ${Object.keys(got.jobs).length} saved jobs.`;
+    const nco = Object.keys(cos).length;
+    foot(`Welcome back — restored ${Object.keys(got.jobs).length} saved jobs${nco ? ` and ${nco} compan${nco === 1 ? "y" : "ies"}` : ""}.`);
   } catch (err) {
     document.getElementById("foot").textContent = "That file isn’t a Job Radar backup. Choose the .json file that “Back up my saves” downloaded.";
   }

@@ -440,10 +440,14 @@ def request_links(cfg: dict) -> dict | None:
     if "/" not in repo:
         return None
     base = f"https://github.com/{repo}"
-    return {"repo_url": base,
-            "add_company_url": f"{base}/issues/new?template=add-company.yml",
-            "refresh_url": f"{base}/issues/new?template=refresh.md",
-            "actions_url": f"{base}/actions/workflows/radar.yml"}
+    out = {"repo_url": base,
+           "add_company_url": f"{base}/issues/new?template=add-company.yml",
+           "refresh_url": f"{base}/issues/new?template=refresh.md",
+           "actions_url": f"{base}/actions/workflows/radar.yml"}
+    relay = str((cfg.get("github") or {}).get("relay_url") or "").strip()
+    if relay.startswith("https://"):
+        out["relay_url"] = relay           # the page then talks to the relay, not GitHub
+    return out
 
 
 if __name__ == "__main__":

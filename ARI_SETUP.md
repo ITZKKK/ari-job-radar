@@ -36,19 +36,19 @@ That's it. You'll get a "your radar is live" email once Itz finishes setup.
 
 ---
 
-## 2. Make a free GitHub account and send Itz your username (3 minutes)
+## 2. Only if Itz asks: make a free GitHub account (3 minutes)
 
-Your radar has two buttons that need it: **Add a company** (watch another
-employer) and **Check for new jobs now**. Each one opens a short form on
-GitHub, the site the radar lives on; Itz's setup then does the rest within
-about 5 minutes. It's free, there's no AI involved, and only the usernames Itz
-lists are obeyed — so he needs yours.
+Adding jobs and companies on your radar needs no account at all. Two things
+do need to reach the radar's home on GitHub: having it *watch* a company's
+page for you, and **Check for new jobs now**. If Itz gives you a **passcode**,
+you're done — the page asks for it once and both work right there. If he
+hasn't, those two open a short form on GitHub instead, so:
 
 1. Go to **github.com** → **Sign up**. Any email is fine; pick a username.
 2. Confirm your email.
 3. Send Itz your username. He adds it to the radar's allow-list.
 
-Until then the buttons still open, but the radar will politely refuse.
+Until then the forms still open, but the radar will politely refuse.
 
 ---
 
@@ -110,7 +110,8 @@ them, but they'll email you directly. Each is free:
 - **All jobs** has everything that's open, with search and filters (where, kind of role, how you'd work, early-career only). **Early career** on a card means the job says entry level or asks for up to 2 years; **Stretch** means it asks for 3–4 years or is a manager role — still worth a look, just know going in.
 - Tap **♡ Save** on anything interesting and **I applied** once you've sent it. A notes box appears for who you wrote to, the deadline and when to follow up, and a small menu lets you say where it stands (Heard back, Interview, Offer…); the **Applied** tab groups your applications by that. **Not for me** hides a job.
 - **Stats** shows the numbers behind what you see: open jobs, new this week, how many are elsewhere in the US, your applications, and whether the radar itself is working.
-- **Who I'm watching** lists the companies the radar checks for you, and which ones are worth checking yourself. **Add a company** there opens a short form: name, website if you know it, LinkedIn page if you like, and a tick if it's one of your picks. The radar adds it within about 5 minutes and replies on the form.
-- **Check for new jobs now** (top of the page) opens a one-tap form; tap **Create** and the radar runs right away. Give it about 5 minutes, then reopen your radar. (Both buttons need you to be signed in to GitHub — see step 2.)
+- Found a job yourself, on LinkedIn or Indeed? **Add a job I found** (Saved or Applied tab) keeps it with the rest: title, company, link, and a tick if you've already applied. Then notes and stages work like for any other job.
+- **Who I'm watching** lists the companies the radar checks for you, and which ones are worth checking yourself. **Add a company** there takes a name, website if you know it, LinkedIn page if you like, and a tick if it's one of your picks. It appears at the top with its jobs page one tap away; with the passcode (step 2) the radar also starts checking its page from the next run.
+- **Check for new jobs now** (top of the page) makes the radar run right away. Give it about 5 minutes, then reload. (Needs the passcode, or a GitHub sign-in — see step 2.)
 - **More places to look** has one-tap LinkedIn and Indeed searches for the last week, plus the alerts and newsletters above.
 - Your saves stay on the phone or laptop you use. Before switching, tap **Back up my saves** at the bottom, then **Restore a backup** on the new one.

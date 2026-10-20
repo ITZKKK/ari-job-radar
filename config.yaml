@@ -266,3 +266,8 @@ aggregators:
 github:
   repo: ITZKKK/ari-job-radar
   allowed_users: [ITZKKK]
+  # Optional. The address of the relay (relay/worker.js on Cloudflare) that
+  # lets Ari add companies and start a crawl from the dashboard WITHOUT a
+  # GitHub account: the page posts to it with a passcode and it opens the
+  # issue on her behalf. Empty = the buttons use GitHub issue forms instead.
+  relay_url: ""

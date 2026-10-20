@@ -119,14 +119,50 @@ On iPhone, she can open it in Safari → **Share** → **Add to Home Screen**, a
 
 ### 9. The two dashboard buttons (Add a company, Check for new jobs now)
 
-Both open a GitHub issue form; the **requests** workflow acts on it within a
-few minutes and replies on the issue. Anyone can open an issue on a public repo,
-so only the GitHub usernames in `config.yaml` → `github.allowed_users` are
-obeyed (everyone else gets a polite "ask Itz" and the issue is closed).
+On the page itself Ari can **add a job she found** (Saved / Applied tabs) and
+**add a company** (Who I'm watching). Both stay on her device, like her saves,
+and need no account. For the radar to *act* on a company (watch its page) or
+to crawl right now, the request has to reach this repo. Two ways:
+
+**a. Through GitHub (the default).** The request becomes a GitHub issue (the
+page's "Ask the radar to watch it too" link, or the Refresh button) and the
+**requests** workflow acts on it within a few minutes and replies on the
+issue. Anyone can open an issue on a public repo, so only the GitHub usernames
+in `config.yaml` → `github.allowed_users` are obeyed (everyone else gets a
+polite "ask Itz" and the issue is closed). Needs a GitHub account.
 
 - Repo → **Issues** → **Labels** → create `add-company` and `refresh` (the
   forms apply them; the title decides even if the labels are missing).
 - When Ari has a GitHub account, add her username to `allowed_users`.
+
+**b. Through a relay: no GitHub account for Ari (about 15 minutes, free).**
+`relay/worker.js` is a small Cloudflare Worker that holds a token for this
+one repo and opens the issue on her behalf; the page sends it a passcode she
+types once. Set it up like this:
+
+1. GitHub → your avatar → **Settings** → **Developer settings** → **Personal
+   access tokens** → **Fine-grained tokens** → **Generate new token**. Name
+   `ari-job-radar relay`; Repository access: **Only select repositories** →
+   `ari-job-radar`; Repository permissions: **Issues → Read and write**
+   (nothing else). Generate and copy the token.
+2. **cloudflare.com** → sign up (free) → **Workers & Pages** → **Create** →
+   **Start with Hello World** → **Deploy** → **Edit code**. Replace everything
+   with the contents of `relay/worker.js` → **Deploy**.
+3. The worker's **Settings** → **Variables and secrets**: add secrets
+   `GITHUB_TOKEN` (the token) and `PASSCODE` (three or four words you'll
+   tell Ari; it is the only thing between the internet and your issue list,
+   so not a single word), and plain variables `REPO` = `ITZKKK/ari-job-radar`,
+   `ALLOW_ORIGIN` = `https://itzkkk.github.io`.
+4. Copy the worker's address (`https://<name>.<account>.workers.dev`) into
+   `config.yaml` → `github.relay_url` and commit. The next deploy switches
+   both buttons over: no GitHub sign-in, just the passcode.
+5. Tell Ari the passcode. The page asks for it once and remembers it.
+
+The issues the relay opens are authored by the token's owner (you), so
+`allowed_users` needs nothing new. To revoke access later, delete the token.
+The worker pauses 1.5 s on a wrong passcode; for extra safety, Cloudflare →
+**Security** → **WAF** → **Rate limiting rules** can cap the worker's
+hostname at, say, 10 requests a minute (one rule is free).
 
 ---
 
@@ -208,7 +244,7 @@ GitHub emails you.
 cd ~/Desktop/"Ari's tracker"/ari-job-radar
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt pytest
-python -m pytest -q                                   # 101 tests, no network needed
+python -m pytest -q                                   # 104 tests, no network needed
 python src/crawl.py --only "the-drum" --dry-run       # one employer, writes nothing
 cp .env.example .env    # fill in to test email locally
 python src/notify.py --test
@@ -248,6 +284,6 @@ site/index.html      the dashboard (one static page)
 .github/workflows/radar.yml      schedule + publish
 .github/workflows/requests.yml   the two dashboard buttons (issue → employers.yaml edit / crawl)
 .github/ISSUE_TEMPLATE/          the "Add a company" form and the "Refresh now" template
-tests/test_tracker.py         101 tests, incl. real job titles from 19 Oct 2026
+tests/test_tracker.py         104 tests, incl. real job titles from 19 Oct 2026
 ARI_SETUP.md         Ari's part: Resend in 5 minutes, alerts to subscribe to, questions
 ```

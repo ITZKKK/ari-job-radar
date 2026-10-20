@@ -9,6 +9,7 @@ so the role filter is tested against what the boards actually say.
 
 import json
 import os
+import re
 import shutil
 import sys
 
@@ -366,6 +367,37 @@ def test_crawl_lifecycle(tmp_path, monkeypatch):
     assert [loc["id"] for loc in radar["locations"]] == ["MIAMI", "REMOTE"]
     drum = [e for e in radar["employers"] if e["id"] == "the-drum"][0]
     assert "linkedin_url" in drum and drum["open_relevant"] == 2   # Reporter + Newsletter Writer, not Staff Writer
+
+
+def test_relay_worker_matches_the_parser():
+    # relay/worker.js builds the issue body by hand; it must stay parseable by handle_request.
+    js = open(os.path.join(ROOT, "relay", "worker.js"), encoding="utf-8").read()
+    labels = dict(re.findall(r'(\w+): "([^"]+)"', re.search(r"const LABELS = \{([^}]+)\}", js).group(1)))
+    assert labels == hreq.LABELS
+    assert re.search(r'const TARGET_OPTION = "([^"]+)"', js).group(1) == hreq.TARGET_OPTION
+    body = "Sent from the dashboard.\n\n" + "\n\n".join([
+        f"### {labels['company']}\n\nWorld Red Eye", f"### {labels['url']}\n\n_No response_",
+        f"### {labels['linkedin']}\n\nhttps://www.linkedin.com/company/world-red-eye/",
+        f"### {labels['target']}\n\n- [x] {hreq.TARGET_OPTION}"])
+    got = hreq.parse_issue_form(body)
+    assert got[labels["company"].lower()] == "World Red Eye" and got[labels["url"].lower()] == ""
+    assert got[labels["linkedin"].lower()].endswith("/world-red-eye/") and got[labels["target"].lower()] is True
+
+
+def test_handle_request_star_in_title(tmp_path):
+    # The dashboard's prefilled GitHub link can't tick the ★ box, so it rides in the title.
+    p = _employers_copy(tmp_path)
+    r = hreq.handle({"title": "Add company: Star Weekly ★", "body": "", "user": "ITZKKK", "labels": ""}, CFG, path=p, check=False)
+    assert r["kind"] == "add-company" and r["changed"]
+    row = {e["id"]: e for e in yaml.safe_load(open(p))["employers"]}["star-weekly"]
+    assert row["name"] == "Star Weekly" and row["target"] is True
+
+
+def test_request_links_relay():
+    assert "relay_url" not in crawl.request_links({"github": {"repo": "a/b"}})
+    got = crawl.request_links({"github": {"repo": "a/b", "relay_url": " https://r.example.workers.dev "}})
+    assert got["relay_url"] == "https://r.example.workers.dev" and got["refresh_url"].startswith("https://github.com/a/b/")
+    assert "relay_url" not in crawl.request_links({"github": {"repo": "a/b", "relay_url": "http://insecure.example"}})
 
 
 def test_export_backfills_old_state(tmp_path):

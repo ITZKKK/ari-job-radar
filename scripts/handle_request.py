@@ -113,11 +113,14 @@ def handle(issue: dict, cfg: dict, *, path: str | None = None, check: bool = Tru
 
     # add-company
     form = parse_issue_form(issue.get("body"))
-    name = form.get(LABELS["company"].lower()) or re.sub(r"^add company:?\s*", "", issue.get("title") or "", flags=re.I)
+    title = issue.get("title") or ""
+    name = form.get(LABELS["company"].lower()) or re.sub(r"^add company:?\s*", "", title, flags=re.I)
     target = form.get(LABELS["target"].lower())
+    # The dashboard's prefilled link can't tick the checkbox, so it puts a ★ in the title.
+    pick = (bool(target) if isinstance(target, bool) else False) or "★" in title
     try:
-        r = add_employer(str(name).strip(), form.get(LABELS["url"].lower()) or None,
-                         target=bool(target) if isinstance(target, bool) else False,
+        r = add_employer(str(name).replace("★", "").strip(), form.get(LABELS["url"].lower()) or None,
+                         target=pick,
                          linkedin_url=form.get(LABELS["linkedin"].lower()) or None,
                          path=path, check=check)
     except ValueError as ex:
