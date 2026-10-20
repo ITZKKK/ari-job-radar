@@ -64,11 +64,15 @@ def fetch_jsearch(client, c: dict) -> list[RawPosting]:
     key = os.environ["JSEARCH_RAPIDAPI_KEY"]
     out = []
     for q in c["queries"]:
-        r = _get(client, "https://jsearch.p.rapidapi.com/search", params={
-            "query": q, "page": 1, "num_pages": 1, "country": "us",
+        # v5 of the API moved Job Search from /search to /search-v2.
+        r = _get(client, "https://jsearch.p.rapidapi.com/search-v2", params={
+            "query": q, "num_pages": 1, "country": "us",
             "date_posted": c.get("date_posted", "3days")},
             headers={"X-RapidAPI-Key": key, "X-RapidAPI-Host": "jsearch.p.rapidapi.com"})
-        for j in r.json().get("data", []) or []:
+        data = r.json().get("data") or []
+        if isinstance(data, dict):
+            data = data.get("jobs") or []
+        for j in data:
             loc = _join(j.get("job_city"), j.get("job_state"), j.get("job_country"))
             if j.get("job_is_remote"):
                 loc = _join(loc, "Remote")
