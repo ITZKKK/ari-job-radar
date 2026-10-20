@@ -1,15 +1,15 @@
 {
- "generated_at": "2026-10-20T13:56:32+00:00",
+ "generated_at": "2026-10-20T15:44:25+00:00",
  "owner": "Ari",
  "last_run": {
-  "closed": 0,
-  "duration_s": 118,
-  "finished_at": "2026-10-20T06:16:09+00:00",
+  "started_at": "2026-10-20T15:41:52+00:00",
+  "finished_at": "2026-10-20T15:44:25+00:00",
+  "duration_s": 153,
   "first_run": false,
-  "new_relevant": 6,
-  "sources_failed": 1,
+  "new_relevant": 4,
+  "closed": 2,
   "sources_ok": 24,
-  "started_at": "2026-10-20T06:14:11+00:00"
+  "sources_failed": 1
  },
  "runs": [
   {
@@ -51,6 +51,16 @@
    "sources_failed": 1,
    "sources_ok": 24,
    "started_at": "2026-10-20T06:14:11+00:00"
+  },
+  {
+   "started_at": "2026-10-20T15:41:52+00:00",
+   "finished_at": "2026-10-20T15:44:25+00:00",
+   "duration_s": 153,
+   "first_run": false,
+   "new_relevant": 4,
+   "closed": 2,
+   "sources_ok": 24,
+   "sources_failed": 1
   }
  ],
  "locations": [
@@ -131,13 +141,13 @@
   "actions_url": "https://github.com/ITZKKK/ari-job-radar/actions/workflows/radar.yml"
  },
  "totals": {
-  "open_all": 193,
+  "open_all": 192,
   "open_shown": 27,
   "by_location_all": {
-   "OTHER_US": 85,
+   "OTHER_US": 83,
    "NYC": 71,
    "REMOTE": 14,
-   "UNKNOWN": 10,
+   "UNKNOWN": 11,
    "MIAMI": 10,
    "FLORIDA": 3
   }
@@ -154,7 +164,7 @@
    "location_raw": "Remote - USA",
    "url": "https://job-boards.greenhouse.io/thenewyorktimes/jobs/4706618005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -181,7 +191,7 @@
    "location_raw": "Remote",
    "url": "https://job-boards.greenhouse.io/axios/jobs/8120449",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -206,7 +216,7 @@
    "location_raw": "Semafor - Remote",
    "url": "https://job-boards.greenhouse.io/semafor/jobs/4717606005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -231,7 +241,7 @@
    "location_raw": "New York, NY",
    "url": "https://jobs.lever.co/morningbrew/c7237d4d-414c-4fc0-949f-53642081b054",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -256,7 +266,7 @@
    "location_raw": "Stamford, CT, US, Remote",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000152489369",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "content",
@@ -281,7 +291,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/simpletiger-content-coordinator-u-s-based-remote-contractor",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "content",
@@ -307,7 +317,7 @@
    "location_raw": "Miami, FL",
    "url": "https://univision.wd1.myworkdayjobs.com/en-US/External/job/Miami-FL/Social-Media-Content-Producer-Seasonal_R019792",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "content",
@@ -332,7 +342,7 @@
    "location_raw": "Miami, FL",
    "url": "https://univision.wd1.myworkdayjobs.com/en-US/External/job/Miami-FL/Digital-Marketing-Specialist_R021166",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -357,7 +367,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/amwell-content-marketing-manager",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "content",
@@ -383,7 +393,7 @@
    "location_raw": "New York, New York, United States / Miami, Florida, United States",
    "url": "https://apply.workable.com/j/69F4B8ADF6",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -408,7 +418,7 @@
    "location_raw": "California - Los Angeles Office; Florida - Miami Office",
    "url": "https://www.pmc.com/join-our-team/?gh_jid=4733474005#/jobs/4733474005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -433,7 +443,7 @@
    "location_raw": "Remote - USA",
    "url": "https://job-boards.greenhouse.io/thenewyorktimes/jobs/4625373005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -458,7 +468,7 @@
    "location_raw": "Miami, Florida, US",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000154747390",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -483,7 +493,7 @@
    "location_raw": "Remote",
    "url": "https://job-boards.greenhouse.io/semafor/jobs/4726092005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -534,7 +544,7 @@
    "location_raw": "Miami, Florida, United States / New York, New York, United States",
    "url": "https://apply.workable.com/j/AE03E4894D",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -559,7 +569,7 @@
    "location_raw": "Miami, Florida, United States",
    "url": "https://apply.workable.com/j/C593903BEC",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -584,7 +594,7 @@
    "location_raw": "Miami, FL",
    "url": "https://univision.wd1.myworkdayjobs.com/en-US/External/job/Miami-FL/Assignment-Editor-and-Producer_R020958",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -592,7 +602,7 @@
    "seniority": "mid",
    "years": null,
    "flags": [],
-   "posted_at": "Posted 26 Days Ago",
+   "posted_at": "Posted 27 Days Ago",
    "work_mode": "unknown",
    "fit": "open",
    "remote_offered": false,
@@ -609,7 +619,7 @@
    "location_raw": "Washington, DC, New York, New York or Remote",
    "url": "https://job-boards.greenhouse.io/semafor/jobs/4744127005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -634,7 +644,7 @@
    "location_raw": "Remote (US Only)",
    "url": "http://boards.greenhouse.io/voxmedia/jobs/8259059?gh_jid=8259059",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -659,7 +669,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/animalz-developmental-content-editor",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -685,7 +695,7 @@
    "location_raw": "Miami, Florida, US",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000150722598",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -736,7 +746,7 @@
    "location_raw": "Stamford, CT, US, Remote",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000154195149",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -761,7 +771,7 @@
    "location_raw": "Washington, DC, New York, New York or Remote",
    "url": "https://job-boards.greenhouse.io/semafor/jobs/4743568005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -786,7 +796,7 @@
    "location_raw": "Remote",
    "url": "https://job-boards.greenhouse.io/axios/jobs/8042367",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -811,7 +821,7 @@
    "location_raw": "Palm Beach Gardens, FL, United States",
    "url": "https://eevd.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/2023828",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-20T06:14:11+00:00",
+   "last_seen": "2026-10-20T15:41:52+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -914,7 +924,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://careers.timeout.com/jobs",
     "error": ""
    }
@@ -938,7 +948,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://www.miaminewtimes.com/about/careers/",
     "error": ""
    }
@@ -962,7 +972,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://www.voicemediagroup.com/open-positions/",
     "error": ""
    }
@@ -986,7 +996,7 @@
     "status": "blocked",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://hauteliving.com/careers",
     "error": "HTTP 403"
    }
@@ -1044,7 +1054,7 @@
     "status": "blocked",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://www.modernluxury.com/careers",
     "error": "HTTP 403"
    }
@@ -1095,7 +1105,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 4,
-   "board_total": 397,
+   "board_total": 387,
    "error": "",
    "failures": 0,
    "page": null
@@ -1112,7 +1122,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 3,
-   "board_total": 54,
+   "board_total": 53,
    "error": "",
    "failures": 0,
    "page": null
@@ -1136,7 +1146,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://www.wlrn.org/jobs",
     "error": ""
    }
@@ -1177,7 +1187,7 @@
     "status": "empty",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://www.local10.com/careers/",
     "error": ""
    }
@@ -1194,7 +1204,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 582,
+   "board_total": 577,
    "error": "",
    "failures": 0,
    "page": null
@@ -1245,7 +1255,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 1,
-   "board_total": 372,
+   "board_total": 370,
    "error": "",
    "failures": 0,
    "page": null
@@ -1262,7 +1272,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 35,
+   "board_total": 34,
    "error": "",
    "failures": 0,
    "page": null
@@ -1381,7 +1391,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 2,
-   "board_total": 149,
+   "board_total": 150,
    "error": "",
    "failures": 0,
    "page": null
@@ -1398,7 +1408,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 199,
+   "board_total": 198,
    "error": "",
    "failures": 0,
    "page": null
@@ -1466,7 +1476,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 112,
+   "board_total": 116,
    "error": "",
    "failures": 0,
    "page": null
@@ -1490,7 +1500,7 @@
     "status": "blocked",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://www.atlasobscura.com/jobs",
     "error": "HTTP 403"
    }
@@ -1514,7 +1524,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://jobs.jobvite.com/everyday-health-consumer/jobs",
     "error": ""
    }
@@ -1538,7 +1548,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://pucknews.applytojob.com",
     "error": ""
    }
@@ -1596,7 +1606,7 @@
     "status": "error",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-20T06:14:11+00:00",
+    "checked_at": "2026-10-20T15:41:52+00:00",
     "url": "https://careers.digiday.com",
     "error": "ConnectError: [Errno -2] Name or service not known"
    }
@@ -1645,7 +1655,7 @@
    "last_ok": null,
    "count_total": null,
    "count_relevant": null,
-   "consecutive_failures": 3
+   "consecutive_failures": 4
   },
   {
    "id": "remotive",
@@ -1662,7 +1672,7 @@
    "name": "NAHJ Career Center",
    "ok": true,
    "error": "",
-   "last_ok": "2026-10-20T06:14:11+00:00",
+   "last_ok": "2026-10-20T15:41:52+00:00",
    "count_total": 20,
    "count_relevant": 7,
    "consecutive_failures": 0
@@ -1672,8 +1682,8 @@
    "name": "We Work Remotely (marketing)",
    "ok": true,
    "error": "",
-   "last_ok": "2026-10-20T06:14:11+00:00",
-   "count_total": 128,
+   "last_ok": "2026-10-20T15:41:52+00:00",
+   "count_total": 124,
    "count_relevant": 3,
    "consecutive_failures": 0
   }
