@@ -1,15 +1,15 @@
 {
- "generated_at": "2026-10-20T15:44:25+00:00",
+ "generated_at": "2026-10-20T15:49:45+00:00",
  "owner": "Ari",
  "last_run": {
-  "started_at": "2026-10-20T15:41:52+00:00",
-  "finished_at": "2026-10-20T15:44:25+00:00",
+  "closed": 2,
   "duration_s": 153,
+  "finished_at": "2026-10-20T15:44:25+00:00",
   "first_run": false,
   "new_relevant": 4,
-  "closed": 2,
+  "sources_failed": 1,
   "sources_ok": 24,
-  "sources_failed": 1
+  "started_at": "2026-10-20T15:41:52+00:00"
  },
  "runs": [
   {
@@ -53,14 +53,14 @@
    "started_at": "2026-10-20T06:14:11+00:00"
   },
   {
-   "started_at": "2026-10-20T15:41:52+00:00",
-   "finished_at": "2026-10-20T15:44:25+00:00",
+   "closed": 2,
    "duration_s": 153,
+   "finished_at": "2026-10-20T15:44:25+00:00",
    "first_run": false,
    "new_relevant": 4,
-   "closed": 2,
+   "sources_failed": 1,
    "sources_ok": 24,
-   "sources_failed": 1
+   "started_at": "2026-10-20T15:41:52+00:00"
   }
  ],
  "locations": [
@@ -134,11 +134,10 @@
    "tier": "also"
   }
  ],
- "requests": {
-  "repo_url": "https://github.com/ITZKKK/ari-job-radar",
-  "add_company_url": "https://github.com/ITZKKK/ari-job-radar/issues/new?template=add-company.yml",
-  "refresh_url": "https://github.com/ITZKKK/ari-job-radar/issues/new?template=refresh.md",
-  "actions_url": "https://github.com/ITZKKK/ari-job-radar/actions/workflows/radar.yml"
+ "inbox": {
+  "url": "https://ntfy.sh/ari-job-radar-dbda73628b94bb13124e",
+  "done": [],
+  "rejected": {}
  },
  "totals": {
   "open_all": 192,
@@ -845,6 +844,12 @@
    "city": "London / New York / Miami",
    "careers_url": "https://apply.workable.com/the-drum/",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "The Drum",
+    "Carnyx Group",
+    "Drum"
+   ],
    "ats": "workable",
    "mode": "read",
    "note": null,
@@ -862,6 +867,11 @@
    "city": "New York / national",
    "careers_url": "https://www.theinfatuation.com/careers",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "The Infatuation",
+    "Infatuation"
+   ],
    "ats": "oracle",
    "mode": "read",
    "note": null,
@@ -879,6 +889,20 @@
    "city": "New York / Los Angeles / national",
    "careers_url": "https://job-boards.greenhouse.io/pmc",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Penske Media",
+    "Penske Media Corporation",
+    "PMC",
+    "Eater",
+    "Thrillist",
+    "Robb Report",
+    "WWD",
+    "Variety",
+    "Billboard",
+    "Rolling Stone",
+    "PMX Global"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -896,6 +920,14 @@
    "city": "New York / Los Angeles",
    "careers_url": null,
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "VICE",
+    "VICE Media",
+    "VICE Media Group",
+    "Vice Media LLC",
+    "Refinery29"
+   ],
    "ats": "unknown",
    "mode": "check",
    "note": "No public job board found (its old Workday and Greenhouse boards are gone as of Oct 2026). Follow VICE on LinkedIn.",
@@ -913,6 +945,13 @@
    "city": "Miami / New York",
    "careers_url": "https://careers.timeout.com/jobs",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Time Out",
+    "Time Out Group",
+    "Time Out Miami",
+    "Time Out New York"
+   ],
    "ats": "teamtailor",
    "mode": "watched",
    "note": "Board is mostly Time Out Market hospitality jobs; the radar watches it for editorial ones.",
@@ -937,6 +976,12 @@
    "city": "Miami",
    "careers_url": "https://www.miaminewtimes.com/about/careers/",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Miami New Times",
+    "Voice Media Group",
+    "New Times"
+   ],
    "ats": "email",
    "mode": "watched",
    "note": "Posts openings on its own careers page and takes applications by email; often freelance calls.",
@@ -961,6 +1006,11 @@
    "city": "Miami / Denver / Phoenix",
    "careers_url": "https://www.voicemediagroup.com/open-positions/",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Voice Media Group",
+    "VMG"
+   ],
    "ats": "email",
    "mode": "watched",
    "note": null,
@@ -985,6 +1035,13 @@
    "city": "Miami / New York",
    "careers_url": "https://hauteliving.com/careers",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Haute Living",
+    "Haute Media Group",
+    "Haute Media",
+    "Haute Residence"
+   ],
    "ats": "none",
    "mode": "check",
    "note": "No job board found; roles appear on LinkedIn / Indeed. Follow Haute Living on LinkedIn.",
@@ -1009,6 +1066,11 @@
    "city": "Miami",
    "careers_url": null,
    "linkedin_url": "https://www.linkedin.com/company/world-red-eye/",
+   "inbox_id": null,
+   "aliases": [
+    "World Red Eye",
+    "WorldRedEye"
+   ],
    "ats": "none",
    "mode": "check",
    "note": "No careers page; posts on Mediabistro / ZipRecruiter. The job-search sources catch it when it does.",
@@ -1026,6 +1088,12 @@
    "city": "Miami",
    "careers_url": null,
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Ocean Drive",
+    "Ocean Drive Magazine",
+    "Ocean Drive Media Group"
+   ],
    "ats": "none",
    "mode": "check",
    "note": "No public job board; openings go out by email and through the University of Miami communication jobs board.",
@@ -1043,6 +1111,12 @@
    "city": "Miami / national",
    "careers_url": "https://www.modernluxury.com/careers",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Modern Luxury",
+    "Modern Luxury Media",
+    "Modern Luxury Miami"
+   ],
    "ats": "none",
    "mode": "check",
    "note": "No job board found; check LinkedIn.",
@@ -1067,6 +1141,13 @@
    "city": "Local newsrooms / Washington / New York",
    "careers_url": "https://job-boards.greenhouse.io/axios",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Axios",
+    "Axios Media",
+    "Axios Local",
+    "Axios Miami"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1084,6 +1165,13 @@
    "city": "Miami / McClatchy markets",
    "careers_url": "https://mcclatchy.rec.pro.ukg.net/MCC1008MCLTC/JobBoard/ff11d963-22db-4278-a2b7-709f3b882262",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Miami Herald",
+    "el Nuevo Herald",
+    "McClatchy",
+    "The McClatchy Company"
+   ],
    "ats": "ukg",
    "mode": "read",
    "note": null,
@@ -1101,6 +1189,15 @@
    "city": "Miami / New York",
    "careers_url": "https://www.nbcunicareers.com",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "NBCUniversal",
+    "Telemundo",
+    "NBC Universal",
+    "NBCUniversal Media",
+    "NBC News",
+    "Telemundo Network Group"
+   ],
    "ats": "smartrecruiters",
    "mode": "read",
    "note": null,
@@ -1118,6 +1215,13 @@
    "city": "Miami / New York",
    "careers_url": "https://corporate.televisaunivision.com/careers/",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "TelevisaUnivision",
+    "Univision",
+    "Univision Communications",
+    "Televisa Univision"
+   ],
    "ats": "workday",
    "mode": "read",
    "note": null,
@@ -1135,6 +1239,11 @@
    "city": "Miami",
    "careers_url": "https://www.wlrn.org/jobs",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "WLRN",
+    "Friends of WLRN"
+   ],
    "ats": "none",
    "mode": "watched",
    "note": null,
@@ -1159,6 +1268,14 @@
    "city": "Miami",
    "careers_url": "https://careers.paramount.com/go/CBS-News/8710900/",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Paramount",
+    "CBS News",
+    "CBS News Miami",
+    "Paramount Skydance",
+    "WFOR"
+   ],
    "ats": "successfactors",
    "mode": "check",
    "note": "Paramount's careers site can't be read automatically; open the CBS News list and look for Miami.",
@@ -1176,6 +1293,12 @@
    "city": "Miami",
    "careers_url": "https://www.local10.com/careers/",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "WPLG",
+    "Local 10",
+    "Graham Media Group"
+   ],
    "ats": "email",
    "mode": "check",
    "note": null,
@@ -1200,6 +1323,15 @@
    "city": "Miami / New York / global",
    "careers_url": "https://job-boards.greenhouse.io/feverup",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Fever",
+    "Feverup",
+    "Fever Labs",
+    "Secret Media Network",
+    "Secret Miami",
+    "Secret NYC"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1217,6 +1349,15 @@
    "city": "New York / national",
    "careers_url": "https://job-boards.greenhouse.io/voxmedia",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Vox Media",
+    "Vox Media LLC",
+    "New York Magazine",
+    "The Cut",
+    "Vox",
+    "Curbed"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1234,6 +1375,19 @@
    "city": "New York",
    "careers_url": "https://condenast.wd5.myworkdayjobs.com/en-US/CondeCareers",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Condé Nast",
+    "Conde Nast",
+    "Bon Appétit",
+    "Bon Appetit",
+    "Vogue",
+    "Condé Nast Traveler",
+    "Architectural Digest",
+    "The New Yorker",
+    "WIRED",
+    "GQ"
+   ],
    "ats": "workday",
    "mode": "check",
    "note": "Its Workday board redirected to Workday's error page on 19 Oct 2026. Re-check; when it loads, set verified to true.",
@@ -1251,6 +1405,19 @@
    "city": "New York / national",
    "careers_url": "https://www.hearst.com/careers",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Hearst",
+    "Hearst Magazines",
+    "Hearst Communications",
+    "Hearst Television",
+    "Elle",
+    "Cosmopolitan",
+    "Esquire",
+    "Town & Country",
+    "Food Network Magazine",
+    "Delish"
+   ],
    "ats": "oracle",
    "mode": "read",
    "note": null,
@@ -1268,6 +1435,19 @@
    "city": "New York / national",
    "careers_url": "https://meredith.wd5.myworkdayjobs.com/EXT",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "People Inc.",
+    "People Inc",
+    "Dotdash Meredith",
+    "Dotdash",
+    "Meredith",
+    "Food & Wine",
+    "Travel + Leisure",
+    "Southern Living",
+    "Allrecipes",
+    "Serious Eats"
+   ],
    "ats": "workday",
    "mode": "read",
    "note": null,
@@ -1285,6 +1465,17 @@
    "city": "New York",
    "careers_url": "https://jobs.lever.co/BDG",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Bustle Digital Group",
+    "BDG",
+    "Bustle",
+    "Nylon",
+    "Elite Daily",
+    "The Zoe Report",
+    "Inverse",
+    "Romper"
+   ],
    "ats": "lever",
    "mode": "read",
    "note": null,
@@ -1302,6 +1493,13 @@
    "city": "New York / Los Angeles",
    "careers_url": "https://www.buzzfeed.com/about/jobs",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "BuzzFeed",
+    "BuzzFeed Inc",
+    "HuffPost",
+    "Tasty"
+   ],
    "ats": "unknown",
    "mode": "check",
    "note": "Its Greenhouse board was removed (404, 19 Oct 2026). Check the careers page.",
@@ -1319,6 +1517,12 @@
    "city": "New York",
    "careers_url": "https://job-boards.greenhouse.io/insider",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Business Insider",
+    "Insider",
+    "Insider Inc"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1336,6 +1540,11 @@
    "city": "New York",
    "careers_url": "https://jobs.lever.co/morningbrew",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Morning Brew",
+    "Morning Brew Inc"
+   ],
    "ats": "lever",
    "mode": "read",
    "note": null,
@@ -1353,6 +1562,11 @@
    "city": "New York / Jersey City",
    "careers_url": "https://job-boards.greenhouse.io/forbes",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Forbes",
+    "Forbes Media"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1370,6 +1584,10 @@
    "city": "New York / Washington",
    "careers_url": "https://job-boards.greenhouse.io/semafor",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Semafor"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1387,6 +1605,15 @@
    "city": "New York",
    "careers_url": "https://job-boards.greenhouse.io/thenewyorktimes",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "The New York Times",
+    "New York Times",
+    "The New York Times Company",
+    "NYT",
+    "Wirecutter",
+    "NYT Cooking"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1404,6 +1631,15 @@
    "city": "New York",
    "careers_url": "https://dowjones.wd1.myworkdayjobs.com/Dow_Jones_Career",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Dow Jones",
+    "The Wall Street Journal",
+    "Wall Street Journal",
+    "WSJ",
+    "Barron's",
+    "Dow Jones & Company"
+   ],
    "ats": "workday",
    "mode": "read",
    "note": null,
@@ -1421,6 +1657,13 @@
    "city": "Charlotte / New York / remote",
    "careers_url": "https://job-boards.greenhouse.io/redventures",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Red Ventures",
+    "The Points Guy",
+    "Bankrate",
+    "Healthline"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1438,6 +1681,13 @@
    "city": "New York / Chicago",
    "careers_url": "https://wd1.myworkdaysite.com/recruiting/crain/Crain_Careers",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Crain Communications",
+    "Ad Age",
+    "Advertising Age",
+    "Crain"
+   ],
    "ats": "workday",
    "mode": "read",
    "note": null,
@@ -1455,6 +1705,12 @@
    "city": "New York / global",
    "careers_url": "https://michelinhr.wd3.myworkdayjobs.com/Michelin",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Michelin Guide",
+    "Michelin",
+    "MICHELIN Guide"
+   ],
    "ats": "workday",
    "mode": "read",
    "note": null,
@@ -1472,6 +1728,10 @@
    "city": "San Francisco / New York",
    "careers_url": "https://job-boards.greenhouse.io/opentable",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "OpenTable"
+   ],
    "ats": "greenhouse",
    "mode": "read",
    "note": null,
@@ -1489,6 +1749,10 @@
    "city": "New York / remote",
    "careers_url": "https://www.atlasobscura.com/jobs",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Atlas Obscura"
+   ],
    "ats": "none",
    "mode": "check",
    "note": null,
@@ -1513,6 +1777,12 @@
    "city": "New York",
    "careers_url": "https://jobs.jobvite.com/everyday-health-consumer/jobs",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "theSkimm",
+    "The Skimm",
+    "Skimm"
+   ],
    "ats": "jobvite",
    "mode": "watched",
    "note": null,
@@ -1537,6 +1807,11 @@
    "city": "New York / Los Angeles",
    "careers_url": "https://pucknews.applytojob.com",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Puck",
+    "Puck News"
+   ],
    "ats": "jazzhr",
    "mode": "watched",
    "note": null,
@@ -1561,6 +1836,10 @@
    "city": "New York / Miami",
    "careers_url": "https://aexp.eightfold.ai/careers?query=resy&domain=aexp.com",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Resy"
+   ],
    "ats": "eightfold",
    "mode": "check",
    "note": "On American Express's huge board; this link opens it filtered to Resy.",
@@ -1578,6 +1857,12 @@
    "city": "New York",
    "careers_url": "https://bloomberg.avature.net/careers/SearchJobs",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Bloomberg",
+    "Bloomberg LP",
+    "Bloomberg Media"
+   ],
    "ats": "avature",
    "mode": "check",
    "note": "Bloomberg's board can't be read automatically; search \"editorial\" there.",
@@ -1595,6 +1880,11 @@
    "city": "New York",
    "careers_url": "https://careers.digiday.com",
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Digiday",
+    "Digiday Media"
+   ],
    "ats": "none",
    "mode": "check",
    "note": null,
@@ -1619,6 +1909,13 @@
    "city": "Remote",
    "careers_url": null,
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Static Media",
+    "Tasting Table",
+    "Mashed",
+    "The List"
+   ],
    "ats": "none",
    "mode": "check",
    "note": "Mostly freelance writer roles, posted on Mediabistro / Indeed.",
@@ -1636,6 +1933,11 @@
    "city": "Miami / New York",
    "careers_url": null,
    "linkedin_url": null,
+   "inbox_id": null,
+   "aliases": [
+    "Cultured",
+    "Cultured Magazine"
+   ],
    "ats": "none",
    "mode": "check",
    "note": null,
