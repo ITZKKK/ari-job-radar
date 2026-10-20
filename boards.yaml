@@ -13,10 +13,10 @@ boards:
     kind: search
     url: "https://www.linkedin.com/jobs/search/?keywords=social%20media%20OR%20content%20creator%20OR%20copywriter&location=Miami%2C%20Florida%2C%20United%20States&f_TPR=r604800&f_E=2%2C3"
     why: Same, for the social / content / copywriting side.
-  - name: LinkedIn — editorial, New York, past week
+  - name: LinkedIn — remote editorial & social, US, past week
     kind: search
-    url: "https://www.linkedin.com/jobs/search/?keywords=editorial%20assistant%20OR%20associate%20editor%20OR%20staff%20writer&location=New%20York%2C%20New%20York%2C%20United%20States&f_TPR=r604800&f_E=2%2C3"
-    why: NYC is where most national publications hire.
+    url: "https://www.linkedin.com/jobs/search/?keywords=editorial%20OR%20editor%20OR%20writer%20OR%20%22social%20media%22&location=United%20States&f_WT=2&f_TPR=r604800&f_E=2%2C3"
+    why: Fully remote US jobs posted in the last week.
   - name: Indeed — editor / writer, Miami, past week
     kind: search
     url: "https://www.indeed.com/jobs?q=editor+OR+writer+OR+reporter+OR+%22editorial+coordinator%22&l=Miami%2C+FL&fromage=7"
@@ -32,7 +32,7 @@ boards:
   - name: Mediabistro
     kind: alert
     url: "https://www.mediabistro.com/jobs/"
-    why: Media, content and social jobs; create a free account and save a search for Miami + New York.
+    why: Media, content and social jobs; create a free account and save a search for Miami and one for remote.
   - name: ONA job board (Online News Association)
     kind: alert
     url: "https://journalists.org/jobs"

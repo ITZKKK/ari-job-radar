@@ -1,0 +1,3 @@
+# Only the two forms below: no blank issues, so the chooser shows just
+# "Add a company" and "Refresh now".
+blank_issues_enabled: false

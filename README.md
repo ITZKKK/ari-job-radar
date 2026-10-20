@@ -1,9 +1,10 @@
 # Ari's Job Radar
 
 Watches job boards for writer / editor / reporter / editorial-coordinator /
-content-creator roles (plus social media, PR, marketing and copywriting), mostly
-in Miami, New York and remote. It emails Ari when something new appears and
-keeps a dashboard she can open from any phone or laptop.
+content-creator roles (plus social media, PR, marketing and copywriting) in
+Miami or fully remote (a New York job that says "or Remote" counts). It emails
+Ari when something new appears and keeps a dashboard she can open from any
+phone or laptop.
 
 It's built like Itz's IB tracker (same adapters-not-scrapers design, same
 "closed only when a board was read successfully" rule, same page watcher),
@@ -116,17 +117,31 @@ once more. The first run that has email credentials sends Ari a single
 
 On iPhone, she can open it in Safari → **Share** → **Add to Home Screen**, and it behaves like an app.
 
+### 9. The two dashboard buttons (Add a company, Check for new jobs now)
+
+Both open a GitHub issue form; the **requests** workflow acts on it within a
+few minutes and replies on the issue. Anyone can open an issue on a public repo,
+so only the GitHub usernames in `config.yaml` → `github.allowed_users` are
+obeyed (everyone else gets a polite "ask Itz" and the issue is closed).
+
+- Repo → **Issues** → **Labels** → create `add-company` and `refresh` (the
+  forms apply them; the title decides even if the labels are missing).
+- When Ari has a GitHub account, add her username to `allowed_users`.
+
 ---
 
 ## What Ari gets
 
-- **Email**: sent only after a crawl finds something new that matches, so a few times a week rather than daily. Each email lists the new jobs with links, her own employers (★) first, then Miami, then New York, then remote. It also flags when a watched careers page changes (e.g. Haute Living adds an editor role).
+- **Only Miami or fully remote.** Jobs elsewhere in the US are still collected (the Stats tab says how many) but not shown or emailed. A job in another city whose listing itself says "or Remote" is shown as Remote; a remote job that turns out to be hybrid is not. To widen it again, edit `config.yaml` → `locations.show` / `locations.email`.
+- **Email**: sent only after a crawl finds something new that matches, so a few times a week rather than daily. Each email lists the new jobs with links, her own employers (★) first, then early-career roles, then Miami, then remote. It also flags when a watched careers page changes (e.g. Haute Living adds an editor role).
 - **Dashboard** (written to talk to Ari, not like a data tool):
-  - **For you** is the home page: a greeting, new roles at her own companies (★), then everything else new this week, Miami first.
-  - **All jobs** has search, plus filters tucked behind a button: where, kind of role, entry level only.
-  - **Saved** and **Applied** are her own tracking, with a notes box on each job.
-  - **Who I'm watching** explains which companies are checked automatically, which pages are watched and which to check herself.
+  - **For you** is the home page: a greeting, new roles at her own companies (★), then everything else new this week, early-career first, then Miami, then remote.
+  - **All jobs** has search, plus filters tucked behind a button: where, kind of role, how you'd work (remote / hybrid / in person), early-career only. Every job is labelled **Early career** (says entry level, or asks for up to 2 years), nothing, or **Stretch** (asks for 3–4 years, or a manager title).
+  - **Saved** and **Applied** are her own tracking, with a notes box on each job. On an applied job she picks where it stands (Applied, Heard back, Phone screen, Interview, Offer, Rejected…), and the Applied tab groups by that.
+  - **Stats** counts what she sees: open jobs, new this week, how many are elsewhere in the US, a 30-day chart, her application pipeline, and whether the radar itself is healthy.
+  - **Who I'm watching** explains which companies are checked automatically, which pages are watched and which to check herself, with an **Add a company** button.
   - **More places to look** has one-tap LinkedIn and Indeed searches, plus the alerts and newsletters to sign up for.
+  - **Check for new jobs now** (top bar) starts a crawl; the dashboard updates in about 5 minutes.
 - Saves, applications and notes are stored in her browser. **Back up my saves** downloads a file and **Restore a backup** reads it back, for moving to a new phone or laptop.
 
 ## What it covers, and what it doesn't
@@ -174,16 +189,18 @@ couple of minutes.
 
 | To… | Edit |
 |---|---|
-| add an employer | `employers.yaml` (or run `python scripts/add_employer.py "Name" "<careers URL>"`) |
-| change locations, role types, seniority, years cap | `config.yaml` |
+| add an employer | open an issue with the **Add a company** form (the dashboard button), or edit `employers.yaml`, or run `python scripts/add_employer.py "Name" "<careers URL>"` |
+| change locations (Miami / remote only), role types, seniority, early-career rules, years cap | `config.yaml` |
+| let someone use the dashboard buttons | `config.yaml` → `github.allowed_users` |
 | change who gets email / when | secrets (`ALERT_TO`) and `config.yaml` → `alerts` |
 | change the crawl times | `.github/workflows/radar.yml` → `cron` (UTC) |
 | add a "More places to look" link | `boards.yaml` |
 
 **Health:** every run page on GitHub (**Actions** → a run → *Summary*) shows how
 many sources were read and a table of any that failed. Failures are also listed
-on the dashboard's **Employers** tab. Ari's emails never include maintenance
-messages. If the *email* step fails, the run turns red and GitHub emails you.
+on the dashboard's **Stats** tab ("Is the radar healthy?"). Ari's emails never
+include maintenance messages. If the *email* step fails, the run turns red and
+GitHub emails you.
 
 **Running locally (optional, for testing a change):**
 
@@ -191,7 +208,7 @@ messages. If the *email* step fails, the run turns red and GitHub emails you.
 cd ~/Desktop/"Ari's tracker"/ari-job-radar
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt pytest
-python -m pytest -q                                   # 66 tests, no network needed
+python -m pytest -q                                   # 101 tests, no network needed
 python src/crawl.py --only "the-drum" --dry-run       # one employer, writes nothing
 cp .env.example .env    # fill in to test email locally
 python src/notify.py --test
@@ -221,12 +238,16 @@ employers.yaml       the employer list (single source of truth)
 boards.yaml          the "More places to look" links
 src/adapters.py      one adapter per job-board platform (Greenhouse, Lever, Workday, Oracle, UKG, Workable…)
 src/aggregators.py   Adzuna, JSearch, Remotive, RSS feeds
-src/classify.py      role family, seniority, location bucket, relevant or not
+src/classify.py      role family, seniority, location bucket, work mode, early-career fit, relevant or not
 src/crawl.py         the crawl and its state machine; writes data/state.json + data/radar.json
 src/watch.py         careers-page change watcher
 src/notify.py        the email
+scripts/add_employer.py       add a row to employers.yaml from a URL (CLI and the function behind the button)
+scripts/handle_request.py     acts on an "Add a company" / "Refresh now" issue
 site/index.html      the dashboard (one static page)
-.github/workflows/radar.yml   schedule + publish
-tests/test_tracker.py         66 tests, incl. real job titles from 19 Oct 2026
+.github/workflows/radar.yml      schedule + publish
+.github/workflows/requests.yml   the two dashboard buttons (issue → employers.yaml edit / crawl)
+.github/ISSUE_TEMPLATE/          the "Add a company" form and the "Refresh now" template
+tests/test_tracker.py         101 tests, incl. real job titles from 19 Oct 2026
 ARI_SETUP.md         Ari's part: Resend in 5 minutes, alerts to subscribe to, questions
 ```

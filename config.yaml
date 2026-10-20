@@ -64,10 +64,25 @@ locations:
                "north dakota", "ohio", "oklahoma", "oregon", "pennsylvania", "rhode island", "south carolina",
                "south dakota", "tennessee", "texas", "utah", "vermont", "virginia", "west virginia", "wisconsin",
                "wyoming", "puerto rico"]
-  # Buckets that appear on the dashboard by default. OTHER_US = any other US city.
-  show: [MIAMI, NYC, REMOTE, FLORIDA, OTHER_US, UNKNOWN]
-  # Buckets that trigger an email.
-  email: [MIAMI, NYC, REMOTE, UNKNOWN]
+  # Buckets that appear on the dashboard. Ari wants Miami or fully remote only,
+  # so this is [MIAMI, REMOTE]; to show New York or the rest of the US again,
+  # add NYC / FLORIDA / OTHER_US / UNKNOWN back (every bucket is still kept in
+  # data/state.json, so nothing is lost meanwhile).
+  #
+  # Two rules sit on top of these lists (src/classify.py, visible()):
+  #   * REMOTE counts only when it is fully remote: "Remote (hybrid, 3 days a
+  #     week in our Chicago office)" is hidden.
+  #   * A job in another city whose location or title itself says remote
+  #     ("Washington, DC, New York or Remote") IS shown and emailed, as Remote,
+  #     because she can do it from Miami. The card still says "Remote or New
+  #     York". Edge: a head like "Hybrid or Remote (New York)" is also shown,
+  #     since remote is literally on offer. A remote mention only in the job
+  #     description does not count ("remote teams", "remote interviews").
+  # An employer whose jobs can only be in Miami can set `home: MIAMI` in
+  # employers.yaml so its postings with no location land in MIAMI.
+  show: [MIAMI, REMOTE]
+  # Buckets that trigger an email (same rules as above).
+  email: [MIAMI, REMOTE]
 
 # ---------------------------------------------------------------------------
 # Role families. Matched against the job TITLE (case-insensitive regex).
@@ -148,7 +163,9 @@ roles:
 # board provides one).
 # ---------------------------------------------------------------------------
 seniority:
-  entry_markers: '\b(assistant|coordinator|associate|junior|jr\.?|entry[- ]level|fellow(ship)?|apprentice|trainee|intern(ship)?|i)\b|\bgraduate\b|\bearly career\b'
+  # The lone "i" alternative matches "Reporter I" (a level suffix: end of title
+  # or before a comma / bracket / dash) but not "I Heart Radio Writer".
+  entry_markers: '\b(assistant|coordinator|associate|junior|jr\.?|entry[- ]level|fellow(ship)?|apprentice|trainee|intern(ship)?)\b|(?:^|\s)i(?=\s*(?:$|[,(\-–|/]))|\bgraduate\b|\bearly career\b'
   senior_markers: '\b(senior|sr\.?|lead|principal|director|head|chief|vp|vice president|executive (editor|producer)|managing editor|deputy|editor[- ]in[- ]chief|editor at large|iii|iv|supervis(or|ing)|manager)\b'
   # Show senior titles at all? false = drop them (they are not what she can get yet).
   keep_senior: false
@@ -159,6 +176,19 @@ seniority:
   keep_internships: false
   # Hide a posting whose description asks for at least this many years.
   max_years_required: 5
+
+# ---------------------------------------------------------------------------
+# Early-career fit. Every kept posting gets one of three labels:
+#   early    says entry level / recent grads, or asks for up to early_max_years
+#   open     says nothing about experience
+#   stretch  asks for more years (up to max_years_required above), or is a
+#            "... Manager" title
+# Nothing is hidden by this; "stretch" jobs are labelled and sorted last.
+# ---------------------------------------------------------------------------
+fit:
+  early_max_years: 2
+  early_description_markers: '\bentry[- ]level\b|\bearly[- ]career\b|\b(recent|new) grad(uate)?s?\b|\bno (prior |previous )?experience (necessary|required|needed)\b|\bup to (1|2|one|two) years?\b'
+  stretch_title_markers: '\bmanager\b'
 
 # ---------------------------------------------------------------------------
 # Email digest. Sent after a crawl that found something new and relevant.
@@ -187,7 +217,7 @@ aggregators:
     # Free key (developer.adzuna.com): 250 calls/day, 2,500/month. Secrets:
     # ADZUNA_APP_ID, ADZUNA_APP_KEY. Each run uses len(where) x pages calls.
     enabled: true
-    where: ["Miami, FL", "New York, NY"]
+    where: ["Miami, FL"]
     distance_km: 40
     # Any of these words (title or description); classify.py then keeps only
     # matching titles.
@@ -203,7 +233,7 @@ aggregators:
     queries:
       - "editorial assistant OR editorial coordinator OR staff writer OR reporter in Miami, FL"
       - "social media coordinator OR content creator OR copywriter OR PR coordinator in Miami, FL"
-      - "editorial assistant OR associate editor OR staff writer OR editorial coordinator in New York, NY"
+      - "remote editorial assistant OR remote staff writer OR remote content writer OR remote social media coordinator in United States"
     date_posted: 3days
     min_hours_between: 20
   remotive:
@@ -225,3 +255,14 @@ aggregators:
         default_location: ""
         title_format: "title"
     min_hours_between: 5
+
+# ---------------------------------------------------------------------------
+# The GitHub repo the radar lives in. Two buttons on the dashboard open issue
+# forms here ("Add a company", "Check for new jobs now"); the `requests`
+# workflow acts on them. Only the GitHub usernames below may use them (anyone
+# else gets a polite "ask Itz" reply). Case does not matter. To let Ari use the
+# buttons: she makes a free GitHub account and her username goes on this list.
+# ---------------------------------------------------------------------------
+github:
+  repo: ITZKKK/ari-job-radar
+  allowed_users: [ITZKKK]

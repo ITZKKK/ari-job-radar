@@ -21,7 +21,14 @@
 #   watch_url   page to watch for changes when there is no readable board (defaults to careers_url)
 #   aliases     other names job sites use for it (so aggregator finds get the ★)
 #   target_match  regex; on a parent's board, only postings matching it count as Ari's pick (★)
+#   linkedin_url  the company's LinkedIn page (shown as a "LinkedIn jobs" link; never fetched)
+#   home        MIAMI = this employer's jobs can only be in Miami, so a posting
+#               that states no location is treated as Miami. Opt-in: set it only
+#               on Miami-only rows (not on a parent with boards in 30 markets).
 #   note        anything Ari should know
+#
+# Ari and Itz can also add a company from the dashboard ("Add a company" opens
+# a GitHub issue form; the requests workflow appends the row here).
 #
 # Research behind every row: 19 Oct 2026 (see README, "Employer research").
 
@@ -91,6 +98,7 @@ employers:
     name: Miami New Times
     group: Alt-weekly (Voice Media Group)
     city: Miami
+    home: MIAMI
     target: true
     ats: email
     careers_url: https://www.miaminewtimes.com/about/careers/
@@ -119,9 +127,11 @@ employers:
     name: World Red Eye
     group: Miami nightlife & society media
     city: Miami
+    home: MIAMI
     target: true
     ats: none
     watch: false
+    linkedin_url: https://www.linkedin.com/company/world-red-eye/
     note: No careers page; posts on Mediabistro / ZipRecruiter. The job-search sources catch it when it does.
     aliases: [World Red Eye, WorldRedEye]
 
@@ -129,6 +139,7 @@ employers:
     name: Ocean Drive Magazine
     group: Miami luxury magazine
     city: Miami
+    home: MIAMI
     target: true
     ats: none
     watch: false
@@ -195,6 +206,7 @@ employers:
     name: WLRN (South Florida public media)
     group: Public radio & news
     city: Miami
+    home: MIAMI
     ats: none
     careers_url: https://www.wlrn.org/jobs
     aliases: [WLRN, Friends of WLRN]

@@ -1,0 +1,91 @@
+name: requests
+
+# Ari's two dashboard buttons open issues ("Add company: …" / "Refresh now").
+# This acts on each new issue: scripts/handle_request.py reads it, checks the
+# author against config.yaml -> github.allowed_users, edits employers.yaml if
+# asked, and writes the reply. Then: commit, start a crawl, comment, close.
+#
+# The issue's title/body/author only ever reach the script through `env:`,
+# never inside `run:`, so nothing a stranger types can become shell.
+# A push made with GITHUB_TOKEN does not fire radar.yml's `push` trigger (by
+# GitHub design), hence the explicit `gh workflow run`.
+on:
+  issues:
+    types: [opened]
+
+# The repo default is read-only; all three are needed here.
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+# Its own group (not `radar`): the crawl commits only data/, this commits only
+# employers.yaml, and `git pull --rebase` with retries keeps the push safe.
+concurrency:
+  group: requests
+  cancel-in-progress: false
+
+jobs:
+  handle:
+    if: github.event.issue.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # An issues event checks out whatever HEAD is; be explicit.
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Read the request
+        id: req
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_USER: ${{ github.event.issue.user.login }}
+          ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
+          COMMENT_FILE: ${{ runner.temp }}/comment.md
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: python scripts/handle_request.py
+
+      - name: Save the employer list
+        if: steps.req.outputs.changed == 'true'
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git config user.name  "job-radar"
+          git config user.email "actions@github.com"
+          git add employers.yaml
+          if git diff --staged --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "add employer via #${ISSUE_NUMBER}"
+          # A crawl may have pushed data/ meanwhile; rebase and retry. If the
+          # push never lands, fail loudly rather than tell Ari it was added.
+          pushed=
+          for i in 1 2 3; do
+            if git pull --rebase && git push; then pushed=1; break; fi
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
+          [ -n "$pushed" ] || { echo "::error::Could not push employers.yaml"; exit 1; }
+
+      - name: Start a crawl
+        if: steps.req.outputs.dispatch == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run radar.yml --ref main -R ${{ github.repository }}
+
+      - name: Reply and close
+        if: steps.req.outputs.kind != 'ignore'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_FILE: ${{ runner.temp }}/comment.md
+          CLOSE_REASON: ${{ steps.req.outputs.close_reason }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" -F "$COMMENT_FILE" -R "$GITHUB_REPOSITORY"
+          gh issue close "$ISSUE_NUMBER" --reason "$CLOSE_REASON" -R "$GITHUB_REPOSITORY"

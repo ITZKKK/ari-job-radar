@@ -34,6 +34,7 @@ import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src import store  # noqa: E402
+from src.classify import visible  # noqa: E402
 
 ROOT = store.ROOT
 # Never email something first seen more than this long ago: if email was off
@@ -43,19 +44,35 @@ MAX_AGE_DAYS = 3
 INK, MUTED, LINE, ACCENT, SUN, PAPER = "#22264A", "#5F6487", "#EDE4DE", "#E2577C", "#D9930F", "#FBF6F2"
 
 
-def site_url() -> str:
+def site_url(repo: str | None = None) -> str:
+    """The dashboard's address: SITE_URL if set, else the Pages URL of the
+    repo (GITHUB_REPOSITORY on Actions, or config's github.repo)."""
     u = os.environ.get("SITE_URL", "").strip()
     if u:
         return u
-    repo = os.environ.get("GITHUB_REPOSITORY", "")
+    repo = os.environ.get("GITHUB_REPOSITORY") or repo or ""
     if "/" in repo:
         owner, name = repo.split("/", 1)
         return f"https://{owner.lower()}.github.io/{name}/"
     return ""
 
 
+def emailable(p: dict, cfg: dict) -> bool:
+    """Same rule as the dashboard (classify.visible), against the email list.
+    notify.py reads state, where `location` is still the true bucket."""
+    return visible(p.get("location"), p.get("work_mode") or "unknown",
+                   {"show": cfg["locations"]["email"]}, bool(p.get("remote_offered")))
+
+
+def eff_loc(p: dict, cfg: dict) -> str | None:
+    """The bucket the email sorts by: a "New York or Remote" job counts as REMOTE."""
+    loc = p.get("location")
+    if loc in cfg["locations"]["email"]:
+        return loc
+    return "REMOTE" if p.get("remote_offered") else loc
+
+
 def pending(state: dict, cfg: dict) -> list[dict]:
-    loc_ok = set(cfg["locations"]["email"])
     tiers = set(cfg["alerts"]["tiers"])
     out = []
     for p in state["postings"].values():
@@ -65,7 +82,7 @@ def pending(state: dict, cfg: dict) -> list[dict]:
             continue
         if store.days_since(p.get("first_seen")) > MAX_AGE_DAYS:
             continue
-        if p.get("location") not in loc_ok or p.get("tier") not in tiers:
+        if not emailable(p, cfg) or p.get("tier") not in tiers:
             continue
         out.append(p)
     return out
@@ -105,10 +122,17 @@ def short_place(p: dict, labels: dict) -> str:
     loc = p.get("location")
     if loc == "MIAMI":
         return "Miami or New York" if "new york" in raw else "Miami"
-    if loc == "NYC":
-        return "New York or Miami" if "miami" in raw else "New York"
     if loc == "REMOTE":
         return "Remote"
+    if p.get("remote_offered"):
+        # A city job whose location says "or Remote": say both.
+        if "new york" in raw:
+            return "Remote or New York"
+        if "miami" in raw:
+            return "Remote or Miami"
+        return "Remote"
+    if loc == "NYC":
+        return "New York or Miami" if "miami" in raw else "New York"
     if loc == "UNKNOWN":
         return ""
     return labels.get(loc, "") if loc != "OTHER_US" else (p.get("location_raw") or "").split(";")[0].strip()[:40]
@@ -124,8 +148,10 @@ def build(posts: list[dict], changes: list[dict], broken: list[dict], cfg: dict,
         return None
     cap = cfg["alerts"]["max_per_email"]
     order = {b: i for i, b in enumerate(cfg["locations"]["email"])}
+    fit_rank = {"early": 0, "open": 1, "stretch": 2}
     posts = sorted(posts, key=lambda p: (not p.get("target"), p.get("tier") != "core",
-                                         order.get(p.get("location"), 9), p.get("company") or ""))
+                                         fit_rank.get(p.get("fit"), 1),
+                                         order.get(eff_loc(p, cfg), 9), p.get("company") or ""))
     shown, more = posts[:cap], max(0, len(posts) - cap)
 
     n = len(posts)
@@ -147,8 +173,8 @@ def build(posts: list[dict], changes: list[dict], broken: list[dict], cfg: dict,
         star = f"<span style='color:{SUN}'>★</span> " if p.get("target") else ""
         where = short_place(p, labels)
         bits = [families.get(p.get("family"), "")]
-        if p.get("seniority") == "entry":
-            bits.append("Entry level")
+        if p.get("fit") == "early" or p.get("seniority") == "entry":
+            bits.append("Early career")
         if p.get("years") and p["years"] >= 3:
             bits.append(f"Asks for {p['years']}+ years")
         rows.append(
@@ -195,8 +221,7 @@ your radar’s “More places to look” page has one-tap searches for those.</p
 
 def welcome(state: dict, cfg: dict) -> tuple[str, str]:
     open_rel = [p for p in state["postings"].values() if p.get("relevant")
-                and p.get("status") == "open" and not p.get("dupe_of")
-                and p.get("location") in cfg["locations"]["email"]]
+                and p.get("status") == "open" and not p.get("dupe_of") and emailable(p, cfg)]
     url = site_url()
     name = cfg["owner"]["name"]
     subject = f"{cfg['alerts']['subject_prefix']} Hi {name}, your job radar is ready ({len(open_rel)} jobs open now)"

@@ -32,7 +32,7 @@ import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src import adapters, aggregators, store, watch  # noqa: E402
-from src.classify import Rules, classify  # noqa: E402
+from src.classify import Rules, classify, fit, remote_in_head, visible, work_mode  # noqa: E402
 
 ROOT = store.ROOT
 AGGREGATOR_CLOSE_DAYS = 7
@@ -122,6 +122,7 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
                           follow_redirects=True)
     delay = 1.0 / max(cfg["crawl"]["requests_per_second"], 0.1)
     match_employer = employer_matcher(employers)
+    emp_by_id = {e["id"]: e for e in employers}
 
     total = len(readable) + len(aggs) + (1 if watched else 0)
     prog = Progress(total)
@@ -131,15 +132,19 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
     counts = {"new_relevant": 0, "closed": 0, "sources_ok": 0, "sources_failed": 0}
     seen_now: dict[str, set] = {}
 
-    def ingest(source_id: str, kind: str, raws: list) -> tuple[int, int]:
+    def ingest(source_id: str, kind: str, raws: list, emp: dict | None = None) -> tuple[int, int]:
         ids, n_rel, n_new = set(), 0, 0
         for r in raws:
             pid = pid_for(source_id, r.job_id)
             if pid in ids:
                 continue
             ids.add(pid)
-            v = classify(r.title, r.location_raw, r.description, rules)
             emp_id = source_id if kind == "employer" else match_employer(r.company)
+            # `home: MIAMI` in employers.yaml: a posting with no location at a
+            # Miami-only employer is a Miami job (aggregator finds included).
+            home = (emp or emp_by_id.get(emp_id) or {}).get("home")
+            v = classify(r.title, r.location_raw, r.description, rules,
+                         default_location=home, workplace_hint=r.extra.get("workplace"))
             p = state["postings"].get(pid)
             is_new = p is None
             if is_new:
@@ -153,7 +158,8 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
                 "last_seen": ts, "status": "open", "closed_at": None,
                 "relevant": v.relevant, "reason": v.reason, "family": v.family,
                 "tier": v.tier, "seniority": v.seniority, "location": v.location,
-                "years": v.years, "flags": v.flags,
+                "years": v.years, "flags": v.flags, "work_mode": v.work_mode, "fit": v.fit,
+                "remote_offered": v.remote_offered,
             })
             if was_closed:
                 p["reopened_at"] = ts
@@ -190,7 +196,7 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
                 raws = [r for r in raws if rx.search(" ".join(
                     [r.title, r.description, str(r.extra.get("departments") or ""),
                      str(r.extra.get("organization") or "")]))]
-            n_rel, n_new = ingest(e["id"], "employer", raws)
+            n_rel, n_new = ingest(e["id"], "employer", raws, e)
             record(e["id"], e["name"], "employer", e["ats"], True, "", len(raws), n_rel)
             counts["new_relevant"] += n_new
             prog.step(f"{e['name']}: {len(raws)} jobs, {n_rel} relevant, {n_new} new")
@@ -325,18 +331,30 @@ def mark_duplicates(state: dict) -> None:
 
 def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], path: str) -> None:
     """Write data/radar.json — everything the dashboard page shows, and nothing
-    it doesn't (no irrelevant postings, no descriptions)."""
+    it doesn't (no irrelevant postings, no descriptions, nothing outside
+    Miami / fully remote)."""
     keep_closed = cfg["crawl"]["keep_closed_days"]
+    rules = Rules(cfg)
+    loc = cfg["locations"]
     posts = []
     for p in state["postings"].values():
         if not p.get("relevant") or p.get("dupe_of"):
             continue
         if p.get("status") == "closed" and store.days_since(p.get("closed_at")) > keep_closed:
             continue
-        posts.append({k: p.get(k) for k in (
+        row = {k: p.get(k) for k in (
             "pid", "title", "company", "employer_id", "kind", "source_id", "location",
             "location_raw", "url", "first_seen", "last_seen", "status", "closed_at",
-            "family", "tier", "seniority", "years", "flags", "posted_at")})
+            "family", "tier", "seniority", "years", "flags", "posted_at",
+            "work_mode", "fit", "remote_offered")}
+        # Rows written before these fields existed (closed ones are never
+        # re-read): fill them from what state has. Descriptions aren't kept,
+        # so the work mode comes from the head alone.
+        row["work_mode"] = row["work_mode"] or work_mode(row["location_raw"], row["title"], "")
+        if row["remote_offered"] is None:
+            row["remote_offered"] = remote_in_head(row["location_raw"], row["title"])
+        row["fit"] = row["fit"] or fit(row["seniority"], row["years"], row["title"], "", rules)
+        posts.append(row)
     targets = {e["id"]: e for e in employers if e.get("target")}
     for p in posts:
         e = targets.get(p["employer_id"])
@@ -344,6 +362,20 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
             re.search(e["target_match"], p["title"] if p["kind"] == "employer"
                       else f"{p['title']} {p['company']}", re.I)))
     posts.sort(key=lambda p: p["first_seen"] or "", reverse=True)
+
+    # What Ari sees: Miami, fully remote, or "<city> or Remote". The rest is
+    # counted (so the Stats tab can say how much is elsewhere) but not shown.
+    shown = [p for p in posts if visible(p["location"], p["work_mode"], loc, p["remote_offered"])]
+    open_posts = [p for p in posts if p["status"] == "open"]
+    by_loc: dict[str, int] = {}
+    for p in open_posts:
+        by_loc[p["location"]] = by_loc.get(p["location"], 0) + 1
+    totals = {"open_all": len(open_posts),
+              "open_shown": sum(1 for p in shown if p["status"] == "open"),
+              "by_location_all": dict(sorted(by_loc.items(), key=lambda kv: -kv[1]))}
+    for p in shown:
+        if p["location"] not in loc["show"]:
+            p["location"] = "REMOTE"         # exported copy only; state keeps the true bucket
 
     emp_out = []
     for e in employers:
@@ -358,9 +390,10 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
         emp_out.append({
             "id": e["id"], "name": e["name"], "group": e.get("group"),
             "target": bool(e.get("target")), "city": e.get("city"),
-            "careers_url": e.get("careers_url"), "ats": e.get("ats"), "mode": mode,
+            "careers_url": e.get("careers_url"), "linkedin_url": e.get("linkedin_url"),
+            "ats": e.get("ats"), "mode": mode,
             "note": e.get("note"), "open_relevant": sum(
-                1 for p in posts if p["employer_id"] == e["id"] and p["status"] == "open"),
+                1 for p in shown if p["employer_id"] == e["id"] and p["status"] == "open"),
             "board_total": s.get("count_total"), "error": s.get("error") if not s.get("ok") else "",
             "failures": s.get("consecutive_failures", 0),
             "page": None if not w else {k: w.get(k) for k in (
@@ -375,7 +408,6 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
         if p["kind"] == "aggregator":
             p["via"] = via.get(p["source_id"], p["source_id"])
 
-    loc = cfg["locations"]
     labels = {b["id"]: b["label"] for b in loc["buckets"]}
     labels.update({"OTHER_US": "Other US", "UNKNOWN": "Location not listed"})
     store.write_json({
@@ -385,13 +417,33 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
         "runs": state["runs"][-30:],
         "locations": [{"id": b, "label": labels.get(b, b), "email": b in loc["email"]}
                       for b in loc["show"]],
+        "work_modes": [{"id": "remote", "label": "Remote"}, {"id": "hybrid", "label": "Hybrid"},
+                       {"id": "onsite", "label": "In person"}, {"id": "unknown", "label": "Not stated"}],
+        "fits": [{"id": "early", "label": "Early career"},
+                 {"id": "open", "label": "Experience not stated"},
+                 {"id": "stretch", "label": "Stretch (3–4 years, or a manager role)"}],
         "families": [{"id": f["id"], "label": f["label"], "tier": f["tier"]}
                      for f in cfg["roles"]["families"]],
-        "postings": [p for p in posts if p["location"] in loc["show"]],
+        "requests": request_links(cfg),
+        "totals": totals,
+        "postings": shown,
         "employers": emp_out,
         "aggregators": aggs_out,
         "boards": boards,
     }, path)
+
+
+def request_links(cfg: dict) -> dict | None:
+    """Where the dashboard's "Add a company" and "Check for new jobs now"
+    buttons go: issue forms on the repo (handled by requests.yml)."""
+    repo = (cfg.get("github") or {}).get("repo") or os.environ.get("GITHUB_REPOSITORY", "")
+    if "/" not in repo:
+        return None
+    base = f"https://github.com/{repo}"
+    return {"repo_url": base,
+            "add_company_url": f"{base}/issues/new?template=add-company.yml",
+            "refresh_url": f"{base}/issues/new?template=refresh.md",
+            "actions_url": f"{base}/actions/workflows/radar.yml"}
 
 
 if __name__ == "__main__":

@@ -1,8 +1,9 @@
-# Ari's part — about 20 minutes
+# Ari's part — about 25 minutes
 
-Itz runs the radar. You do three things: create a free email-sending account
-(this lets the radar email you), answer a few questions so it only shows jobs
-you'd actually take, and optionally sign up for a handful of job alerts.
+Itz runs the radar. You do four things: create a free email-sending account
+(this lets the radar email you), make a free GitHub account (this unlocks the
+two buttons on your radar), answer a few questions so it only shows jobs you'd
+actually take, and optionally sign up for a handful of job alerts.
 
 ---
 
@@ -35,14 +36,32 @@ That's it. You'll get a "your radar is live" email once Itz finishes setup.
 
 ---
 
-## 2. Answer these questions (reply to Itz in any format)
+## 2. Make a free GitHub account and send Itz your username (3 minutes)
+
+Your radar has two buttons that need it: **Add a company** (watch another
+employer) and **Check for new jobs now**. Each one opens a short form on
+GitHub, the site the radar lives on; Itz's setup then does the rest within
+about 5 minutes. It's free, there's no AI involved, and only the usernames Itz
+lists are obeyed — so he needs yours.
+
+1. Go to **github.com** → **Sign up**. Any email is fine; pick a username.
+2. Confirm your email.
+3. Send Itz your username. He adds it to the radar's allow-list.
+
+Until then the buttons still open, but the radar will politely refuse.
+
+---
+
+## 3. Answer these questions (reply to Itz in any format)
 
 Each answer changes a filter. The default in brackets is what the radar does if
 you don't answer.
 
 1. **Where?** Miami only, or also New York, remote, elsewhere in Florida,
    anywhere in the US? Is hybrid OK?
-   *[Emails: Miami, New York, remote. Dashboard also shows the rest of Florida and the US.]*
+   *[Miami or fully remote only, on the dashboard and in emails. A New York job
+   that says "or Remote" counts; a remote job that turns out to be hybrid or
+   on-site doesn't. Everything else is counted on the Stats tab but hidden.]*
 2. **Experience.** How many years of full-time work, and when did you graduate?
    Any bylines, a portfolio or published clips?
    *[Shows entry and mid-level roles, hides "Senior / Lead / Director", hides jobs asking for 5+ years.]*
@@ -66,28 +85,32 @@ you don't answer.
 
 ---
 
-## 3. Optional: sign up for these alerts (15 minutes)
+## 4. Optional: sign up for these alerts (15 minutes)
 
 Some of the best editorial job sites don't allow tools like the radar to read
 them, but they'll email you directly. Each is free:
 
-- **JournalismJobs.com**: create an account → *Job Notifications* → Miami + New York, your role types.
-- **Mediabistro**: free account → save a search for editorial / social in Miami and New York.
+- **JournalismJobs.com**: create an account → *Job Notifications* → Miami, plus remote, your role types.
+- **Mediabistro**: free account → save a search for editorial / social in Miami, and one for remote.
 - **ONA job board** (journalists.org/jobs): set up the email alert.
 - **NAHJ Career Center** (nahjcareers.org): especially if you speak Spanish.
 - Newsletter: **"Journalism jobs and a photo of my dog"** (journojobs.substack.com), a free weekly round-up.
 - On **LinkedIn**: follow the companies with no job board (World Red Eye, Haute
   Living, Ocean Drive, Modern Luxury, Cultured). Then save a job search for
-  "editorial OR writer OR reporter" in Miami with alerts on.
+  "editorial OR writer OR reporter" in Miami with alerts on, and another one
+  with the Remote filter.
 
 ---
 
 ## Using your radar
 
 - Open the link Itz sends you. On iPhone: Safari → **Share** → **Add to Home Screen** and it sits there like an app.
-- **For you** is the home page. It shows new roles at the companies you picked (★), then everything else new this week, Miami first.
-- **All jobs** has everything that's open, with search and filters (where, kind of role, entry level only).
-- Tap **♡ Save** on anything interesting and **I applied** once you've sent it. A notes box appears for who you wrote to, the deadline and when to follow up. **Not for me** hides a job.
-- **Who I'm watching** lists the companies the radar checks for you, and which ones are worth checking yourself.
+- It shows **Miami and fully remote jobs only**. A job somewhere else whose listing says "or Remote" is in, as Remote.
+- **For you** is the home page. It shows new roles at the companies you picked (★), then everything else new this week — early-career first, then Miami, then remote.
+- **All jobs** has everything that's open, with search and filters (where, kind of role, how you'd work, early-career only). **Early career** on a card means the job says entry level or asks for up to 2 years; **Stretch** means it asks for 3–4 years or is a manager role — still worth a look, just know going in.
+- Tap **♡ Save** on anything interesting and **I applied** once you've sent it. A notes box appears for who you wrote to, the deadline and when to follow up, and a small menu lets you say where it stands (Heard back, Interview, Offer…); the **Applied** tab groups your applications by that. **Not for me** hides a job.
+- **Stats** shows the numbers behind what you see: open jobs, new this week, how many are elsewhere in the US, your applications, and whether the radar itself is working.
+- **Who I'm watching** lists the companies the radar checks for you, and which ones are worth checking yourself. **Add a company** there opens a short form: name, website if you know it, LinkedIn page if you like, and a tick if it's one of your picks. The radar adds it within about 5 minutes and replies on the form.
+- **Check for new jobs now** (top of the page) opens a one-tap form; tap **Create** and the radar runs right away. Give it about 5 minutes, then reopen your radar. (Both buttons need you to be signed in to GitHub — see step 2.)
 - **More places to look** has one-tap LinkedIn and Indeed searches for the last week, plus the alerts and newsletters above.
 - Your saves stay on the phone or laptop you use. Before switching, tap **Back up my saves** at the bottom, then **Restore a backup** on the new one.

@@ -37,6 +37,7 @@ body { margin: 0; background: var(--paper); color: var(--ink);
   font: 400 16px/1.55 Figtree, system-ui, -apple-system, "Segoe UI", sans-serif; }
 a { color: inherit; }
 button { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
 .wrap { max-width: 900px; margin: 0 auto; padding: 0 18px; }
 
@@ -44,7 +45,9 @@ button { font: inherit; color: inherit; }
 .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 0 0; }
 .brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 15px; }
 .brand svg { width: 22px; height: 22px; }
-.updated { color: var(--faint); font-size: 14px; text-align: right; }
+.topside { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; }
+.updated { color: var(--faint); font-size: 14px; }
+#refresh { font-size: 14px; }
 
 /* Greeting */
 .hello { padding: 40px 0 30px; }
@@ -86,7 +89,7 @@ section.block { margin: 18px 0 40px; }
 .card h3 a:hover { text-decoration: underline; text-decoration-color: var(--flamingo); text-underline-offset: 4px; }
 .pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .pill { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--paper); color: var(--soft); }
-.pill.entry { background: var(--lagoon-soft); color: var(--lagoon); }
+.pill.entry, .pill.lagoon { background: var(--lagoon-soft); color: var(--lagoon); }
 .pill.new { background: var(--flamingo-soft); color: var(--flamingo); }
 .pill.warn { background: var(--sun-soft); color: var(--sun); }
 .found { font-size: 14px; color: var(--faint); }
@@ -101,23 +104,29 @@ section.block { margin: 18px 0 40px; }
 .act.skip { border: 0; padding: 7px 4px; color: var(--faint); }
 .note textarea { width: 100%; min-height: 64px; resize: vertical; font: inherit; font-size: 15px; color: var(--ink);
   background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.stage { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; font-size: 14px; color: var(--soft); }
+.stage label { display: inline-flex; align-items: center; gap: 8px; }
+.stage select, .stage input { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper);
+  border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; max-width: 100%; }
+.stage input { flex: 1 1 160px; min-width: 0; }
 
 /* Filters */
 .filterbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0 0 18px; }
 .search { flex: 1 1 240px; }
 .search input { width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--card);
   border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; }
-.filters { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; margin: 0 0 20px; }
-.filters[hidden] { display: none; }
-.filters h4 { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--soft); }
-.filters .group + .group { margin-top: 14px; }
+.filters, .panel { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; box-shadow: var(--shadow); }
+.filters { margin: 0 0 20px; }
+.filters h4, .panel h4 { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--soft); }
+.filters .group + .group, .panel .group + .group { margin-top: 14px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { appearance: none; cursor: pointer; font-size: 14px; font-weight: 600; padding: 6px 13px; border-radius: 999px;
   border: 1px solid var(--line); background: transparent; color: var(--faint); }
 .chip[aria-pressed="true"] { background: var(--flamingo-soft); border-color: transparent; color: var(--flamingo); }
-label.entry-only { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; color: var(--soft); cursor: pointer; margin-top: 14px; }
+label.entry-only { display: flex; align-items: flex-start; gap: 8px; font-size: 15px; color: var(--soft); cursor: pointer; margin-top: 14px; }
+label.entry-only input { margin-top: 5px; flex-shrink: 0; }
 .day { font-size: 15px; font-weight: 600; color: var(--soft); margin: 26px 0 10px; }
-.day:first-child { margin-top: 0; }
+.day:first-child, .block-head + .day { margin-top: 0; }
 
 /* Lists (employers / places) */
 .list { background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
@@ -129,12 +138,43 @@ label.entry-only { display: inline-flex; align-items: center; gap: 8px; font-siz
 .item .side a { color: var(--flamingo); font-weight: 600; }
 .item .changed { color: var(--flamingo); font-weight: 600; }
 
+/* Stats: one quiet hue for the data (lagoon), flamingo only for "today"; text stays in text colours. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; box-shadow: var(--shadow); }
+.tile .v { font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -.01em; }
+.tile .l { font-size: 14px; color: var(--soft); margin-top: 4px; }
+.tile .s { font-size: 13px; color: var(--faint); margin-top: 2px; }
+.rows { display: grid; gap: 8px; }
+.row { display: grid; grid-template-columns: minmax(96px, 1fr) 3fr auto; gap: 10px; align-items: center; font-size: 14px; color: var(--soft); }
+.row .n { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 2ch; text-align: right; }
+.bar { height: 10px; border-radius: 0 4px 4px 0; background: var(--lagoon); }
+.chart svg.days { display: block; width: 100%; height: 72px; }
+.chart .d { fill: var(--lagoon); }
+.chart .d.today { fill: var(--flamingo); }
+.chart .hit { fill: transparent; }
+.chart g:hover .d { opacity: .7; }
+.chart .base { stroke: var(--line); stroke-width: 1; }
+.chart .axis { display: flex; justify-content: space-between; font-size: 13px; color: var(--faint); margin-top: 6px; }
+.cap { margin: 10px 0 0; font-size: 14px; color: var(--soft); }
+.cap:first-child { margin-top: 0; }
+.cap strong { color: var(--ink); }
+details.nums summary { cursor: pointer; font-size: 14px; color: var(--flamingo); font-weight: 600; margin-top: 8px; }
+details.nums p { margin: 6px 0 0; font-size: 14px; color: var(--soft); }
+.spark { flex-shrink: 0; }
+.spark polyline { fill: none; stroke: var(--lagoon); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.spark circle { fill: var(--flamingo); stroke: var(--card); stroke-width: 2; }
+.sparkrow { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.sparkrow .lbl { font-size: 14px; color: var(--soft); }
+.sparkrow .why { font-size: 14px; color: var(--faint); margin-top: 2px; }
+
 .empty { background: var(--card); border: 1px dashed var(--line); border-radius: 18px; padding: 26px 22px; color: var(--soft); }
 .empty strong { color: var(--ink); display: block; margin-bottom: 4px; font-size: 17px; }
 
 footer { margin: 48px 0 56px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--soft); font-size: 14px;
   display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
 footer .grow { flex: 1 1 260px; }
+footer .fine { flex: 1 0 100%; margin: 0; font-size: 13px; color: var(--faint); }
+footer .fine a { color: var(--flamingo); font-weight: 600; }
 footer button, footer label.btn { appearance: none; cursor: pointer; border: 1px solid var(--line); background: var(--card);
   border-radius: 999px; padding: 7px 14px; font-weight: 600; font-size: 14px; color: var(--ink); }
 
@@ -156,7 +196,7 @@ footer button, footer label.btn { appearance: none; cursor: pointer; border: 1px
 <div class="wrap">
   <header class="top">
     <span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="var(--flamingo)"/><circle cx="16" cy="16" r="8" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="16" cy="16" r="2.5" fill="#fff"/></svg><span id="brand">Job Radar</span></span>
-    <span class="updated" id="updated"></span>
+    <span class="topside"><span class="updated" id="updated"></span><a class="linkbtn" id="refresh" href="#" target="_blank" rel="noopener" hidden>Check for new jobs now</a></span>
   </header>
 
   <section class="hello" aria-live="polite">
@@ -171,14 +211,20 @@ footer button, footer label.btn { appearance: none; cursor: pointer; border: 1px
     <span class="grow" id="foot">Your saved jobs and notes stay on this device. Before switching phone or laptop, tap “Back up my saves”.</span>
     <button id="export">Back up my saves</button>
     <label class="btn">Restore a backup<input id="import" type="file" accept="application/json" hidden></label>
+    <p class="fine" id="refreshnote" hidden></p>
   </footer>
 </div>
 
 <script>
 "use strict";
 const KEY = "ajr.v1";
-const TABS = [["home", "For you"], ["all", "All jobs"], ["saved", "Saved"], ["applied", "Applied"],
+const TABS = [["home", "For you"], ["all", "All jobs"], ["saved", "Saved"], ["applied", "Applied"], ["stats", "Stats"],
               ["watching", "Who I’m watching"], ["elsewhere", "More places to look"]];
+const STAGES = ["Applied", "Heard back", "Phone screen", "Interview", "Offer", "Rejected", "No response", "Withdrawn", "Other…"];
+const STAGE_CLASS = { Offer: "lagoon", "Heard back": "warn", "Phone screen": "warn", Interview: "warn" };
+const FIT_RANK = { early: 0, open: 1, stretch: 2 };
+const DEFAULT_WORK_MODES = [{ id: "remote", label: "Remote" }, { id: "hybrid", label: "Hybrid" }, { id: "onsite", label: "In person" }, { id: "unknown", label: "Not stated" }];
+const DEFAULT_FITS = [{ id: "early", label: "Early career" }, { id: "open", label: "Experience not stated" }, { id: "stretch", label: "Stretch (3–4 years, or a manager role)" }];
 const MIAMI_PLACES = ["Miami Beach", "Coral Gables", "Doral", "Fort Lauderdale", "Wynwood", "Brickell", "Aventura",
                       "Boca Raton", "West Palm Beach", "Palm Beach", "Coconut Grove", "Hialeah", "Key Biscayne"];
 let DATA = null;
@@ -186,11 +232,12 @@ const me = load();
 me.jobs = me.jobs || {};
 const lastVisit = me.lastVisit || null;
 const view = { tab: me.tab || "home", q: "", locOff: new Set(me.locOff || []), famOff: new Set(me.famOff || []),
-               entryOnly: !!me.entryOnly, showFilters: false, more: {} };
+               wmOff: new Set(me.wmOff || []), fitOnly: me.fitOnly ?? !!me.entryOnly, showFilters: false, more: {} };
 
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
 function save() {
-  Object.assign(me, { tab: view.tab, locOff: [...view.locOff], famOff: [...view.famOff], entryOnly: view.entryOnly });
+  Object.assign(me, { tab: view.tab, locOff: [...view.locOff], famOff: [...view.famOff], wmOff: [...view.wmOff], fitOnly: view.fitOnly });
+  delete me.entryOnly; // migrated to fitOnly
   try { localStorage.setItem(KEY, JSON.stringify(me)); } catch (e) { /* private window: fine for this visit */ }
 }
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -211,6 +258,7 @@ function dayName(iso) {
   if (diff < 7) return d.toLocaleDateString(undefined, { weekday: "long" });
   return d.toLocaleDateString(undefined, { month: "long", day: "numeric" });
 }
+const shortDate = d => d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 function greeting() {
   const h = new Date().getHours();
   return h < 5 ? "Hi" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
@@ -232,7 +280,7 @@ function place(p) {
     return has("new york") ? "Miami or New York" : (city || "Miami");
   }
   if (p.location === "NYC") return has("miami") ? "New York or Miami" : (has("remote") ? "New York or remote" : "New York");
-  if (p.location === "REMOTE") return "Remote";
+  if (p.location === "REMOTE") return has("new york") ? "Remote or New York" : has("miami") ? "Remote or Miami" : "Remote";
   if (p.location === "UNKNOWN") return "";
   let s = raw.split(/[;/|]/)[0].replace(/\boffice\b/i, "").trim();
   if (s.includes(" - ")) s = s.split(" - ").pop().trim();
@@ -247,7 +295,14 @@ function titleParts(p) {
   if (pipe) return { title: pipe[1], brand: pipe[2].trim(), parent: company };
   return { title: p.title, brand: company, parent: "" };
 }
+const nice = n => String(n || "").split(/\s+[—(]/)[0];
 const famWord = id => (DATA.families.find(f => f.id === id) || {}).label || "";
+const wm = p => p.work_mode || "unknown";
+const wmWord = id => (DATA.work_modes.find(w => w.id === id) || {}).label || "";
+const chipModes = () => DATA.work_modes.filter(w => w.id !== "unknown");
+// Older radar files have no `fit`: guess it from the years asked and the title level.
+const fitOf = p => p.fit || (p.years >= 3 ? "stretch" : p.seniority === "entry" ? "early" : "open");
+const stageOf = j => j.stage === "other" ? ((j.stage_other || "").trim() || "Other") : (j.stage || "Applied");
 const isNew = p => lastVisit && p.first_seen > lastVisit && p.status === "open";
 const jobState = pid => me.jobs[pid] || {};
 
@@ -262,14 +317,43 @@ async function boot() {
     document.getElementById("lede").textContent = "The radar is doing its first search. Come back in a few minutes and your jobs will be here.";
     return;
   }
+  // The radar file may be a few minutes older than this page: every new key is optional.
+  DATA.work_modes ??= DEFAULT_WORK_MODES;
+  DATA.fits ??= DEFAULT_FITS;
+  DATA.requests ??= deriveRequests();
+  DATA.totals ??= null;
+  // Forget filters for places or kinds that no longer exist in the file.
+  const keep = (set, ids) => new Set([...set].filter(id => ids.includes(id)));
+  view.locOff = keep(view.locOff, DATA.locations.map(l => l.id));
+  view.famOff = keep(view.famOff, DATA.families.map(f => f.id));
+  view.wmOff = keep(view.wmOff, chipModes().map(w => w.id));
   const name = DATA.owner || "there";
   document.getElementById("brand").textContent = `${name}’s Job Radar`;
   document.title = `${name}’s Job Radar`;
   const at = DATA.last_run?.finished_at || DATA.generated_at;
   document.getElementById("updated").textContent = at ? `Checked ${ago(at)}` : "";
+  refreshLinks();
   greet(name);
   render();
   me.lastVisit = new Date().toISOString(); save();
+}
+
+// On GitHub Pages the repo is known from the address: user.github.io/repo/ -> github.com/user/repo
+function deriveRequests() {
+  const m = /^([^.]+)\.github\.io$/i.exec(location.hostname), repo = location.pathname.split("/").filter(Boolean)[0];
+  if (!m || !repo) return null;
+  const base = `https://github.com/${m[1]}/${repo}`;
+  return { repo_url: base, add_company_url: `${base}/issues/new?template=add-company.yml`,
+           refresh_url: `${base}/issues/new?template=refresh.md`, actions_url: `${base}/actions/workflows/radar.yml` };
+}
+function refreshLinks() {
+  const rq = DATA.requests || {}, a = document.getElementById("refresh"), note = document.getElementById("refreshnote");
+  if (!rq.refresh_url) return;
+  a.href = rq.refresh_url; a.hidden = false;
+  a.onclick = () => { document.getElementById("foot").textContent = "GitHub is opening in a new tab — tap the green “Create” button there, then come back in about 5 minutes."; };
+  note.innerHTML = `“Check for new jobs now” takes about 5 minutes and asks you to sign in to GitHub.` +
+    (rq.actions_url ? ` You can watch it work on the <a href="${esc(rq.actions_url)}" target="_blank" rel="noopener">Actions page</a>.` : "");
+  note.hidden = false;
 }
 
 function openJobs() { return DATA.postings.filter(p => p.status === "open" && !jobState(p.pid).hidden); }
@@ -304,19 +388,29 @@ function render() {
   tabs.querySelectorAll("button").forEach(b => b.onclick = () => { view.tab = b.dataset.tab; save(); render(); window.scrollTo({ top: document.querySelector(".tabs").offsetTop - 4 }); });
   const main = document.getElementById("main");
   main.innerHTML = ({ home: homeHTML, all: allHTML, saved: () => trackedHTML("saved"), applied: () => trackedHTML("applied"),
-                      watching: watchingHTML, elsewhere: elsewhereHTML }[view.tab] || homeHTML)();
+                      stats: statsHTML, watching: watchingHTML, elsewhere: elsewhereHTML }[view.tab] || homeHTML)();
   wire(main);
 }
 
 function cardHTML(p) {
-  const j = jobState(p.pid), t = titleParts(p), where = place(p);
+  const j = jobState(p.pid), t = titleParts(p), where = place(p), f = fitOf(p), mode = wm(p);
   const pills = [];
   if (p.status !== "open") pills.push(`<span class="pill">No longer listed</span>`);
   else if (isNew(p)) pills.push(`<span class="pill new">New</span>`);
-  if (p.seniority === "entry") pills.push(`<span class="pill entry">Entry level</span>`);
+  if (f === "early") pills.push(`<span class="pill entry">Early career</span>`);
+  else if (f === "stretch") pills.push(`<span class="pill warn">${p.years >= 3 ? `Stretch · asks for ${p.years}+ years` : "Stretch · manager role"}</span>`);
   pills.push(`<span class="pill">${esc(famWord(p.family))}</span>`);
-  if (p.years >= 3) pills.push(`<span class="pill warn">Asks for ${p.years}+ years</span>`);
+  if (f !== "stretch" && p.years >= 3) pills.push(`<span class="pill warn">Asks for ${p.years}+ years</span>`);
+  if (mode !== "unknown" && wmWord(mode)) pills.push(`<span class="pill">${esc(wmWord(mode))}</span>`);
   if ((p.flags || []).includes("internship")) pills.push(`<span class="pill">Internship</span>`);
+  if (j.applied && j.stage && j.stage !== "Applied") {
+    const s = stageOf(j);
+    pills.push(`<span class="pill ${STAGE_CLASS[s] || ""}" data-stagepill>${esc(s)}</span>`);
+  }
+  const stage = j.applied ? `<div class="stage"><label>Where is it now?
+      <select data-stage>${STAGES.map(s => { const v = s === "Other…" ? "other" : s;
+        return `<option value="${v}"${(j.stage || "Applied") === v ? " selected" : ""}>${s}</option>`; }).join("")}</select></label>
+      ${j.stage === "other" ? `<input data-stage-other type="text" aria-label="What happened?" placeholder="e.g. Writing test" value="${esc(j.stage_other || "")}">` : ""}</div>` : "";
   return `<article class="card${p.target ? " mine" : ""}${p.status !== "open" ? " gone" : ""}" data-pid="${p.pid}">
     <div class="where">${p.target ? `<span class="star" aria-label="On your list">★</span>` : ""}<span class="co">${esc(t.brand)}</span>${where ? `<span>· ${esc(where)}</span>` : ""}</div>
     <h3><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(t.title)}</a></h3>
@@ -328,6 +422,7 @@ function cardHTML(p) {
       ${view.tab === "saved" || view.tab === "applied" ? "" : `<button class="act skip" data-act="hidden">Not for me</button>`}
       <a class="act view" href="${esc(p.url)}" target="_blank" rel="noopener">View job</a>
     </div>
+    ${stage}
     ${j.saved || j.applied ? `<div class="note"><textarea data-note aria-label="Your notes" placeholder="Notes — who you wrote to, the deadline, when to follow up…">${esc(j.note || "")}</textarea></div>` : ""}
   </article>`;
 }
@@ -340,10 +435,12 @@ function block(id, title, sub, items, limit) {
     ${showAll ? "" : `<button class="linkbtn" data-more="${id}">See all ${items.length}</button>`}</div>
     <div class="cards">${shown.map(cardHTML).join("")}</div></section>`;
 }
+const panel = (title, sub, inner) => `<section class="block"><div class="block-head"><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ""}</div></div>${inner}</section>`;
 
 const byNewest = (a, b) => (b.first_seen || "").localeCompare(a.first_seen || "");
-const locRank = p => ({ MIAMI: 0, NYC: 1, REMOTE: 2, FLORIDA: 3, OTHER_US: 4, UNKNOWN: 5 }[p.location] ?? 6);
-const friendly = (a, b) => locRank(a) - locRank(b) || ((a.seniority !== "entry") - (b.seniority !== "entry")) || byNewest(a, b);
+const locRank = p => ({ MIAMI: 0, REMOTE: 1, NYC: 2, FLORIDA: 3, OTHER_US: 4, UNKNOWN: 5 }[p.location] ?? 6);
+const fitRank = p => FIT_RANK[fitOf(p)] ?? 1;
+const friendly = (a, b) => fitRank(a) - fitRank(b) || locRank(a) - locRank(b) || byNewest(a, b);
 
 function homeHTML() {
   const open = openJobs();
@@ -351,7 +448,7 @@ function homeHTML() {
   const week = open.filter(p => !p.target && age(p.first_seen) < 7).sort(friendly);
   const miami = open.filter(p => !p.target && p.location === "MIAMI" && age(p.first_seen) >= 7).sort(byNewest);
   let html = block("mine", "From your list", "Open roles at the companies you picked.", mine, 4) +
-             block("week", "New this week", "Everything else that matches, Miami first.", week, 6) +
+             block("week", "New this week", "Everything else that matches — early-career first, then Miami, then remote.", week, 6) +
              block("miami", "Still open in Miami", "Found earlier but not filled yet.", miami, 4);
   if (!html) html = `<div class="empty"><strong>A quiet week.</strong>Nothing new matches right now. The radar checks three times a day and emails you as soon as something comes up. Meanwhile, “More places to look” has quick searches on LinkedIn and Indeed.</div>`;
   return html;
@@ -360,16 +457,19 @@ function homeHTML() {
 function allHTML() {
   const locs = DATA.locations.map(l => `<button class="chip" data-loc="${l.id}" aria-pressed="${!view.locOff.has(l.id)}">${esc(l.label)}</button>`).join("");
   const fams = DATA.families.map(f => `<button class="chip" data-fam="${f.id}" aria-pressed="${!view.famOff.has(f.id)}">${esc(f.label)}</button>`).join("");
-  const active = view.locOff.size + view.famOff.size + (view.entryOnly ? 1 : 0);
+  const wms = chipModes().map(w => `<button class="chip" data-wm="${w.id}" aria-pressed="${!view.wmOff.has(w.id)}"${w.id === "onsite" ? ` title="Includes jobs that don’t say"` : ""}>${esc(w.label)}</button>`).join("");
+  const active = view.locOff.size + view.famOff.size + view.wmOff.size + (view.fitOnly ? 1 : 0);
   const q = view.q.trim().toLowerCase();
-  const items = openJobs().filter(p => !view.locOff.has(p.location) && !view.famOff.has(p.family) &&
-      (!view.entryOnly || p.seniority === "entry") &&
+  const wmKey = p => wm(p) === "unknown" ? "onsite" : wm(p); // a job that doesn't say is almost always in person
+  const items = openJobs().filter(p => !view.locOff.has(p.location) && !view.famOff.has(p.family) && !view.wmOff.has(wmKey(p)) &&
+      (!view.fitOnly || fitOf(p) === "early") &&
       (!q || `${p.title} ${p.company} ${p.location_raw}`.toLowerCase().includes(q)))
     .sort((a, b) => dayName(a.first_seen) === dayName(b.first_seen) ? friendly(a, b) : byNewest(a, b));
   let list = "", cur = null, buf = [];
   const flush = () => { if (buf.length) list += `<div class="day">${cur}</div><div class="cards">${buf.join("")}</div>`; buf = []; };
   for (const p of items) { const d = dayName(p.first_seen); if (d !== cur) { flush(); cur = d; } buf.push(cardHTML(p)); }
   flush();
+  const onlyHere = DATA.locations.every(l => l.id === "MIAMI" || l.id === "REMOTE");
   return `<div class="filterbar">
       <div class="search"><input id="q" type="search" placeholder="Search a job title or company" value="${esc(view.q)}" aria-label="Search"></div>
       <button class="act" id="ftoggle" aria-expanded="${view.showFilters}">${view.showFilters ? "Hide filters" : "Filters"}${active ? ` (${active})` : ""}</button>
@@ -377,46 +477,57 @@ function allHTML() {
     <div class="filters" ${view.showFilters ? "" : "hidden"}>
       <div class="group"><h4>Where</h4><div class="chips">${locs}</div></div>
       <div class="group"><h4>Kind of role</h4><div class="chips">${fams}</div></div>
-      <label class="entry-only"><input type="checkbox" id="entry" ${view.entryOnly ? "checked" : ""}> Only entry-level roles</label>
+      <div class="group"><h4>How you’d work</h4><div class="chips">${wms}</div></div>
+      <label class="entry-only"><input type="checkbox" id="fitonly" ${view.fitOnly ? "checked" : ""}> <span>Early-career only — jobs that say entry level or up to 2 years</span></label>
     </div>
-    <div id="results">${list || `<div class="empty"><strong>No jobs match these filters.</strong>Try turning a place or a kind of role back on.</div>`}</div>`;
+    <div id="results">${list || `<div class="empty"><strong>No jobs match these filters.</strong>Try turning a place or a kind of role back on.${onlyHere ? " The radar shows Miami and fully remote jobs only." : ""}</div>`}</div>`;
 }
 
 function trackedHTML(kind) {
   const have = new Set(DATA.postings.map(p => p.pid));
   const gone = Object.values(me.jobs).filter(j => j.snap && !have.has(j.snap.pid)).map(j => ({ ...j.snap, status: "closed" }));
-  const items = DATA.postings.concat(gone).filter(p => jobState(p.pid)[kind])
-    .sort((a, b) => (jobState(b.pid).applied_at || b.first_seen || "").localeCompare(jobState(a.pid).applied_at || a.first_seen || ""));
+  const when = p => { const j = jobState(p.pid); return (kind === "applied" && j.stage_at) || j.applied_at || p.first_seen || ""; };
+  const items = DATA.postings.concat(gone).filter(p => jobState(p.pid)[kind]).sort((a, b) => when(b).localeCompare(when(a)));
   if (!items.length) return kind === "saved"
     ? `<div class="empty"><strong>Nothing saved yet.</strong>Tap “♡ Save” on any job you like and it waits for you here, with a space for notes.</div>`
     : `<div class="empty"><strong>No applications marked yet.</strong>When you send one, tap “I applied” on the job. It moves here with the date, and you can jot down who you contacted and when to follow up.</div>`;
-  const sub = kind === "saved" ? "Jobs you’ve set aside. Add notes as you go." : "Everything you’ve sent, newest first. Good luck!";
-  return `<section class="block"><div class="block-head"><div><h2>${kind === "saved" ? "Saved for later" : "Your applications"}</h2><p>${sub}</p></div></div>
-    <div class="cards">${items.map(cardHTML).join("")}</div></section>`;
+  let body;
+  if (kind === "applied") {
+    // Group by stage, in the order of the dropdown; each custom "Other…" answer gets its own heading.
+    const groups = new Map();
+    for (const p of items) { const s = stageOf(jobState(p.pid)); if (!groups.has(s)) groups.set(s, []); groups.get(s).push(p); }
+    const order = s => { const i = STAGES.indexOf(s); return i < 0 ? STAGES.length - 1 : i; };
+    body = [...groups.keys()].sort((a, b) => order(a) - order(b) || a.localeCompare(b))
+      .map(s => `<div class="day">${esc(s)}</div><div class="cards">${groups.get(s).map(cardHTML).join("")}</div>`).join("");
+  } else body = `<div class="cards">${items.map(cardHTML).join("")}</div>`;
+  const sub = kind === "saved" ? "Jobs you’ve set aside. Add notes as you go." : "Everything you’ve sent, by where it stands. Good luck!";
+  return `<section class="block"><div class="block-head"><div><h2>${kind === "saved" ? "Saved for later" : "Your applications"}</h2><p>${sub}</p></div></div>${body}</section>`;
 }
 
 function watchingHTML() {
   const E = DATA.employers.slice().sort((a, b) => (b.target - a.target) || a.name.localeCompare(b.name));
-  const nice = n => n.split(/\s+[—(]/)[0];
+  const li = e => e.linkedin_url ? `<a href="${esc(String(e.linkedin_url).replace(/\/+$/, ""))}/jobs/" target="_blank" rel="noopener">LinkedIn jobs</a>` : "";
+  const plus = e => li(e) ? ` · ${li(e)}` : "";
   const row = (e, side, why) => `<div class="item"><div><div class="name">${e.target ? `<span style="color:var(--sun)">★</span> ` : ""}${esc(nice(e.name))}</div>
       ${why ? `<div class="why">${why}</div>` : ""}</div><div class="side">${side}</div></div>`;
   const auto = E.filter(e => ["read", "failing", "pending"].includes(e.mode)).map(e => row(e,
-      e.mode === "read" ? (e.open_relevant ? `${e.open_relevant} open for you` : "Nothing for you right now")
-      : `<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Check their site</a>`,
+      (e.mode === "read" ? (e.open_relevant ? `${e.open_relevant} open for you` : "Nothing for you right now")
+      : `<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Check their site</a>`) + plus(e),
       esc(e.group || ""))).join("");
   const watched = E.filter(e => e.mode === "watched").map(e => {
     const pg = e.page || {};
     const changed = pg.changed_at && age(pg.changed_at) < 14;
-    return row(e, `${changed ? `<span class="changed">Updated ${ago(pg.changed_at)}</span> · ` : ""}<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Open page</a>`,
+    return row(e, `${changed ? `<span class="changed">Updated ${ago(pg.changed_at)}</span> · ` : ""}<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Open page</a>${plus(e)}`,
       changed && (pg.added || [])[0] ? `New on their page: “${esc(pg.added[0])}”` : esc(e.group || ""));
   }).join("");
   const hand = E.filter(e => e.mode === "check").map(e => row(e,
-      e.careers_url ? `<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Open their jobs page</a>`
-                    : `<a href="https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(nice(e.name))}" target="_blank" rel="noopener">Find on LinkedIn</a>`,
+      e.careers_url ? `<a href="${esc(e.careers_url)}" target="_blank" rel="noopener">Open their jobs page</a>${plus(e)}`
+                    : li(e) || `<a href="https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(nice(e.name))}" target="_blank" rel="noopener">Find on LinkedIn</a>`,
       esc(e.note || e.group || ""))).join("");
   const src = (DATA.aggregators || []).filter(a => a.ok);
+  const add = DATA.requests?.add_company_url ? `<a class="linkbtn" href="${esc(DATA.requests.add_company_url)}" target="_blank" rel="noopener">Add a company</a>` : "";
   return `<section class="block"><div class="block-head"><div><h2>Checked for you, three times a day</h2>
-      <p>The radar reads these companies’ job pages and tells you when a role fits.</p></div></div><div class="list">${auto}</div></section>
+      <p>The radar reads these companies’ job pages and tells you when a role fits.</p></div>${add}</div><div class="list">${auto}</div></section>
     ${watched ? `<section class="block"><div class="block-head"><div><h2>Pages I keep an eye on</h2>
       <p>These companies don’t have a proper jobs board, so the radar watches their careers page and emails you when it changes.</p></div></div><div class="list">${watched}</div></section>` : ""}
     ${hand ? `<section class="block"><div class="block-head"><div><h2>Worth checking yourself</h2>
@@ -426,13 +537,111 @@ function watchingHTML() {
 
 function elsewhereHTML() {
   const groups = [["search", "Quick searches", "Sites the radar isn’t allowed to read for you. Each link opens a search of the last 7 days — worth a look once or twice a week."],
-                  ["alert", "Set up these alerts once", "Make a free account on each and save a search for Miami and New York. They’ll email you directly."],
+                  ["alert", "Set up these alerts once", "Make a free account on each and save a search for Miami and for remote jobs. They’ll email you directly."],
                   ["newsletter", "Newsletters worth subscribing to", ""]];
   return groups.map(([k, title, sub]) => {
     const rows = (DATA.boards || []).filter(b => b.kind === k).map(b => `<div class="item"><div><div class="name">${esc(b.name)}</div>
       <div class="why">${esc(b.why || "")}</div></div><div class="side"><a href="${esc(b.url)}" target="_blank" rel="noopener">Open</a></div></div>`).join("");
     return rows ? `<section class="block"><div class="block-head"><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ""}</div></div><div class="list">${rows}</div></section>` : "";
   }).join("");
+}
+
+/* ---- Stats ----------------------------------------------------------------- */
+const tile = (label, value, sub) => `<div class="tile"><div class="v">${value}</div><div class="l">${label}</div>${sub ? `<div class="s">${sub}</div>` : ""}</div>`;
+function barRows(items) {
+  const max = Math.max(1, ...items.map(i => i.n));
+  return `<div class="rows">${items.map(i => `<div class="row"><span class="lbl">${esc(i.label)}</span><div class="bar" style="width:${Math.round(i.n / max * 100)}%" aria-hidden="true"></div><span class="n">${i.n}</span></div>`).join("")}</div>`;
+}
+function dayChart(posts) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const N = 30, counts = new Array(N).fill(0);
+  for (const p of posts) {
+    if (!p.first_seen) continue;
+    const d = new Date(p.first_seen); d.setHours(0, 0, 0, 0);
+    const back = Math.round((today - d) / DAY);
+    if (back >= 0 && back < N) counts[N - 1 - back]++;
+  }
+  const label = i => i === N - 1 ? "Today" : i === N - 2 ? "Yesterday" : shortDate(new Date(today - (N - 1 - i) * DAY));
+  const total = counts.reduce((a, b) => a + b, 0), max = Math.max(1, ...counts), peak = counts.indexOf(Math.max(...counts));
+  const W = 300, H = 60, slot = W / N;
+  const bars = counts.map((n, i) => {
+    const h = n ? Math.max(1.5, n / max * (H - 6)) : 0;
+    return `<g><title>${esc(label(i))}: ${n} new job${n === 1 ? "" : "s"}</title><rect class="hit" x="${(i * slot).toFixed(1)}" y="0" width="${slot.toFixed(1)}" height="${H}"/>` +
+      (n ? `<rect class="d${i === N - 1 ? " today" : ""}" x="${(i * slot + slot * 0.1).toFixed(1)}" y="${(H - 1 - h).toFixed(1)}" width="${(slot * 0.8).toFixed(1)}" height="${h.toFixed(1)}"/>` : "") + `</g>`;
+  }).join("");
+  const svg = `<svg class="days" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${total} new job${total === 1 ? "" : "s"} found in the last 30 days${total ? `, most on ${esc(label(peak))} (${counts[peak]})` : ""}">${bars}<line class="base" x1="0" x2="${W}" y1="${H - 0.5}" y2="${H - 0.5}" vector-effect="non-scaling-stroke"/></svg>`;
+  const nums = counts.map((n, i) => n ? `${label(i)}: ${n}` : "").filter(Boolean).join(" · ");
+  return `<div class="panel chart">${svg}<div class="axis"><span>${esc(label(0))}</span><span>Today</span></div>
+    <p class="cap">${total ? `<strong>${total}</strong> new job${total === 1 ? "" : "s"} in the last 30 days. Busiest day: ${esc(label(peak))}, with ${counts[peak]}.` : "No new jobs found in the last 30 days."}</p>
+    ${nums ? `<details class="nums"><summary>See the numbers</summary><p>${esc(nums)}</p></details>` : ""}</div>`;
+}
+function runsSpark(runs) {
+  const vals = runs.slice(-30).map(r => r.new_relevant || 0), n = vals.length;
+  if (!n) return "";
+  const W = 160, H = 36, pad = 6, max = Math.max(1, ...vals);
+  const x = i => n === 1 ? W / 2 : pad + i * (W - 2 * pad) / (n - 1), y = v => H - pad - v / max * (H - 2 * pad);
+  const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="New jobs found on each of the last ${n} check${n === 1 ? "" : "s"}: ${vals.join(", ")}"><title>${vals.join(" · ")}</title>` +
+    `${n > 1 ? `<polyline points="${pts}"/>` : ""}<circle cx="${x(n - 1).toFixed(1)}" cy="${y(vals[n - 1]).toFixed(1)}" r="4"/></svg>`;
+}
+function healthHTML() {
+  const lr = DATA.last_run || {}, srcN = (lr.sources_ok || 0) + (lr.sources_failed || 0);
+  const line = lr.finished_at ? `Last checked ${ago(lr.finished_at)}${lr.duration_s ? ` · took ${Math.round(lr.duration_s)}s` : ""}${srcN ? ` · ${lr.sources_ok} of ${srcN} sources read` : ""}` : "No check has finished yet.";
+  const short = s => esc(String(s || "").replace(/^\w*Error:\s*/, "").slice(0, 80));
+  const bad = DATA.employers.filter(e => e.mode === "failing").map(e => ({ name: nice(e.name), n: e.failures || 0, err: e.error }))
+    .concat((DATA.aggregators || []).filter(a => a.ok === false).map(a => ({ name: a.name.split(" (")[0], n: a.consecutive_failures ?? 0, err: a.error })));
+  const list = bad.length ? `<p class="cap">Couldn’t be read on the last check — the radar tries again next time:</p><div class="list">${bad.map(b =>
+      `<div class="item"><div><div class="name">${esc(b.name)}</div><div class="why">${short(b.err) || "Couldn’t be read"}</div></div><div class="side">${b.n ? `${b.n} check${b.n === 1 ? "" : "s"} in a row` : "Not read"}</div></div>`).join("")}</div>`
+    : `<p class="cap">Every source was read fine on the last check.</p>`;
+  const runs = DATA.runs || [], vals = runs.slice(-30).map(r => r.new_relevant || 0);
+  return `<p class="cap">${line}</p>${list}
+    ${runs.length ? `<div class="panel sparkrow">${runsSpark(runs)}<div><div class="lbl">New jobs found by the radar on each check — all areas, not just Miami and remote.</div>
+      <div class="why">Last ${vals.length} check${vals.length === 1 ? "" : "s"}: ${esc(vals.join(" · "))}</div></div></div>` : ""}`;
+}
+function statsHTML() {
+  if (!DATA.postings.length) return `<div class="empty"><strong>Nothing to count yet.</strong>Come back after the next check.</div>`;
+  const open = openJobs(), J = Object.values(me.jobs), applied = J.filter(j => j.applied);
+  const n = f => open.filter(f).length;
+  const replies = applied.filter(j => !["Applied", "No response", "Withdrawn"].includes(stageOf(j))).length;
+  const t = DATA.totals;
+  const tiles = [
+    tile("Open jobs", open.length, "that match you"),
+    tile("New this week", n(p => age(p.first_seen) < 7)),
+    tile("Early career", n(p => fitOf(p) === "early"), "say entry level or up to 2 years"),
+    tile("Remote", n(p => p.location === "REMOTE"), "fully remote"),
+    tile("From your list", n(p => p.target), "companies you picked"),
+    tile("Saved", J.filter(j => j.saved).length),
+    tile("Applied", applied.length),
+    tile("Replies", replies, "any answer after applying"),
+    applied.length ? tile("Response rate", `${Math.round(replies / applied.length * 100)}%`, "replies ÷ applications") : "",
+    t && t.open_all != null && t.open_shown != null ? tile("Elsewhere in the US (not shown)", Math.max(0, t.open_all - t.open_shown), "matching jobs that aren’t Miami or fully remote") : "",
+  ].join("");
+  const where = DATA.locations.map(l => ({ label: l.label, n: n(p => p.location === l.id) }));
+  const how = [{ label: wmWord("remote") || "Remote", n: n(p => wm(p) === "remote") }, { label: wmWord("hybrid") || "Hybrid", n: n(p => wm(p) === "hybrid") },
+               { label: `${wmWord("onsite") || "In person"} or not stated`, n: n(p => wm(p) === "onsite" || wm(p) === "unknown") }];
+  const kinds = DATA.families.map(f => ({ label: f.label, n: n(p => p.family === f.id) }));
+  const fits = DATA.fits.map(f => ({ label: f.label, n: n(p => fitOf(p) === f.id) }));
+  const byEmp = new Map();
+  for (const p of open) {
+    const e = p.employer_id && DATA.employers.find(x => x.id === p.employer_id), k = e ? e.id : nice(p.company).trim();
+    if (!k) continue; // a posting with no company name can't be grouped
+    const cur = byEmp.get(k) || { label: `${e?.target || (!e && p.target) ? "★ " : ""}${nice(e ? e.name : p.company).trim()}`, n: 0 };
+    cur.n++; byEmp.set(k, cur);
+  }
+  const companies = [...byEmp.values()].sort((a, b) => b.n - a.n || a.label.localeCompare(b.label)).slice(0, 8);
+  const stages = STAGES.map(s => ({ label: s === "Other…" ? "Other" : s,
+    n: applied.filter(j => s === "Other…" ? (j.stage === "other" && !STAGES.includes(stageOf(j))) : stageOf(j) === s).length })).filter(x => x.n);
+  const sentWeek = applied.filter(j => j.applied_at && age(j.applied_at) < 7).length;
+  const apps = applied.length ? `<div class="panel">${barRows(stages)}<p class="cap"><strong>${sentWeek}</strong> sent this week.</p></div>`
+                              : `<div class="empty">Mark a job as applied and your pipeline shows here.</div>`;
+  return panel("Right now", "Counted from the jobs you can see here.", `<div class="tiles">${tiles}</div>`) +
+    panel("New jobs, last 30 days", "How many new matches the radar found each day.", dayChart(DATA.postings)) +
+    panel("Where and how", "", `<div class="panel"><div class="group"><h4>Where</h4>${barRows(where)}</div><div class="group"><h4>How you’d work</h4>${barRows(how)}</div></div>`) +
+    panel("Kinds of roles", "", `<div class="panel">${barRows(kinds)}</div>`) +
+    panel("Fit", "How much experience the jobs ask for.", `<div class="panel">${barRows(fits)}</div>`) +
+    (companies.length ? panel("Companies with the most open roles", "★ means a company on your list.", `<div class="panel">${barRows(companies)}</div>`) : "") +
+    panel("Your applications", "", apps) +
+    panel("Is the radar healthy?", "", healthHTML());
 }
 
 /* ---- Interactions ---------------------------------------------------------- */
@@ -444,23 +653,43 @@ function wire(root) {
       const j = me.jobs[pid] = me.jobs[pid] || {};
       const k = b.dataset.act;
       j[k] = !j[k];
-      if (k === "applied") { j.applied_at = j.applied ? new Date().toISOString() : null; if (j.applied) j.saved = true; }
+      if (k === "applied") {
+        if (j.applied) { j.applied_at = new Date().toISOString(); j.saved = true; j.stage = "Applied"; j.stage_other = ""; j.stage_at = j.applied_at; }
+        else { j.applied_at = null; delete j.stage; delete j.stage_other; delete j.stage_at; }
+      }
       const p = DATA.postings.find(x => x.pid === pid);
       if (p) j.snap = { pid, title: p.title, company: p.company, url: p.url, location_raw: p.location_raw, location: p.location,
-                        family: p.family, first_seen: p.first_seen, target: p.target, seniority: p.seniority };
+                        family: p.family, first_seen: p.first_seen, target: p.target, seniority: p.seniority,
+                        work_mode: p.work_mode, fit: p.fit, years: p.years };
       save(); render(); greet(DATA.owner || "there");
       if (k === "hidden") document.getElementById("foot").textContent = "Hidden. It won’t show up again on this device.";
     });
     const t = card.querySelector("[data-note]");
     if (t) t.oninput = () => { (me.jobs[pid] = me.jobs[pid] || {}).note = t.value; save(); };
+    const st = card.querySelector("[data-stage]");
+    if (st) st.onchange = () => {
+      const j = me.jobs[pid] = me.jobs[pid] || {};
+      j.stage = st.value; if (j.stage !== "other") j.stage_other = ""; j.stage_at = new Date().toISOString();
+      save(); render();
+      if (j.stage === "other") document.querySelector(`.card[data-pid="${pid}"] [data-stage-other]`)?.focus();
+    };
+    const so = card.querySelector("[data-stage-other]");
+    if (so) {
+      so.oninput = () => { // save as she types; the pill follows; nothing re-renders under her fingers
+        const j = me.jobs[pid] = me.jobs[pid] || {}; j.stage_other = so.value; save();
+        const pill = card.querySelector("[data-stagepill]"); if (pill) pill.textContent = stageOf(j);
+      };
+      so.onchange = () => setTimeout(render, 300); // after she leaves the box, regroup — delayed so a tap elsewhere still lands
+    }
   });
   const tog = root.querySelector("#ftoggle");
   if (tog) tog.onclick = () => { view.showFilters = !view.showFilters; render(); };
   const flip = (set, v) => set.has(v) ? set.delete(v) : set.add(v);
   root.querySelectorAll("[data-loc]").forEach(b => b.onclick = () => { flip(view.locOff, b.dataset.loc); save(); render(); });
   root.querySelectorAll("[data-fam]").forEach(b => b.onclick = () => { flip(view.famOff, b.dataset.fam); save(); render(); });
-  const en = root.querySelector("#entry");
-  if (en) en.onchange = () => { view.entryOnly = en.checked; save(); render(); };
+  root.querySelectorAll("[data-wm]").forEach(b => b.onclick = () => { flip(view.wmOff, b.dataset.wm); save(); render(); });
+  const en = root.querySelector("#fitonly");
+  if (en) en.onchange = () => { view.fitOnly = en.checked; save(); render(); };
   const q = root.querySelector("#q");
   if (q) q.oninput = () => {
     view.q = q.value; const pos = q.selectionStart; render();
@@ -483,8 +712,10 @@ document.getElementById("import").onchange = async e => {
     if (!got || typeof got.jobs !== "object") throw new Error("not a backup");
     for (const [k, v] of Object.entries(got.jobs)) {
       const cur = me.jobs[k] || {};
+      const st = (v.stage_at || "") > (cur.stage_at || "") ? v : cur; // the newer stage wins; otherwise what's on this device
       me.jobs[k] = { ...v, ...cur, saved: !!(v.saved || cur.saved), applied: !!(v.applied || cur.applied),
                      applied_at: cur.applied_at || v.applied_at || null, note: cur.note || v.note || "" };
+      if (st.stage) Object.assign(me.jobs[k], { stage: st.stage, stage_other: st.stage_other || "", stage_at: st.stage_at || null });
     }
     save(); render(); greet(DATA.owner || "there");
     document.getElementById("foot").textContent = `Welcome back — restored ${Object.keys(got.jobs).length} saved jobs.`;
