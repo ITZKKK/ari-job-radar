@@ -20,6 +20,12 @@ import re
 from dataclasses import dataclass, field
 
 
+# Bump when the classifier's CODE changes what it decides (config changes are
+# fingerprinted on their own): crawl.py re-reads enriched Workday postings
+# whose verdict was stored under an older version.
+CLASSIFY_VERSION = 2
+
+
 @dataclass
 class Verdict:
     relevant: bool
@@ -215,10 +221,14 @@ def employment(title: str | None, description: str | None, hint: str | None, rul
     "Fellowship" instead)."""
     t = title or ""
     kind = _hint_kind(hint)
-    if kind is None and rules.intern.search(t):
-        kind = "intern"
-    if kind is None:
-        kind = next((k for k, rx in rules.emp_title if rx.search(t)), None)
+    # A board's "Full time" is about hours, not permanence: Workday says it for
+    # temp jobs too ("News Assignment Editor and Producer-Temp"). So a title
+    # that says Temp / Contract / Part-time / Freelance / Intern wins over a
+    # full-time field; any other board field wins over the title.
+    from_title = "intern" if rules.intern.search(t) else next(
+        (k for k, rx in rules.emp_title if rx.search(t)), None)
+    if kind in (None, "full_time") and from_title:
+        kind = from_title
     if kind is None:
         kind = next((k for k, rx in rules.emp_desc if rx.search(description or "")), None)
     if kind == "contract" and rules.fellowship.search(t):

@@ -176,25 +176,35 @@ def _due(state: dict, sid: str, hours: float) -> bool:
     return store.days_since(s.get("last_ok")) * 24 >= (hours or 0)
 
 
-def enabled(cfg: dict, state: dict | None = None) -> list[dict]:
+def _sources(cfg: dict) -> list[dict]:
+    """Every source config (and the keys in the environment) turns on, due or
+    not: {"id", "name", "fetch", "cfg"} rows."""
     a = cfg.get("aggregators") or {}
     out = []
-
-    def add(sid, name, fn, c):
-        if _due(state, sid, c.get("min_hours_between", 0)):
-            out.append({"id": sid, "name": name, "fetch": fn, "cfg": c})
-
     c = a.get("adzuna") or {}
     if c.get("enabled") and os.environ.get("ADZUNA_APP_ID") and os.environ.get("ADZUNA_APP_KEY"):
-        add("adzuna", "Adzuna (job search)", fetch_adzuna, c)
+        out.append({"id": "adzuna", "name": "Adzuna (job search)", "fetch": fetch_adzuna, "cfg": c})
     c = a.get("jsearch") or {}
     if c.get("enabled") and os.environ.get("JSEARCH_RAPIDAPI_KEY"):
-        add("jsearch", "JSearch (Google for Jobs)", fetch_jsearch, c)
+        out.append({"id": "jsearch", "name": "JSearch (Google for Jobs)", "fetch": fetch_jsearch, "cfg": c})
     c = a.get("remotive") or {}
     if c.get("enabled"):
-        add("remotive", "Remotive (remote jobs)", fetch_remotive, c)
+        out.append({"id": "remotive", "name": "Remotive (remote jobs)", "fetch": fetch_remotive, "cfg": c})
     c = a.get("rss") or {}
     if c.get("enabled"):
         for f in c.get("feeds", []):
-            add(f"rss_{f['id']}", f["name"], fetch_rss, {**f, "min_hours_between": c.get("min_hours_between", 0)})
+            out.append({"id": f"rss_{f['id']}", "name": f["name"], "fetch": fetch_rss,
+                        "cfg": {**f, "min_hours_between": c.get("min_hours_between", 0)}})
     return out
+
+
+def enabled(cfg: dict, state: dict | None = None) -> list[dict]:
+    """The sources that run this time (configured, and due by min_hours_between)."""
+    return [s for s in _sources(cfg) if _due(state, s["id"], s["cfg"].get("min_hours_between", 0))]
+
+
+def configured(cfg: dict) -> set[str]:
+    """Ids of every source config turns on, due or not. The dashboard export
+    uses it so a source switched off in config (JSearch until its key is
+    subscribed) keeps its history in state but stops showing as "failing"."""
+    return {s["id"] for s in _sources(cfg)}

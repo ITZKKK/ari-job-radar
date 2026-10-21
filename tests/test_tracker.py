@@ -526,6 +526,23 @@ def test_export_backfills_old_state(tmp_path):
     assert wre["linkedin_url"].startswith("https://www.linkedin.com/company/")
 
 
+def test_export_drops_switched_off_aggregators(tmp_path, monkeypatch):
+    """JSearch is off in config until its key is subscribed; its old failure in
+    state must not show as 'failing' on Ari's Stats tab."""
+    monkeypatch.setenv("JSEARCH_RAPIDAPI_KEY", "k")
+    st = store.empty()
+    st["sources"] = {"jsearch": {"name": "JSearch (Google for Jobs)", "kind": "aggregator", "ok": False, "error": "403"},
+                     "remotive": {"name": "Remotive (remote jobs)", "kind": "aggregator", "ok": True, "error": ""}}
+    out = str(tmp_path / "radar.json")
+    cfg = json.loads(json.dumps(CFG))
+    cfg["aggregators"]["jsearch"]["enabled"] = False
+    crawl.export(st, cfg, [], [], out)
+    assert [a["id"] for a in json.load(open(out))["aggregators"]] == ["remotive"]
+    cfg["aggregators"]["jsearch"]["enabled"] = True
+    crawl.export(st, cfg, [], [], out)
+    assert sorted(a["id"] for a in json.load(open(out))["aggregators"]) == ["jsearch", "remotive"]
+
+
 def test_duplicates_collapse_to_employer_copy():
     st = store.empty()
     st["postings"] = {
@@ -739,7 +756,11 @@ def test_employment_from_board_field(hint, kind):
     ("Staff Writer", "This is a contract role through March.", None, "contract"),
     ("Staff Writer", "You'll manage contracts with our freelance photographers.", None, "unknown"),
     ("Staff Writer", "", None, "unknown"),
-    ("Freelance Writer", "", "Full-time", "full_time"),            # the board's own field wins
+    ("Freelance Writer", "", "Full-time", "freelance"),            # "Full time" is hours, not permanence: the title wins
+    ("News Assignment Editor and Producer-Temp", "", "Full time", "contract"),   # Workday says Full time for temp jobs
+    ("Staff Writer", "", "Full time", "full_time"),
+    ("Staff Writer", "", "Part-time", "part_time"),                # a non-full-time board field still wins
+    ("Freelance Writer", "", "Part-time", "part_time"),
     # A fellowship has an end date but is a full-time job: kept.
     ("Editorial Fellow", "This is a temporary position for 12 months.", None, "full_time"),
     ("Reporting Fellowship", "", "Temporary Full Time", "full_time"),

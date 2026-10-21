@@ -33,7 +33,7 @@ import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src import adapters, aggregators, inbox, store, watch  # noqa: E402
-from src.classify import (EMPLOYMENT_LABELS, Rules, beats, classify, employment, fit,  # noqa: E402
+from src.classify import (CLASSIFY_VERSION, EMPLOYMENT_LABELS, Rules, beats, classify, employment, fit,  # noqa: E402
                           fit_labels, remote_in_head, visible, work_mode)
 
 ROOT = store.ROOT
@@ -56,7 +56,7 @@ _ROW_KEYS = ("name", "home", "industry", "topics", "spanish", "miami_match")
 
 
 def rules_fingerprint(cfg: dict, emp: dict | None) -> str:
-    blob = json.dumps([[cfg.get(k) for k in _RULE_KEYS], {k: (emp or {}).get(k) for k in _ROW_KEYS}],
+    blob = json.dumps([CLASSIFY_VERSION, [cfg.get(k) for k in _RULE_KEYS], {k: (emp or {}).get(k) for k in _ROW_KEYS}],
                       sort_keys=True, default=str)
     return hashlib.sha1(blob.encode()).hexdigest()[:12]
 
@@ -544,7 +544,10 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
 
     aggs_out = [{"id": sid, **{k: s.get(k) for k in (
         "name", "ok", "error", "last_ok", "count_total", "count_relevant", "consecutive_failures")}}
-        for sid, s in state["sources"].items() if s.get("kind") == "aggregator"]
+        for sid, s in state["sources"].items() if s.get("kind") == "aggregator"
+        # A source config has switched off (JSearch until its key is subscribed)
+        # keeps its history in state but must not show as "failing" on Ari's Stats.
+        and sid in aggregators.configured(cfg)]
     via = {sid: s.get("name") for sid, s in state["sources"].items()}
     for p in posts:
         if p["kind"] == "aggregator":
