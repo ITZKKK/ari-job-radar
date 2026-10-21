@@ -1467,6 +1467,32 @@ def test_the_same_job_on_both_feeds_is_shown_once(tmp_path, monkeypatch):
     assert len(shown) == 1 and shown[0]["via"] in ("NAHJ Career Center", "NABJ Career Center")
 
 
+def test_page_watch_reports_only_added_role_lines():
+    """A testimonial carousel saying "hiring" that rotates away is not news; a
+    role line appearing is."""
+    from src import watch
+
+    class Page:
+        def __init__(self, html): self.html = html
+        def get(self, url, headers=None):
+            class R: status_code, text = 200, self.html
+            return R()
+    emp = [{"id": "x", "name": "X", "careers_url": "https://x/careers"}]
+    quote = ("<p>Hiring X for our PR and Marketing has been one of the best decisions our company has made. "
+             "We have grown as a team, as a company and in the process added many new clients.</p>")
+    base = "<ul><li>Careers at X</li><li>Send your resume to jobs@x.com</li></ul>"
+    st = store.empty()
+    watch.check(st, Page(base + quote), emp, "t1", 0, log=lambda *a: None)      # baseline
+    r = watch.check(st, Page(base), emp, "t2", 0, log=lambda *a: None)          # quote rotated away
+    assert r["changed"] == 0 and st["watch"]["x"]["changed_at"] is None
+    r = watch.check(st, Page(base + quote), emp, "t3", 0, log=lambda *a: None)  # quote back: long, no role word
+    assert r["changed"] == 0
+    r = watch.check(st, Page(base + "<li>Now hiring: Editorial Coordinator</li>"), emp, "t4", 0, log=lambda *a: None)
+    assert r["changed"] == 1 and st["watch"]["x"]["changed_at"] == "t4"
+    assert st["watch"]["x"]["added"] == ["Now hiring: Editorial Coordinator"]
+    assert watch.worthy(["We are hiring! " + "x" * 120]) == [] and watch.worthy(["We are hiring a Staff Writer. " + "x" * 120])
+
+
 def test_every_ats_is_known_and_aliases_dont_clash():
     rows = yaml.safe_load(open(EMPLOYERS_YAML))["employers"]
     known = set(adapters.ADAPTERS) | adapters.MANUAL

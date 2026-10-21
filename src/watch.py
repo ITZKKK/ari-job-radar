@@ -38,12 +38,24 @@ NOISE = [re.compile(p, re.I) for p in (
     r"©.*", r"\bcopyright\b.*",
 )]
 
-# A change is only worth telling Ari about when a line that appeared or went
-# is about a role. Anything else quietly becomes the new baseline.
+# A change is only worth telling Ari about when a line that APPEARED is about
+# a role: a line going away is never something to apply for, and a rotating
+# testimonial ("Hiring BoardroomPR for our PR and marketing has been one of
+# the best decisions...") said "hiring" without being a job. So a long line
+# counts only when it names a role. Anything else quietly becomes the new
+# baseline.
 WORTHY = re.compile(
     r"\b(editor(ial)?|writer|reporter|journalist|producer|content (creator|producer|writer)|"
     r"social media|coordinator|assistant|intern(ship)?|fellow(ship)?|copywriter|"
     r"(now )?hiring|open (position|role)s?|we'?re looking for|job opening)\b", re.I)
+ROLE = re.compile(r"\b(editor(ial)?|writer|reporter|journalist|producer|coordinator|assistant|"
+                  r"associate|intern(ship)?|fellow(ship)?|copywriter|publicist|specialist|manager)\b", re.I)
+LONG_LINE = 120
+
+
+def worthy(lines: list[str]) -> list[str]:
+    """The added lines that read like a role, not like a sentence about one."""
+    return [l for l in lines if WORTHY.search(l) and (len(l) <= LONG_LINE or ROLE.search(l))]
 
 _BLOCKS = {"p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6", "tr", "td", "th",
            "section", "article", "br", "a", "button", "option", "dt", "dd"}
@@ -130,7 +142,7 @@ def check(state: dict, client, employers: list[dict], ts: str, delay: float, log
                 added = [x for x in lines if x not in old]
                 removed = [x for x in old if x not in lines]
                 entry["lines"] = lines
-                if WORTHY.search(" | ".join(added + removed)):
+                if worthy(added):
                     entry.update(changed_at=ts, added=added[:12], removed=removed[:12])
                     counts["changed"] += 1
                     log(f"  page changed · {e['name']}: {(added or removed)[0][:70]}")
