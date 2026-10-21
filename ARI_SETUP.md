@@ -1,39 +1,34 @@
-# Ari's part — about 25 minutes
+# Ari's part — about 15 minutes
 
-Itz runs the radar. You do four things: create a free email-sending account
-(this lets the radar email you), get the radar's passcode from Itz (this lets
-you add companies and ask for a fresh search right on your radar), answer a
-few questions so it only shows jobs you'd actually take, and optionally sign
-up for a handful of job alerts.
+Itz runs the radar. Two of your four steps are already done: you created the
+email-sending account, and you answered the questions (section 3 says what the
+radar does with each answer). What's left: get the radar's passcode from Itz
+(this lets you add companies and ask for a fresh search right on your radar),
+and optionally sign up for a handful of job alerts.
 
 ---
 
-## 1. Create your Resend account (5 minutes)
+## 1. Your Resend account — done
 
-Resend is the service that sends you the job emails. It has to be **your**
-account: on the free plan it only delivers to the email address that owns the
-account.
+Resend is the service that sends you the job emails. You created the account
+with your own email (on the free plan it only delivers to the address that
+owns the account) and a key that can only send email. Thank you! You'll get a
+"your radar is ready" email once Itz finishes setup, and after that one summary
+first thing each morning when something new has come in.
 
-1. Go to **resend.com** and click **Get Started** (or **Sign up**).
-2. Sign up with **the email address where you want the job alerts**. "Continue
-   with Google" is fine if that's your Gmail.
-3. Confirm your email if it asks you to.
-4. If it walks you through "add a domain" or sending a test email, skip it.
-5. In the left menu, click **API Keys** → **Create API Key**.
+**If the key ever needs replacing** (you think someone saw it, or Itz asks):
+
+1. Go to **resend.com**, sign in, and click **API Keys** in the left menu.
+2. Delete the `job-radar` key, then click **Create API Key**:
    - **Name:** `job-radar`
    - **Permission:** **Sending access** (not Full access; the key should only be able to send email)
    - **Domain:** All domains
    - Click **Add**.
-6. A key starting with `re_` appears. **Copy it now**, because Resend never shows it again.
-   If you lose it, delete it and create a new one.
-7. Send Itz:
-   - the key
-   - the exact email address you signed up with
-
-   Send them privately: a direct text that you then delete, or a one-time note.
-   Don't post them in a group chat. The key can only send emails, but it's still a password.
-
-That's it. You'll get a "your radar is live" email once Itz finishes setup.
+3. A key starting with `re_` appears. **Copy it now**, because Resend never shows it again.
+4. Send it to Itz privately: a direct text that you then delete, or a one-time
+   note. Don't post it in a group chat. The key can only send emails, but it's
+   still a password. Until he puts the new one in, the emails pause; nothing
+   else is affected.
 
 ---
 
@@ -48,36 +43,38 @@ send Itz the name.)
 
 ---
 
-## 3. Answer these questions (reply to Itz in any format)
+## 3. What you told us, and what the radar does with it
 
-Each answer changes a filter. The default in brackets is what the radar does if
-you don't answer.
+- **Where:** Miami only; in person or hybrid preferred, remote OK but not
+  first. → It shows Miami and fully remote jobs, Miami first everywhere. In
+  the email, remote jobs come after the Miami ones, in their own section.
+- **Experience:** 3 years of work, 2 in newsrooms, graduated July 2025. →
+  **Good fit** means the job says entry level or asks for up to 3 years;
+  **Stretch** means it asks for 4–5 years or is a manager role. Jobs asking
+  for 6 years or more, or with Senior / Lead / Director titles, are hidden.
+- **Roles:** writer, editor, reporter, content creator, PR, marketing. → All
+  of those count as your main roles; social media is shown too, a step behind.
+  At PR and marketing agencies, "Account Coordinator" and "Account Executive"
+  count as PR jobs (that's what agencies call them).
+- **Full-time only.** → Part-time, freelance, contract and temporary jobs are
+  hidden (the Stats tab counts them). Fellowships stay in, marked
+  **Fellowship**: they're full-time, just with an end date.
+- **Beats:** food, hospitality, travel, fashion, lifestyle, culture. → Jobs on
+  your beats get a badge (like **Food & dining**), rank higher, and there's a
+  "my beats only" filter.
+- **Native Spanish.** → Jobs that mention Spanish, bilingual roles, Telemundo
+  or Univision get a **Spanish** badge, and Spanish job titles (redactora,
+  periodista, editora…) are found like English ones. Nothing is ever hidden
+  for not mentioning Spanish.
+- **Companies:** the ones you listed stay as your picks (★). Itz is adding
+  more Miami companies on your beats, PR and marketing agencies, and
+  Spanish-language media.
+- **Email:** one summary each morning. → The radar still checks three times a
+  day, but you get one email, first thing each morning, with everything new
+  since the last one. No email on a morning with nothing new.
 
-1. **Where?** Miami only, or also New York, remote, elsewhere in Florida,
-   anywhere in the US? Is hybrid OK?
-   *[Miami or fully remote only, on the dashboard and in emails. A New York job
-   that says "or Remote" counts; a remote job that turns out to be hybrid or
-   on-site doesn't. Everything else is counted on the Stats tab but hidden.]*
-2. **Experience.** How many years of full-time work, and when did you graduate?
-   Any bylines, a portfolio or published clips?
-   *[Shows entry and mid-level roles, hides "Senior / Lead / Director", hides jobs asking for 5+ years.]*
-3. **Rank the role types** you want, from most to least:
-   writer · editor · reporter · editorial coordinator · content creator ·
-   social media · PR / communications · marketing · copywriting · events.
-   Any you would **not** take?
-   *[All are shown; writer/editor/reporter and content creator count as "core", the rest as "also".]*
-4. **Kinds of job:** full-time only, or also part-time, freelance / contract,
-   temporary, fellowships, internships?
-   *[Everything except internships.]*
-5. **Topics you'd love to cover**, e.g. food and dining, luxury lifestyle, real
-   estate, nightlife, music, fashion, the marketing industry, local news.
-6. **Spanish:** fluent, conversational or none? Miami has many bilingual roles
-   (Telemundo, TelevisaUnivision, el Nuevo Herald, Billboard Latin).
-7. **More employers to watch:** Miami PR or marketing agencies, restaurant or
-   hotel groups, brands, magazines. Also any on your list you'd rather drop.
-8. **Email:** after each check (up to 3 a day, but only when something's new),
-   or one summary each morning?
-9. **Salary floor**, if you have one. Few listings say, so this is low priority.
+If you change your mind about any of these, tell Itz; each one is a one-line
+change.
 
 ---
 
@@ -101,9 +98,10 @@ them, but they'll email you directly. Each is free:
 ## Using your radar
 
 - Open the link Itz sends you. On iPhone: Safari → **Share** → **Add to Home Screen** and it sits there like an app.
-- It shows **Miami and fully remote jobs only**. A job somewhere else whose listing says "or Remote" is in, as Remote.
-- **For you** is the home page. It shows new roles at the companies you picked (★), then everything else new this week — early-career first, then Miami, then remote.
-- **All jobs** has everything that's open, with search and filters (where, kind of role, how you'd work, early-career only). **Early career** on a card means the job says entry level or asks for up to 2 years; **Stretch** means it asks for 3–4 years or is a manager role — still worth a look, just know going in.
+- It shows **full-time jobs in Miami, or fully remote**, Miami first. A job somewhere else whose listing says "or Remote" is in, as Remote.
+- **Your email** comes once a day, first thing each morning, only when something new has come in: Miami jobs first, then remote ones, and in each part the companies on your list (★) first. Each job says its role type and, when it applies, **Good fit**, your beats, **Spanish** or **Fellowship**.
+- **For you** is the home page. It shows new roles at the companies you picked (★), then new Miami jobs this week, then new remote ones, then what's still open in Miami.
+- **All jobs** has everything that's open, with search and filters (where, kind of role, how you'd work, good fit only, my beats only, Spanish roles only). **Good fit** on a card means the job says entry level or asks for up to 3 years; **Stretch** means it asks for 4–5 years or is a manager role — still worth a look, just know going in. Badges like **Food & dining** or **Spanish** show your beats and Spanish roles.
 - Tap **♡ Save** on anything interesting and **I applied** once you've sent it. A notes box appears for who you wrote to, the deadline and when to follow up, and a small menu lets you say where it stands (Heard back, Interview, Offer…); the **Applied** tab groups your applications by that. **Not for me** hides a job.
 - **Stats** shows the numbers behind what you see: open jobs, new this week, how many are elsewhere in the US, your applications, and whether the radar itself is working.
 - Found a job yourself, on LinkedIn or Indeed? **Add a job I found** (Saved or Applied tab) keeps it with the rest: title, company, link, and a tick if you've already applied. Then notes and stages work like for any other job.

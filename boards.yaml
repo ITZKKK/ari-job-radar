@@ -13,6 +13,14 @@ boards:
     kind: search
     url: "https://www.linkedin.com/jobs/search/?keywords=social%20media%20OR%20content%20creator%20OR%20copywriter&location=Miami%2C%20Florida%2C%20United%20States&f_TPR=r604800&f_E=2%2C3"
     why: Same, for the social / content / copywriting side.
+  - name: LinkedIn — PR, communications & marketing, Miami, past week
+    kind: search
+    url: "https://www.linkedin.com/jobs/search/?keywords=%22public%20relations%22%20OR%20communications%20OR%20%22marketing%20coordinator%22%20OR%20publicist&location=Miami%2C%20Florida%2C%20United%20States&f_TPR=r604800&f_E=2%2C3"
+    why: PR agencies, hotels, cruise lines and brands post their coordinator jobs here. Entry level + associate, last 7 days.
+  - name: LinkedIn — bilingual / Spanish editorial, content & communications, Miami, past week
+    kind: search
+    url: "https://www.linkedin.com/jobs/search/?keywords=%28bilingual%20OR%20Spanish%29%20AND%20%28editor%20OR%20writer%20OR%20content%20OR%20communications%29&location=Miami%2C%20Florida%2C%20United%20States&f_TPR=r604800&f_E=2%2C3"
+    why: Jobs that ask for Spanish — Miami's Spanish-language media, Latin music and LatAm marketing teams.
   - name: LinkedIn — remote editorial & social, US, past week
     kind: search
     url: "https://www.linkedin.com/jobs/search/?keywords=editorial%20OR%20editor%20OR%20writer%20OR%20%22social%20media%22&location=United%20States&f_WT=2&f_TPR=r604800&f_E=2%2C3"
@@ -25,6 +33,14 @@ boards:
     kind: search
     url: "https://www.indeed.com/jobs?q=%22social+media%22+OR+%22content+creator%22+OR+copywriter&l=Miami%2C+FL&fromage=7"
     why: Same, for social / content.
+  - name: Indeed — PR, communications & marketing coordinator, Miami, past week
+    kind: search
+    url: "https://www.indeed.com/jobs?q=%22public+relations%22+OR+%22communications+coordinator%22+OR+%22marketing+coordinator%22+OR+publicist&l=Miami%2C+FL&fromage=7"
+    why: Small PR agencies and local brands that never use LinkedIn.
+  - name: Indeed — bilingual Spanish writer, editor or content, Miami, past week
+    kind: search
+    url: "https://www.indeed.com/jobs?q=%28bilingual+OR+spanish%29+%28writer+OR+editor+OR+content+OR+communications%29&l=Miami%2C+FL&fromage=7"
+    why: Same, for roles that ask for Spanish.
   - name: JournalismJobs.com
     kind: alert
     url: "https://www.journalismjobs.com/job-notifications"
@@ -41,6 +57,14 @@ boards:
     kind: alert
     url: "https://nahjcareers.org"
     why: National Association of Hispanic Journalists — strong for Miami / Spanish-language media. (The radar also tries to read its feed.)
+  - name: PRSA Jobcenter (Public Relations Society of America)
+    kind: alert
+    url: "https://jobs.prsa.org/"
+    why: The main US board for PR and communications jobs. Create a free account and save a search for Miami (and one for remote) to get them by email.
+  - name: Culinary Agents — hospitality marketing & social, Miami
+    kind: search
+    url: "https://culinaryagents.com/search/jobs?search%5Blocation%5D=Miami%2C+FL&search%5Bq%5D=marketing"
+    why: Restaurant, bar and hotel groups post their marketing, social and events jobs here. Try "social media" and "events" too.
   - name: Poynter media jobs
     kind: search
     url: "https://www.poynter.org/media-jobs/"

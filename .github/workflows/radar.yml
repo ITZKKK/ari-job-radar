@@ -1,13 +1,24 @@
 name: radar
 
-# Three runs a day, in New York time roughly 7:20am, 1:20pm and 7:20pm
-# (cron is UTC; offset off the hour to dodge GitHub's peak). "Run workflow"
+# Three runs a day, in New York time roughly 7:20am, 1:20pm and 7:20pm in
+# summer (6:20am, 12:20pm, 6:20pm in winter: cron is UTC and doesn't move for
+# daylight saving; offset off the hour to dodge GitHub's peak). "Run workflow"
 # in the Actions tab is the manual refresh. Editing a YAML file or the page on
 # GitHub republishes the dashboard without crawling.
+#
+# Email: Ari gets ONE summary a day (config.yaml -> alerts.digest: daily). The
+# morning run (11:21 UTC) is the one that sends it; the other runs crawl and
+# update the dashboard, and their finds go into the next morning's summary.
+# Ticking "email_now" on a manual run sends an extra email right away.
 on:
   schedule:
     - cron: "21 11,17,23 * * *"
   workflow_dispatch:
+    inputs:
+      email_now:
+        description: "Send the email now even if today's morning summary already went out"
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ["site/**", "boards.yaml", "employers.yaml", "config.yaml"]
@@ -66,6 +77,8 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           SITE_URL: ${{ vars.SITE_URL }}
+          # "1" only on a manual run with email_now ticked (empty on schedules).
+          RADAR_EMAIL_NOW: ${{ inputs.email_now == true && '1' || '' }}
         run: python src/notify.py
 
       - name: Save state to the repo

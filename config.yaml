@@ -6,7 +6,20 @@
 
 owner:
   name: Ari
+  # Her time zone: the morning summary email (alerts.digest) goes by this clock.
   timezone: America/New_York
+  # What Ariella told us on 21 Oct 2026. Nothing reads this block; it is here
+  # so whoever edits the rules below knows what they are for.
+  #   Experience   3 years of work, 2 of them in newsrooms; graduated July 2025
+  #   Where        Miami only. In person or hybrid preferred; remote is OK but
+  #                comes last (locations.preferred, alerts.remote_last)
+  #   Kind of job  full-time only (employment.show)
+  #   Roles        writer, editor, reporter, content creator, PR, marketing
+  #                (all "core"); social media is "also"
+  #   Beats        food, hospitality, travel, fashion, lifestyle, culture (topics)
+  #   Languages    native Spanish (languages.spanish_markers)
+  #   Email        one summary each morning (alerts.digest)
+  #   Companies    her list in employers.yaml (target: true) stays as it is
 
 crawl:
   user_agent: "ari-job-radar/1.0 (personal job-search monitor; one request per second)"
@@ -30,7 +43,19 @@ locations:
       match: ["miami", "miami beach", "coral gables", "doral", "brickell", "wynwood",
               "fort lauderdale", "ft. lauderdale", "ft lauderdale", "hollywood, fl",
               "boca raton", "aventura", "key biscayne", "south florida", "west palm",
-              "palm beach", "hialeah", "coconut grove", "sunny isles", "bal harbour"]
+              "palm beach", "hialeah", "coconut grove", "sunny isles", "bal harbour",
+              "north miami", "north miami beach", "miami gardens", "miami lakes", "miami shores",
+              "cutler bay", "little havana", "south beach", "dania beach", "hallandale",
+              "pembroke pines", "deerfield beach", "delray beach", "boynton beach",
+              "coral springs", "opa-locka", "fisher island",
+              # Matching is by plain text and Miami is tried first, so a name that is
+              # also a place elsewhere (Weston MA, Homestead PA, Kendall Square in
+              # Cambridge...) only counts with its state (", fl" also catches
+              # ", Florida"). Neighbourhoods like Edgewater or the Design District
+              # aren't listed: a listing that names them also says Miami.
+              "homestead, fl", "weston, fl", "kendall, fl", "plantation, fl", "medley, fl",
+              "miramar, fl", "pompano beach", "davie, fl", "sunrise, fl", "surfside, fl",
+              "pinecrest, fl", "bay harbor islands"]
     - id: NYC
       label: New York
       match: ["new york", "nyc", "manhattan", "brooklyn", "queens", "jersey city", "hoboken"]
@@ -53,8 +78,11 @@ locations:
             "lisbon", "portugal", "warsaw", "poland", "stockholm", "copenhagen", "zurich",
             "emea", "apac", "latam", "europe", "middle east", "gulf region", "asia", "africa", "santiago", "chile", "lima", "peru", "rio de janeiro", "mexico city", "prague", "casablanca", "morocco", "brussels", "belgium", "rotterdam", "lisboa", "vienna", "austria", "athens", "greece", "istanbul", "turkey", "cairo", "riyadh", "doha", "qatar", "abu dhabi", "taipei", "taiwan", "korea", "bangkok", "thailand", "vietnam", "hanoi", "ho chi minh", "nigeria", "kenya", "south africa", "johannesburg", "medellín", "medellin", "guadalajara", "monterrey", "são paulo", "lagos", "nairobi", "cape town", "seoul",
             "shanghai", "beijing", "kuala lumpur", "jakarta", "auckland", "belfast", "glasgow"]
-  us_markers: ["united states", "usa", "u.s.", " us", "us-", "(us)", "remote - us",
-               ", ny", ", fl", ", ca", ", il", ", tx", ", ma", ", dc", ", ga", ", wa", ", nj",
+  # Plain text, like the lists above. State codes after a comma ("Austin, TX")
+  # are recognised in src/classify.py (as a pattern, so ", CA" never matches
+  # ", Canada"). A dash with spaces round it reads as a comma everywhere in
+  # this block: "Plantation - FL" is "Plantation, FL".
+  us_markers: ["united states", "usa", "u.s.", " us", "us-", "(us)",
                "new york", "miami", "los angeles", "chicago", "washington", "atlanta",
                "boston", "austin", "san francisco", "nationwide",
                "alabama", "alaska", "arizona", "arkansas", "california", "colorado", "connecticut", "delaware",
@@ -83,11 +111,17 @@ locations:
   show: [MIAMI, REMOTE]
   # Buckets that trigger an email (same rules as above).
   email: [MIAMI, REMOTE]
+  # The place she'd rather work. Its jobs come first everywhere (home page,
+  # All jobs, email); remote jobs come after them (see alerts.remote_last).
+  # Nothing is hidden by this, it only changes the order.
+  preferred: MIAMI
 
 # ---------------------------------------------------------------------------
 # Role families. Matched against the job TITLE (case-insensitive regex).
-# tier "core" = what Ari wants most; "also" = acceptable (she said social /
-# marketing / PR / copywriting "works too").
+# tier "core" = what Ari wants most (she named writer, editor, reporter,
+# content creator, PR and marketing); "also" = acceptable (social media).
+# Spanish titles (redactor, periodista, editora...) are in the same families:
+# she is a native speaker.
 # ---------------------------------------------------------------------------
 roles:
   families:
@@ -102,7 +136,10 @@ roles:
         - '\bjournalis[tm]'
         - '\bcorrespondent\b'
         - '\bfact[- ]?check'
-        - '\b(editorial|news|research) (assistant|associate|coordinator|fellow|researcher)\b'
+        # Newsroom research only: a bare "Research Associate" is a lab job
+        # (University of Miami posts hundreds; see roles.exclude).
+        - '\b(editorial|news|newsroom) (assistant|associate|coordinator|fellow|researcher)\b'
+        - '\b(editorial|news|newsroom) research(er)?\b'
         - '\b(associate|digital|news|segment|social|web|podcast|audience|editorial) producer\b'
         - '\baudience (editor|associate|growth|development|engagement)\b'
         - '\bnewsletter\b'
@@ -110,6 +147,13 @@ roles:
         - '\b(editorial|reporting|journalism|news|newsroom|writing|audience|video|content|fact[- ]checking|investigative|investigations?|photo|production) fellow(ship)?s?\b'
         - '^(forbes|axios|semafor|vox|nyt|times|bloomberg|reuters|propublica|insider)\b.*\bfellowship\b'
         - '\bfellow(ship)?s?\b.*\b(editorial|journalism|reporting|news|newsroom|media)\b'
+        - '\bcritic\b'
+        - '\bcolumnist\b'
+        - '\bcontributing (writer|editor)\b'
+        # Spanish: redactor/a, periodista, reportero/a, escritor/a, corrector/a, editora
+        - '\b(redactor|redactora|periodista|reportero|reportera|escritor|escritora|corrector|correctora)\b'
+        - '\beditora?\b'
+        - '\bproductora? (de contenido|digital)\b'
     - id: content
       label: Content creation
       tier: core
@@ -119,6 +163,11 @@ roles:
         - '\bvideo (producer|creator|journalist)\b'
         - '\bstoryteller|\bstorytelling\b'
         - '\bscript ?writer|\bscriptwriter\b'
+        - '\bdigital content\b'
+        - '\bbrand(ed)? content\b'
+        - '\bcreative (writer|producer|coordinator)\b'
+        - '\bmultimedia (journalist|producer)\b'
+        - '\bcontenido\b'
     - id: social
       label: Social media
       tier: also
@@ -127,29 +176,62 @@ roles:
         - '\bcommunity (manager|coordinator|associate)\b'
         - '\b(tiktok|instagram|youtube)\b'
         - '\binfluencer\b'
+        - '\bsocial\b.*\b(coordinator|specialist|manager|associate|producer|strategist|editor)\b'
+        - '\bdigital (media )?coordinator\b'
+        - '\bredes sociales\b'
     - id: pr_comms
       label: PR & communications
-      tier: also
+      tier: core
       patterns:
         - '\bpublic relations\b|\bpr (coordinator|associate|assistant|specialist|manager|account)\b'
         - '\bpublicist\b'
-        - '\bcommunications? (coordinator|associate|assistant|specialist|manager|lead)\b'
-        - '\bmedia relations\b|\bpress (officer|assistant|associate)\b'
+        - '\bcommunications?\b.*\b(coordinator|associate|assistant|specialist|manager|officer|lead|generalist)\b'
+        - '\b(coordinator|associate|assistant|specialist|manager|officer|generalist)\b.*\bcommunications?\b'
+        - '\bmedia relations\b|\bpress (officer|assistant|associate|secretary)\b'
+        - '\bpublic affairs\b'
+        - '\bpr\b'
+        - '\bpublicity\b'
+        - '\bcorporate communications\b'
+        - '\bexternal (communications|affairs)\b'
+        - '\bcomms\b'
+        # Spanish: comunicación / comunicaciones, relaciones públicas, prensa
+        - '\bcomunicaci(ó|o)n(es)?\b'
+        - '\brelaciones p(ú|u)blicas\b'
+        - '\bprensa\b'
     - id: marketing_copy
       label: Marketing & copywriting
-      tier: also
+      tier: core
       patterns:
         - '\bcopy ?writer|\bcopywriting\b'
-        - '\bmarketing (coordinator|associate|assistant|specialist)\b'
+        - '\bmarketing (coordinator|associate|assistant|specialist|manager|generalist)\b'
         - '\bbrand (coordinator|associate|assistant|specialist|marketing)\b'
         - '\bevents?( operations| marketing| programming| content)? (coordinator|associate|assistant|producer)\b'
         - '\bpartnerships? (coordinator|associate|assistant)\b'
+        - '\b(digital|content|email|brand|integrated|lifestyle|hospitality|destination|tourism) marketing\b'
+        - '\bmarketing (and|&) (communications|pr|events)\b'
+        - '\bmarcom(m)?s?\b'
+        - '\bcampaign (coordinator|manager)\b'
+        - '\bpromotions? (coordinator|assistant|specialist)\b'
+        # Spanish: redactor publicitario (copywriter), mercadeo (marketing)
+        - '\bredactor publicitario\b'
+        - '\bmercadeo\b'
+  # PR and marketing agencies (rows with `industry: pr` in employers.yaml)
+  # call their entry-level PR jobs "Account Coordinator" / "Account
+  # Executive". At those employers only, these titles count as the family
+  # below, and an exclusion that caught nothing but the agency title itself
+  # ("account executive") does not apply. Everywhere else an Account
+  # Executive is a sales job and stays excluded.
+  agency_titles:
+    industry: pr
+    family: pr_comms
+    patterns:
+      - '\b(account|client) (coordinator|executive|associate|assistant|manager|supervisor)\b'
   # Titles matching any of these are never relevant, even if a family matched.
   exclude:
     - '\b(software|data|machine learning|ml|backend|frontend|full[- ]?stack|devops|site reliability|security|platform|qa|test) (engineer|developer|scientist|analyst)\b'
     - '\bengineer(ing)?\b'
     - '\btechnical writer\b|\bdocumentation\b'
-    - '\b(medical|grant|proposal|clinical|regulatory|legal|rfp) writer\b'
+    - '\b(medical|scientific|grant|proposal|clinical|regulatory|legal|rfp) writer\b'
     - '\b(ad|advertising|media|account|inside|outside|field) sales\b|\bsales (representative|executive|manager|director|associate)\b'
     - '\baccount executive\b(?!.*\b(pr|public relations)\b)'
     - '\bmedia buyer\b|\bprogrammatic\b'
@@ -157,6 +239,18 @@ roles:
     - '\bpaid (social|search|media)\b|\bperformance marketing\b|\bgrowth marketing\b|\bsales associate\b|\bmerchandiser\b'
     - '\bdriver\b|\bwarehouse\b|\bcashier\b|\bline cook\b|\bdishwasher\b|\bserver\b|\bbartender\b|\bhost(ess)?\b'
     - '\bnurse\b|\bphysician\b|\btherapist\b'
+    # Design and photo jobs: not writing, even when "creative" or "content" is in the title.
+    - '\b(graphic|ux|ui|product|visual|web|motion) designer\b|\bphotographer\b|\banimator\b|\bart director\b'
+    # Numbers-and-funnel marketing, and sales by another name.
+    - '\bproduct marketing\b|\bmarketing (analytics|operations|technology|ops)\b|\blifecycle marketing\b|\bdemand gen(eration)?\b|\bbusiness development\b|\bsdr\b|\bbdr\b'
+    # University, hospital and lab jobs ("Clinical Research Coordinator 2",
+    # "Research Associate 1", "Postdoctoral Associate"), and teaching. Newsroom
+    # research ("News Research Assistant", "Editorial Researcher") stays in.
+    - '\bclinical\b'
+    - '(?<!news )(?<!editorial )\bresearch (assistant|associate|coordinator|scientist|nurse|technician|specialist|analyst|manager|program)\b'
+    - '\blab(oratory)?\b|\bpostdoc\w*\b|\bpatient\b|\bbiostat\w*\b|\bgrants? (coordinator|manager|specialist|administrator)\b|\bprofessor\b|\bfaculty\b|\binstructor\b|\blecturer\b|\badjunct\b|\bmedical (editor|writer)\b'
+    # Trade and insurance paperwork that says "writer" ("Customs Entry Writer").
+    - '\bcustoms\b|\bentry writer\b|\bclaims\b'
 
 # ---------------------------------------------------------------------------
 # Seniority, read from the title (and "X+ years" in the description when the
@@ -172,29 +266,127 @@ seniority:
   # "Manager" titles (social media manager, content manager) are often 2–4 years.
   # true = treat "... Manager" as mid-level instead of senior.
   manager_is_mid: true
-  # Internships: true keeps them (flagged), false drops them.
+  # Internships: true keeps them (flagged), false drops them. (To show them,
+  # also add `intern` to employment.show below.)
   keep_internships: false
   # Hide a posting whose description asks for at least this many years.
-  max_years_required: 5
+  # Ari has 3 years, so 4-5 is a stretch worth seeing and 6+ is hidden.
+  max_years_required: 6
 
 # ---------------------------------------------------------------------------
-# Early-career fit. Every kept posting gets one of three labels:
-#   early    says entry level / recent grads, or asks for up to early_max_years
+# Fit: how well the experience asked for matches hers. Every kept posting gets
+# one of three labels (the wording on the page and in emails is built from
+# these numbers, e.g. "Good fit (up to 3 years)", "Stretch (4–5 years...)"):
+#   early    "Good fit": says entry level / recent grads, or asks for up to
+#            early_max_years
 #   open     says nothing about experience
-#   stretch  asks for more years (up to max_years_required above), or is a
+#   stretch  asks for more years (below max_years_required above), or is a
 #            "... Manager" title
 # Nothing is hidden by this; "stretch" jobs are labelled and sorted last.
+# A job asking for more than early_max_years also says "Asks for N+ years".
 # ---------------------------------------------------------------------------
 fit:
-  early_max_years: 2
-  early_description_markers: '\bentry[- ]level\b|\bearly[- ]career\b|\b(recent|new) grad(uate)?s?\b|\bno (prior |previous )?experience (necessary|required|needed)\b|\bup to (1|2|one|two) years?\b'
+  early_max_years: 3
+  early_description_markers: '\bentry[- ]level\b|\bearly[- ]career\b|\b(recent|new) grad(uate)?s?\b|\bno (prior |previous )?experience (necessary|required|needed)\b|\bup to (1|2|3|one|two|three) years?\b'
   stretch_title_markers: '\bmanager\b'
 
 # ---------------------------------------------------------------------------
-# Email digest. Sent after a crawl that found something new and relevant.
+# Kind of job: full_time / part_time / freelance / contract / intern / unknown.
+# Read from the board's own field when it has one (Lever, Ashby, Workable,
+# SmartRecruiters, UKG, Recruitee, Breezy, BambooHR, Adzuna, Remotive, We Work
+# Remotely), else from the title, else from the description, else "unknown".
+# Only the kinds in `show` appear on the dashboard and in emails; the rest are
+# kept in data/state.json and counted on the Stats tab ("not full-time").
+# Fellowships are full-time, fixed-term jobs: kept, and labelled "Fellowship".
+# ---------------------------------------------------------------------------
+employment:
+  # Ari: full-time only. "unknown" stays in: most listings never say, and
+  # hiding them would hide most of the full-time jobs too.
+  show: [full_time, unknown]
+  title_markers:
+    # Radio and TV boards write "PT Traffic Anchor", "P/T News Writer",
+    # "Editor (PT)", "Promotions Coordinator - On Call" (not "PTA Newsletter").
+    part_time: '\bpart[- ]time\b|\bper diem\b|\bhourly\b|\bweekend\b.*\b(only|shift)\b|(?:^|[\s(/-])p/?t\b(?=[\s,)/-]|$)|\bon[- ]call\b'
+    freelance: '\bfreelanc\w*\b|\bcontributor\b|\bstringer\b|\bcontributing\b'
+    # Not "casual": "Casual Dining Marketing Coordinator" is a restaurant job.
+    contract:  '\bcontract(or|ual)?\b|\btemp(orary)?\b|\bseasonal\b|\binterim\b|\bfixed[- ]term\b|\b1099\b|\bproject[- ]based\b'
+  # Strong phrases only: "contract" alone in a description is noise ("our
+  # contracts with advertisers").
+  description_markers:
+    part_time: '\b(this is a|is a|job type:?|employment type:?|schedule:?)\s*(part[- ]time)\b|\bpart[- ]time (position|role|opportunity|schedule)\b'
+    freelance: '\b(this is a|is a|job type:?|employment type:?)\s*(freelance)\b|\bfreelance (position|role|opportunity|basis)\b|\bon a freelance basis\b'
+    contract:  '\b(this is a|is a|job type:?|employment type:?)\s*(contract|temporary|temp|seasonal)\b|\b(contract|temporary|seasonal) (position|role|opportunity|assignment)\b|\b1099\b'
+  # In the title. Kept (a fixed term is not "temporary" for this purpose) and
+  # labelled "Fellowship".
+  fellowship_markers: '\bfellow(ship)?s?\b'
+
+# ---------------------------------------------------------------------------
+# Her beats. Each job gets the beats it is about ("Food & dining"...), shown as
+# badges on the page and in the email, with a "my beats only" filter; a job on
+# her beats ranks higher. Nothing is hidden by this.
+# Matched (case-insensitive regex) against the job title and the hiring
+# company's name when a job-search source names it ("Eater"). A beat named only
+# in the description needs several different words for it (below): one or two
+# are usually boilerplate ("our culture", "news and entertainment", "some
+# travel required"); a food job says restaurant, chef, dining...
+# An employer whose every job is on a beat says so on its row in
+# employers.yaml (`topics: [travel, hospitality]` on a cruise line). Its
+# `group` text is not read: it describes the employer, not the job.
+# ---------------------------------------------------------------------------
+# Different words a description needs for a beat ("chef" and "chefs" are one).
+# 2 tagged NYT's Business Editor "Arts & culture" on 21 Oct 2026; 3 didn't,
+# and still caught Billboard, IndieWire and ARTFORUM jobs.
+topics_description_min_words: 3
+topics:
+  - id: food
+    label: Food & dining
+    match: '\b(food|foodie|dining|restaurants?|culinary|chefs?|cuisine|cocktails?|wines?|winery|spirits|beverages?|eater|infatuation|michelin|recipes?|cooking|bar scene|gastronom\w*)\b'
+  - id: hospitality
+    label: Hospitality
+    match: '\b(hospitality|hotels?|hotelier|resorts?|cruises?|guest experience|concierge|nightlife)\b'
+  - id: travel
+    label: Travel
+    match: '\b(travel\w*|tourism|tourist|destinations?|airlines?|cruises?|voyages?|itinerar\w*|points guy|explorer)\b'
+  - id: fashion
+    label: Fashion & beauty
+    # Not "luxury": that made every luxury hotel a fashion job. It's under lifestyle.
+    match: '\b(fashion|style|stylist|beauty|couture|apparel|jewel\w*|runway|cosmetics?|skincare|vogue|wwd|designer label)\b'
+  - id: lifestyle
+    label: Lifestyle
+    match: '\b(lifestyle|wellness|living|luxury|interiors|home & design|society|real estate|fitness)\b'
+  - id: culture
+    label: Arts & culture
+    match: '\b(culture|cultural|the arts|art basel|museums?|galler(y|ies)|music|entertainment|films?|theat(er|re)|nightlife|latin music)\b|\barts (&|and) '
+
+# ---------------------------------------------------------------------------
+# Languages. Ari is a native Spanish speaker: a job that mentions Spanish
+# (title, company or description) or has a Spanish title gets a "Spanish"
+# badge, is counted on Stats and ranks a little higher. Never hidden either
+# way. A Spanish-language employer can set `spanish: true` on its row in
+# employers.yaml to mark all its jobs. "Latin" alone is not enough: it is
+# also the language ("a writing sample in Latin or Greek").
+# ---------------------------------------------------------------------------
+languages:
+  spanish_markers: '\bspanish\b|\bbiling(ü|u)al\b|\bespa(ñ|n)ol\b|\bhispanic\b|\blatino\b|\blatina\b|\blatinx\b|\blatin[\s/-]+(america|american|music|media|market|audience|content|pop|urban|grammys?)\b|\btelemundo\b|\b(televisa)?univision\b|\bnuevo herald\b|\ben espa(ñ|n)ol\b|\b(redactora?|periodista|reporter[oa]|editora|escritora?|correctora?|productora?|coordinadora?|comunicaci(ó|o)n(es)?|mercadeo|redes sociales|contenido|relaciones p(ú|u)blicas|prensa)\b'
+
+# ---------------------------------------------------------------------------
+# Email. The crawl still runs three times a day; the email is one summary
+# each morning of everything new since the last one.
 # ---------------------------------------------------------------------------
 alerts:
   enabled: true
+  # daily = one summary a day, sent by the first run after
+  # send_after_local_hour in owner.timezone: the morning run, around 7am in
+  # summer and 6am in winter (GitHub's cron is UTC and ignores daylight saving).
+  # Later runs that day keep their finds for the next morning.
+  # each_run = an email after every crawl that found something new.
+  digest: daily
+  send_after_local_hour: 6
+  # false = no email on a morning with nothing new (that day is skipped).
+  send_when_empty: false
+  # true = the email lists jobs in the preferred place (locations.preferred)
+  # first and remote jobs in their own section after them.
+  remote_last: true
   # Which role tiers to email: core, also
   tiers: [core, also]
   max_per_email: 40
@@ -228,12 +420,18 @@ aggregators:
   jsearch:
     # Google for Jobs via RapidAPI — the only terms-compliant way to see jobs
     # posted on LinkedIn / Indeed. Free plan = 200 calls/month, so: once a day,
-    # one call per query (3 x 30 = 90/month). Secret: JSEARCH_RAPIDAPI_KEY.
-    enabled: true
+    # one call per query (5 x 30 = 150/month). Secret: JSEARCH_RAPIDAPI_KEY.
+    # OFF for now: the key in the secret is not subscribed to JSearch (every
+    # call returned 403 "You are not subscribed to this API", 21 Oct 2026).
+    # To turn it on: rapidapi.com -> JSearch -> Pricing -> Basic (free) ->
+    # Subscribe, with the same account as the key; then set this to true.
+    enabled: false
     queries:
-      - "editorial assistant OR editorial coordinator OR staff writer OR reporter in Miami, FL"
-      - "social media coordinator OR content creator OR copywriter OR PR coordinator in Miami, FL"
-      - "remote editorial assistant OR remote staff writer OR remote content writer OR remote social media coordinator in United States"
+      - "editorial assistant OR associate editor OR staff writer OR reporter OR editor in Miami, FL"
+      - "content creator OR content coordinator OR social media coordinator OR copywriter in Miami, FL"
+      - "PR coordinator OR communications coordinator OR marketing coordinator OR publicist in Miami, FL"
+      - "bilingual Spanish writer OR editor OR content OR communications in Miami, FL"
+      - "food OR travel OR hospitality OR fashion OR lifestyle writer OR editor in Miami, FL"
     date_posted: 3days
     min_hours_between: 20
   remotive:
@@ -249,11 +447,20 @@ aggregators:
         url: https://weworkremotely.com/categories/remote-sales-and-marketing-jobs.rss
         default_location: Remote
         title_format: "company: title"
+      # The NAHJ and NABJ career centres run on the same platform (YM
+      # Careers): "ymcareers" turns their slug titles back into words and
+      # reads the city and company from the description. They share many
+      # listings; the crawl keeps one copy (same company, title and place).
       - id: nahj
         name: NAHJ Career Center
         url: https://nahjcareers.org/listing-feeds/?feedId=10
         default_location: ""
-        title_format: "title"
+        title_format: "ymcareers"
+      - id: nabj
+        name: NABJ Career Center
+        url: https://nabjcareers.org/listing-feeds/?feedId=10
+        default_location: ""
+        title_format: "ymcareers"
     min_hours_between: 5
 
 # ---------------------------------------------------------------------------

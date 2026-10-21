@@ -16,20 +16,23 @@
 :root {
   --paper: #FBF6F2; --card: #FFFFFF; --ink: #22264A; --soft: #5F6487; --faint: #8C90AD;
   --line: #EDE4DE; --flamingo: #E2577C; --flamingo-soft: #FDEAF0; --lagoon: #138A86; --lagoon-soft: #E1F4F1;
-  --sun: #D9930F; --sun-soft: #FFF3D9; --focus: #3B5BDB; --shadow: 0 1px 0 rgba(34, 38, 74, .04);
+  --sun: #D9930F; --sun-soft: #FFF3D9; --orchid: #7A4DB0; --orchid-soft: #F1E9FA;
+  --focus: #3B5BDB; --shadow: 0 1px 0 rgba(34, 38, 74, .04);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #15172C; --card: #1D2040; --ink: #F1EEF4; --soft: #B5B6CE; --faint: #8A8CA8; --line: #2D3058;
     --flamingo: #FF84A4; --flamingo-soft: #3B1D33; --lagoon: #59CEC6; --lagoon-soft: #15332F;
-    --sun: #F4C25A; --sun-soft: #3A3018; --focus: #8EA7FF; --shadow: none; color-scheme: dark;
+    --sun: #F4C25A; --sun-soft: #3A3018; --orchid: #C7A5F0; --orchid-soft: #2C2348;
+    --focus: #8EA7FF; --shadow: none; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #15172C; --card: #1D2040; --ink: #F1EEF4; --soft: #B5B6CE; --faint: #8A8CA8; --line: #2D3058;
   --flamingo: #FF84A4; --flamingo-soft: #3B1D33; --lagoon: #59CEC6; --lagoon-soft: #15332F;
-  --sun: #F4C25A; --sun-soft: #3A3018; --focus: #8EA7FF; --shadow: none; color-scheme: dark;
+  --sun: #F4C25A; --sun-soft: #3A3018; --orchid: #C7A5F0; --orchid-soft: #2C2348;
+  --focus: #8EA7FF; --shadow: none; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -92,6 +95,7 @@ section.block { margin: 18px 0 40px; }
 .pill.entry, .pill.lagoon { background: var(--lagoon-soft); color: var(--lagoon); }
 .pill.new { background: var(--flamingo-soft); color: var(--flamingo); }
 .pill.warn { background: var(--sun-soft); color: var(--sun); }
+.pill.beat { background: var(--orchid-soft); color: var(--orchid); }   /* her beats: food, travel, fashion… */
 .found { font-size: 14px; color: var(--faint); }
 .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; align-items: center; }
 .act { appearance: none; cursor: pointer; border: 1px solid var(--line); background: transparent; border-radius: 999px;
@@ -140,6 +144,8 @@ section.block { margin: 18px 0 40px; }
 .chip[aria-pressed="true"] { background: var(--flamingo-soft); border-color: transparent; color: var(--flamingo); }
 label.entry-only { display: flex; align-items: flex-start; gap: 8px; font-size: 15px; color: var(--soft); cursor: pointer; margin-top: 14px; }
 label.entry-only input { margin-top: 5px; flex-shrink: 0; }
+.filters label.entry-only + label.entry-only { margin-top: 8px; }
+.filters .cap { margin-top: 14px; }
 .day { font-size: 15px; font-weight: 600; color: var(--soft); margin: 26px 0 10px; }
 .day:first-child, .block-head + .day { margin-top: 0; }
 
@@ -239,9 +245,19 @@ const STAGES = ["Applied", "Heard back", "Phone screen", "Interview", "Offer", "
 const STAGE_CLASS = { Offer: "lagoon", "Heard back": "warn", "Phone screen": "warn", Interview: "warn" };
 const FIT_RANK = { early: 0, open: 1, stretch: 2 };
 const DEFAULT_WORK_MODES = [{ id: "remote", label: "Remote" }, { id: "hybrid", label: "Hybrid" }, { id: "onsite", label: "In person" }, { id: "unknown", label: "Not stated" }];
-const DEFAULT_FITS = [{ id: "early", label: "Early career" }, { id: "open", label: "Experience not stated" }, { id: "stretch", label: "Stretch (3–4 years, or a manager role)" }];
-const MIAMI_PLACES = ["Miami Beach", "Coral Gables", "Doral", "Fort Lauderdale", "Wynwood", "Brickell", "Aventura",
-                      "Boca Raton", "West Palm Beach", "Palm Beach", "Coconut Grove", "Hialeah", "Key Biscayne"];
+const DEFAULT_FITS = [{ id: "early", label: "Good fit (up to 3 years)" }, { id: "open", label: "Experience not stated" }, { id: "stretch", label: "Stretch (4–5 years, or a manager role)" }];
+// What a Miami card says instead of plain "Miami" (the radar's South Florida list, title-cased).
+// [name, what the listing says] where the two differ. Longest first, so "North Miami Beach"
+// wins over "Miami Beach" and "Palm Beach Gardens" over "Palm Beach".
+const MIAMI_PLACES = ["Miami Beach", "Coral Gables", "Doral", "Fort Lauderdale", ["Fort Lauderdale", "ft. lauderdale"],
+  ["Fort Lauderdale", "ft lauderdale"], "Wynwood", "Brickell", "Aventura", "Boca Raton", "West Palm Beach", "Palm Beach Gardens",
+  "Palm Beach", "Coconut Grove", "Hialeah", "Key Biscayne", ["Hollywood", "hollywood, fl"], ["Sunny Isles Beach", "sunny isles"],
+  "Bal Harbour", "North Miami Beach", "North Miami", "Miami Gardens", "Miami Lakes", "Miami Shores", "Kendall", "Pinecrest",
+  "Homestead", "Cutler Bay", "Surfside", ["Bay Harbor Islands", "bay harbor"], "South Beach", "Little Havana", "Design District",
+  "Downtown Miami", "Edgewater", "Midtown Miami", "Plantation", "Dania Beach", ["Hallandale Beach", "hallandale"], "Pembroke Pines",
+  "Miramar", "Weston", "Davie", ["Pompano Beach", "pompano"], "Deerfield Beach", "Delray Beach", "Boynton Beach", "Coral Springs",
+  ["Sunrise", "sunrise, fl"], "Opa-locka", "Medley", "Fisher Island"]
+  .map(c => Array.isArray(c) ? c : [c, c.toLowerCase()]).sort((a, b) => b[1].length - a[1].length);
 let DATA = null;
 const me = load();
 me.jobs = me.jobs || {};
@@ -249,12 +265,14 @@ me.companies = me.companies || {};   // companies she added herself (kept on thi
 Object.values(me.companies).forEach(c => delete c.sending);   // a send cut off by a closed tab must not look "in progress" forever
 const lastVisit = me.lastVisit || null;
 const view = { tab: me.tab || "home", q: "", locOff: new Set(me.locOff || []), famOff: new Set(me.famOff || []),
-               wmOff: new Set(me.wmOff || []), fitOnly: me.fitOnly ?? !!me.entryOnly, showFilters: false, more: {},
+               wmOff: new Set(me.wmOff || []), fitOnly: me.fitOnly ?? !!me.entryOnly, beatsOnly: !!me.beatsOnly,
+               spanishOnly: !!me.spanishOnly, showFilters: false, more: {},
                addJob: false, addCo: false };
 
 function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
 function save() {
-  Object.assign(me, { tab: view.tab, locOff: [...view.locOff], famOff: [...view.famOff], wmOff: [...view.wmOff], fitOnly: view.fitOnly });
+  Object.assign(me, { tab: view.tab, locOff: [...view.locOff], famOff: [...view.famOff], wmOff: [...view.wmOff], fitOnly: view.fitOnly,
+                      beatsOnly: view.beatsOnly, spanishOnly: view.spanishOnly });
   delete me.entryOnly; // migrated to fitOnly
   try { localStorage.setItem(KEY, JSON.stringify(me)); } catch (e) { /* private window: fine for this visit */ }
 }
@@ -294,8 +312,8 @@ function place(p) {
   const raw = p.location_raw || "";
   const has = w => raw.toLowerCase().includes(w);
   if (p.location === "MIAMI") {
-    const city = MIAMI_PLACES.find(c => has(c.toLowerCase()));
-    return has("new york") ? "Miami or New York" : (city || "Miami");
+    const city = MIAMI_PLACES.find(([, says]) => has(says));
+    return has("new york") ? "Miami or New York" : (city ? city[0] : "Miami");
   }
   if (p.location === "NYC") return has("miami") ? "New York or Miami" : (has("remote") ? "New York or remote" : "New York");
   if (p.location === "REMOTE") return has("new york") ? "Remote or New York" : has("miami") ? "Remote or Miami" : "Remote";
@@ -318,8 +336,21 @@ const famWord = id => (DATA.families.find(f => f.id === id) || {}).label || "";
 const wm = p => p.work_mode || "unknown";
 const wmWord = id => (DATA.work_modes.find(w => w.id === id) || {}).label || "";
 const chipModes = () => DATA.work_modes.filter(w => w.id !== "unknown");
-// Older radar files have no `fit`: guess it from the years asked and the title level.
-const fitOf = p => p.fit || (p.years >= 3 ? "stretch" : p.seniority === "entry" ? "early" : "open");
+// What this radar file can tell the page (set in boot). Older files have no beats, Spanish flag or
+// full-time rule: their filters and counts stay out of sight rather than showing zeros.
+const HAS = { topics: false, spanish: false, fullTimeOnly: false };
+const fitYears = () => DATA.fit_years ?? 3;              // "Good fit" = entry level or asks for up to this many years
+const prefLoc = () => DATA.preferred_location || "MIAMI"; // she'd rather be here than remote
+const topicWord = id => (DATA.topics.find(t => t.id === id) || {}).label || "";
+const beatsOf = p => (p.topics || []).filter(topicWord);
+const onBeat = p => beatsOf(p).length > 0;
+const isFellowship = p => (p.flags || []).some(f => /^fellowship$/i.test(f));
+const empWord = id => (DATA.employment?.labels || {})[id] || "";
+// The summary email, in her words. A file without `email` predates the setting: the morning summary is the default.
+const mailWords = () => (!DATA.email || DATA.email.digest === "daily")
+  ? "emails you a summary each morning when something new comes in" : "emails you as soon as something comes up";
+// Older radar files have no `fit`: guess it the radar's way — years asked first, then the title level.
+const fitOf = p => p.fit || (p.years != null ? (p.years > fitYears() ? "stretch" : "early") : p.seniority === "entry" ? "early" : "open");
 const stageOf = j => j.stage === "other" ? ((j.stage_other || "").trim() || "Other") : (j.stage || "Applied");
 const isNew = p => lastVisit && p.first_seen > lastVisit && p.status === "open" && !p.mine;
 const jobState = pid => me.jobs[pid] || {};
@@ -381,6 +412,14 @@ async function boot() {
   DATA.fits ??= DEFAULT_FITS;
   DATA.inbox ??= null;
   DATA.totals ??= null;
+  HAS.topics = Array.isArray(DATA.topics) && DATA.topics.length > 0;
+  HAS.spanish = DATA.postings.some(p => typeof p.spanish === "boolean");
+  if (!Array.isArray(DATA.topics)) DATA.topics = [];
+  DATA.employment ??= null;
+  DATA.email ??= null;
+  // "Full-time only" is said on the page only when the file says that's the rule.
+  const empShow = DATA.employment?.show || [];
+  HAS.fullTimeOnly = empShow.includes("full_time") && empShow.every(s => s === "full_time" || s === "unknown");
   // Companies saved by an earlier version of this page kept the jobs page as `url`.
   Object.values(me.companies).forEach(c => { if (c.url && !c.careers) { c.careers = c.url; delete c.url; } });
   // The radar refused a note of hers for its signature: the passcode was mistyped, so ask again.
@@ -430,7 +469,7 @@ function greet(name) {
   const mine = fresh.filter(p => p.target).length;
   const when = lastVisit ? `since you last looked ${sinceWords(lastVisit)}` : "this week";
   let s;
-  if (!fresh.length) s = `Nothing new ${when} — the radar keeps checking three times a day and will email you the moment something comes up. There are <strong>${open.length}</strong> jobs open right now if you’d like to browse.`;
+  if (!fresh.length) s = `Nothing new ${when} — the radar keeps checking three times a day and ${mailWords()}. There are <strong>${open.length}</strong> jobs open right now if you’d like to browse.`;
   else s = `<span class="count">${fresh.length} new job${fresh.length === 1 ? "" : "s"}</span> ${when}` +
            (mine ? `, including <strong>${mine}</strong> from companies on your list.` : ".") +
            (fresh.length < open.length ? ` ${open.length} are open in total.` : "");
@@ -460,18 +499,25 @@ function render() {
 function cardHTML(p) {
   // A job she typed in is shown exactly as typed; the radar's "Brand: Title" splitting is for boards.
   const j = jobState(p.pid), t = p.mine ? { title: p.title, brand: p.company, parent: "" } : titleParts(p),
-        where = place(p), f = fitOf(p), mode = wm(p);
+        where = place(p), f = fitOf(p), mode = wm(p), flags = p.flags || [];
   const pills = [];
   if (p.mine) pills.push(`<span class="pill you">Added by you</span>`);   // a job she found herself: no radar labels
   else {
     if (p.status !== "open") pills.push(`<span class="pill">No longer listed</span>`);
     else if (isNew(p)) pills.push(`<span class="pill new">New</span>`);
-    if (f === "early") pills.push(`<span class="pill entry">Early career</span>`);
-    else if (f === "stretch") pills.push(`<span class="pill warn">${p.years >= 3 ? `Stretch · asks for ${p.years}+ years` : "Stretch · manager role"}</span>`);
+    if (f === "early") pills.push(`<span class="pill entry">Good fit</span>`);
+    // Years asked always decide the fit, so a stretch that names years is one for its years.
+    else if (f === "stretch") pills.push(`<span class="pill warn">${p.years != null ? `Stretch · asks for ${p.years}+ years` : "Stretch · manager role"}</span>`);
     if (famWord(p.family)) pills.push(`<span class="pill">${esc(famWord(p.family))}</span>`);
-    if (f !== "stretch" && p.years >= 3) pills.push(`<span class="pill warn">Asks for ${p.years}+ years</span>`);
+    beatsOf(p).forEach(id => pills.push(`<span class="pill beat">${esc(topicWord(id))}</span>`));
+    if (p.spanish) pills.push(`<span class="pill lagoon">Spanish</span>`);
+    if (f !== "stretch" && p.years > fitYears()) pills.push(`<span class="pill warn">Asks for ${p.years}+ years</span>`);
     if (mode !== "unknown" && wmWord(mode)) pills.push(`<span class="pill">${esc(wmWord(mode))}</span>`);
-    if ((p.flags || []).includes("internship")) pills.push(`<span class="pill">Internship</span>`);
+    // Shown only if the radar is ever set to show more than full-time jobs.
+    const emp = p.employment && !["full_time", "unknown"].includes(p.employment) ? empWord(p.employment) : "";
+    if (emp && !(p.employment === "intern" && flags.includes("internship"))) pills.push(`<span class="pill">${esc(emp)}</span>`);
+    if (flags.includes("internship")) pills.push(`<span class="pill">Internship</span>`);
+    if (isFellowship(p)) pills.push(`<span class="pill">Fellowship</span>`);
   }
   if (j.applied && j.stage && j.stage !== "Applied") {
     const s = stageOf(j);
@@ -509,19 +555,25 @@ function block(id, title, sub, items, limit) {
 const panel = (title, sub, inner) => `<section class="block"><div class="block-head"><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ""}</div></div>${inner}</section>`;
 
 const byNewest = (a, b) => (b.first_seen || "").localeCompare(a.first_seen || "");
-const locRank = p => ({ MIAMI: 0, REMOTE: 1, NYC: 2, FLORIDA: 3, OTHER_US: 4, UNKNOWN: 5 }[p.location] ?? 6);
+// Where she'd rather be (Miami) first, then remote, then anything else the file has.
+const locRank = p => p.location === prefLoc() ? 0 : 1 + ({ MIAMI: 0, REMOTE: 1, NYC: 2, FLORIDA: 3, OTHER_US: 4, UNKNOWN: 5 }[p.location] ?? 6);
 const fitRank = p => FIT_RANK[fitOf(p)] ?? 1;
-const friendly = (a, b) => fitRank(a) - fitRank(b) || locRank(a) - locRank(b) || byNewest(a, b);
+const beatRank = p => onBeat(p) ? 0 : 1;
+// Her own companies first, then Miami before remote, then her beats, then the best fit, then the newest.
+const friendly = (a, b) => (!!b.target - !!a.target) || locRank(a) - locRank(b) || beatRank(a) - beatRank(b) ||
+                           fitRank(a) - fitRank(b) || byNewest(a, b);
 
 function homeHTML() {
-  const open = openJobs();
+  const open = openJobs(), here = p => p.location === prefLoc();
   const mine = open.filter(p => p.target).sort(friendly);
-  const week = open.filter(p => !p.target && age(p.first_seen) < 7).sort(friendly);
-  const miami = open.filter(p => !p.target && p.location === "MIAMI" && age(p.first_seen) >= 7).sort(byNewest);
+  const week = open.filter(p => !p.target && age(p.first_seen) < 7);
+  const miamiNew = week.filter(here).sort(friendly), remoteNew = week.filter(p => !here(p)).sort(friendly);
+  const miami = open.filter(p => !p.target && here(p) && age(p.first_seen) >= 7).sort(friendly);
   let html = block("mine", "From your list", "Open roles at the companies you picked.", mine, 4) +
-             block("week", "New this week", "Everything else that matches — early-career first, then Miami, then remote.", week, 6) +
+             block("miami-week", "New in Miami this week", HAS.topics ? "Jobs on your beats first, then the best fits." : "The best fits first.", miamiNew, 6) +
+             block("remote-week", "New remote jobs this week", "You said you’d rather be in Miami, so these come after.", remoteNew, 4) +
              block("miami", "Still open in Miami", "Found earlier but not filled yet.", miami, 4);
-  if (!html) html = `<div class="empty"><strong>A quiet week.</strong>Nothing new matches right now. The radar checks three times a day and emails you as soon as something comes up. Meanwhile, “More places to look” has quick searches on LinkedIn and Indeed.</div>`;
+  if (!html) html = `<div class="empty"><strong>A quiet week.</strong>Nothing new matches right now. The radar checks three times a day and ${mailWords()}. Meanwhile, “More places to look” has quick searches on LinkedIn and Indeed.</div>`;
   return html;
 }
 
@@ -529,12 +581,15 @@ function allHTML() {
   const locs = DATA.locations.map(l => `<button class="chip" data-loc="${l.id}" aria-pressed="${!view.locOff.has(l.id)}">${esc(l.label)}</button>`).join("");
   const fams = DATA.families.map(f => `<button class="chip" data-fam="${f.id}" aria-pressed="${!view.famOff.has(f.id)}">${esc(f.label)}</button>`).join("");
   const wms = chipModes().map(w => `<button class="chip" data-wm="${w.id}" aria-pressed="${!view.wmOff.has(w.id)}"${w.id === "onsite" ? ` title="Includes jobs that don’t say"` : ""}>${esc(w.label)}</button>`).join("");
-  const active = view.locOff.size + view.famOff.size + view.wmOff.size + (view.fitOnly ? 1 : 0);
+  // A box for something this radar file doesn't know (beats, Spanish) is hidden and does nothing.
+  const beatsOnly = HAS.topics && view.beatsOnly, spanishOnly = HAS.spanish && view.spanishOnly;
+  const boxes = [view.fitOnly, beatsOnly, spanishOnly].filter(Boolean).length;
+  const active = view.locOff.size + view.famOff.size + view.wmOff.size + boxes;
   const q = view.q.trim().toLowerCase();
   const wmKey = p => wm(p) === "unknown" ? "onsite" : wm(p); // a job that doesn't say is almost always in person
   const items = openJobs().filter(p => !view.locOff.has(p.location) && !view.famOff.has(p.family) && !view.wmOff.has(wmKey(p)) &&
-      (!view.fitOnly || fitOf(p) === "early") &&
-      (!q || `${p.title} ${p.company} ${p.location_raw}`.toLowerCase().includes(q)))
+      (!view.fitOnly || fitOf(p) === "early") && (!beatsOnly || onBeat(p)) && (!spanishOnly || p.spanish) &&
+      (!q || `${p.title} ${p.company} ${p.location_raw} ${beatsOf(p).map(topicWord).join(" ")}${p.spanish ? " Spanish" : ""}`.toLowerCase().includes(q)))
     .sort((a, b) => dayName(a.first_seen) === dayName(b.first_seen) ? friendly(a, b) : byNewest(a, b));
   let list = "", cur = null, buf = [];
   const flush = () => { if (buf.length) list += `<div class="day">${cur}</div><div class="cards">${buf.join("")}</div>`; buf = []; };
@@ -549,9 +604,12 @@ function allHTML() {
       <div class="group"><h4>Where</h4><div class="chips">${locs}</div></div>
       <div class="group"><h4>Kind of role</h4><div class="chips">${fams}</div></div>
       <div class="group"><h4>How you’d work</h4><div class="chips">${wms}</div></div>
-      <label class="entry-only"><input type="checkbox" id="fitonly" ${view.fitOnly ? "checked" : ""}> <span>Early-career only — jobs that say entry level or up to 2 years</span></label>
+      <label class="entry-only"><input type="checkbox" id="fitonly" ${view.fitOnly ? "checked" : ""}> <span>Good fit only — jobs that say entry level or ask for up to ${fitYears()} years</span></label>
+      ${HAS.topics ? `<label class="entry-only"><input type="checkbox" id="beatsonly" ${view.beatsOnly ? "checked" : ""}> <span>My beats only — ${esc(DATA.topics.map(t => String(t.id).replace(/_/g, " ")).join(", "))}</span></label>` : ""}
+      ${HAS.spanish ? `<label class="entry-only"><input type="checkbox" id="spanishonly" ${view.spanishOnly ? "checked" : ""}> <span>Spanish roles only</span></label>` : ""}
+      ${HAS.fullTimeOnly ? `<p class="cap">Full-time only, as you asked — part-time and freelance roles are counted on Stats but not shown.</p>` : ""}
     </div>
-    <div id="results">${list || `<div class="empty"><strong>No jobs match these filters.</strong>Try turning a place or a kind of role back on.${onlyHere ? " The radar shows Miami and fully remote jobs only." : ""}</div>`}</div>`;
+    <div id="results">${list || `<div class="empty"><strong>No jobs match these filters.</strong>Try turning a place or a kind of role back on${boxes ? ", or untick a box at the bottom of the filters" : ""}.${onlyHere ? " The radar shows Miami and fully remote jobs only." : ""}</div>`}</div>`;
 }
 
 /* Jobs she adds herself live only in her saves (snap.mine): a job spotted on
@@ -786,6 +844,26 @@ function runsSpark(runs) {
   return `<svg class="spark" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="New jobs found on each of the last ${n} check${n === 1 ? "" : "s"}: ${vals.join(", ")}"><title>${vals.join(" · ")}</title>` +
     `${n > 1 ? `<polyline points="${pts}"/>` : ""}<circle cx="${x(n - 1).toFixed(1)}" cy="${y(vals[n - 1]).toFixed(1)}" r="4"/></svg>`;
 }
+// When the summary email comes, from the file's `email` settings. The day's first check is the
+// 11:21 UTC cron in .github/workflows/radar.yml: about 7:20am in summer, 6:20am in winter, Miami
+// time. The summary goes with the first check after `after_hour`; if that isn't the morning check,
+// the line says so without a time. Change the 11, 20 below if that cron moves.
+function mailLine() {
+  const m = DATA.email;
+  if (!m) return "";
+  if (m.digest !== "daily") return "Email: sent after any check that finds something new.";
+  const h = m.after_hour ?? 6;
+  let at = "";
+  try {
+    const d = new Date(); d.setUTCHours(11, 20, 0, 0);
+    const part = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: m.timezone || "America/New_York", hour: "numeric",
+      minute: "2-digit", hourCycle: "h23" }).formatToParts(d).map(x => [x.type, x.value]));
+    const hh = Number(part.hour);
+    if (hh >= h && hh < 12) at = `${hh}:${part.minute}am`;
+  } catch (e) { /* a time zone this browser doesn't know: say it without the time */ }
+  return at ? `Summary email: every morning around ${at} when there’s something new.`
+            : `Summary email: once a day, with the first check after ${h % 12 || 12}${h < 12 ? "am" : "pm"}, when there’s something new.`;
+}
 function healthHTML() {
   const lr = DATA.last_run || {}, srcN = (lr.sources_ok || 0) + (lr.sources_failed || 0);
   const line = lr.finished_at ? `Last checked ${ago(lr.finished_at)}${lr.duration_s ? ` · took ${Math.round(lr.duration_s)}s` : ""}${srcN ? ` · ${lr.sources_ok} of ${srcN} sources read` : ""}` : "No check has finished yet.";
@@ -796,7 +874,8 @@ function healthHTML() {
       `<div class="item"><div><div class="name">${esc(b.name)}</div><div class="why">${short(b.err) || "Couldn’t be read"}</div></div><div class="side">${b.n ? `${b.n} check${b.n === 1 ? "" : "s"} in a row` : "Not read"}</div></div>`).join("")}</div>`
     : `<p class="cap">Every source was read fine on the last check.</p>`;
   const runs = DATA.runs || [], vals = runs.slice(-30).map(r => r.new_relevant || 0);
-  return `<p class="cap">${line}</p>${list}
+  const mail = mailLine();
+  return `<p class="cap">${line}</p>${mail ? `<p class="cap">${esc(mail)}</p>` : ""}${list}
     ${runs.length ? `<div class="panel sparkrow">${runsSpark(runs)}<div><div class="lbl">New jobs found by the radar on each check — all areas, not just Miami and remote.</div>
       <div class="why">Last ${vals.length} check${vals.length === 1 ? "" : "s"}: ${esc(vals.join(" · "))}</div></div></div>` : ""}`;
 }
@@ -805,24 +884,29 @@ function statsHTML() {
   const open = openJobs(), J = Object.values(me.jobs), applied = J.filter(j => j.applied);
   const n = f => open.filter(f).length;
   const replies = applied.filter(j => !["Applied", "No response", "Withdrawn"].includes(stageOf(j))).length;
-  const t = DATA.totals;
+  const t = DATA.totals, notFull = t?.open_not_fulltime;
+  const beatIds = DATA.topics.map(x => String(x.id).replace(/_/g, " "));
   const tiles = [
     tile("Open jobs", open.length, "that match you"),
     tile("New this week", n(p => age(p.first_seen) < 7)),
-    tile("Early career", n(p => fitOf(p) === "early"), "say entry level or up to 2 years"),
+    tile("Good fit", n(p => fitOf(p) === "early"), `up to ${fitYears()} years`),
+    HAS.topics ? tile("On your beats", n(onBeat), beatIds.length > 3 ? `${esc(beatIds.slice(0, 3).join(", "))} and more` : esc(beatIds.join(", "))) : "",
+    HAS.spanish ? tile("Spanish roles", n(p => p.spanish), "mention Spanish or bilingual") : "",
     tile("Remote", n(p => p.location === "REMOTE"), "fully remote"),
     tile("From your list", n(p => p.target), "companies you picked"),
     tile("Saved", J.filter(j => j.saved).length),
     tile("Applied", applied.length),
     tile("Replies", replies, "any answer after applying"),
     applied.length ? tile("Response rate", `${Math.round(replies / applied.length * 100)}%`, "replies ÷ applications") : "",
-    t && t.open_all != null && t.open_shown != null ? tile("Elsewhere in the US (not shown)", Math.max(0, t.open_all - t.open_shown), "matching jobs that aren’t Miami or fully remote") : "",
+    t && t.open_all != null && t.open_shown != null ? tile("Elsewhere in the US (not shown)", Math.max(0, t.open_all - t.open_shown - (notFull || 0)), "matching jobs that aren’t Miami or fully remote") : "",
+    notFull != null ? tile("Not full-time (hidden)", notFull, "part-time, freelance, contract or temp — you asked for full-time only") : "",
   ].join("");
   const where = DATA.locations.map(l => ({ label: l.label, n: n(p => p.location === l.id) }));
   const how = [{ label: wmWord("remote") || "Remote", n: n(p => wm(p) === "remote") }, { label: wmWord("hybrid") || "Hybrid", n: n(p => wm(p) === "hybrid") },
                { label: `${wmWord("onsite") || "In person"} or not stated`, n: n(p => wm(p) === "onsite" || wm(p) === "unknown") }];
   const kinds = DATA.families.map(f => ({ label: f.label, n: n(p => p.family === f.id) }));
   const fits = DATA.fits.map(f => ({ label: f.label, n: n(p => fitOf(p) === f.id) }));
+  const beats = DATA.topics.map(x => ({ label: x.label, n: n(p => (p.topics || []).includes(x.id)) }));
   const byEmp = new Map();
   for (const p of open) {
     const e = p.employer_id && DATA.employers.find(x => x.id === p.employer_id), k = e ? e.id : nice(p.company).trim();
@@ -840,6 +924,7 @@ function statsHTML() {
     panel("New jobs, last 30 days", "How many new matches the radar found each day.", dayChart(DATA.postings)) +
     panel("Where and how", "", `<div class="panel"><div class="group"><h4>Where</h4>${barRows(where)}</div><div class="group"><h4>How you’d work</h4>${barRows(how)}</div></div>`) +
     panel("Kinds of roles", "", `<div class="panel">${barRows(kinds)}</div>`) +
+    (HAS.topics ? panel("Your beats", "Open jobs on each of your topics. A job can be on more than one.", `<div class="panel">${barRows(beats)}</div>`) : "") +
     panel("Fit", "How much experience the jobs ask for.", `<div class="panel">${barRows(fits)}</div>`) +
     (companies.length ? panel("Companies with the most open roles", "★ means a company on your list.", `<div class="panel">${barRows(companies)}</div>`) : "") +
     panel("Your applications", "", apps) +
@@ -863,7 +948,8 @@ function wire(root) {
       const p = DATA.postings.find(x => x.pid === pid);
       if (p) j.snap = { pid, title: p.title, company: p.company, url: p.url, location_raw: p.location_raw, location: p.location,
                         family: p.family, first_seen: p.first_seen, target: p.target, seniority: p.seniority,
-                        work_mode: p.work_mode, fit: p.fit, years: p.years };
+                        work_mode: p.work_mode, fit: p.fit, years: p.years, flags: p.flags, topics: p.topics,
+                        spanish: p.spanish, employment: p.employment };
       // A job she added lives only in her saves: un-saving it (while not applied) is the same as removing it.
       if (j.snap?.mine && !j.saved && !j.applied) { delete me.jobs[pid]; foot("Removed."); }
       save(); render(); greet(DATA.owner || "there");
@@ -902,8 +988,10 @@ function wire(root) {
   root.querySelectorAll("[data-loc]").forEach(b => b.onclick = () => { flip(view.locOff, b.dataset.loc); save(); render(); });
   root.querySelectorAll("[data-fam]").forEach(b => b.onclick = () => { flip(view.famOff, b.dataset.fam); save(); render(); });
   root.querySelectorAll("[data-wm]").forEach(b => b.onclick = () => { flip(view.wmOff, b.dataset.wm); save(); render(); });
-  const en = root.querySelector("#fitonly");
-  if (en) en.onchange = () => { view.fitOnly = en.checked; save(); render(); };
+  [["#fitonly", "fitOnly"], ["#beatsonly", "beatsOnly"], ["#spanishonly", "spanishOnly"]].forEach(([sel, k]) => {
+    const box = root.querySelector(sel);
+    if (box) box.onchange = () => { view[k] = box.checked; save(); render(); };
+  });
   const q = root.querySelector("#q");
   if (q) q.oninput = () => {
     view.q = q.value; const pos = q.selectionStart; render();

@@ -9,6 +9,15 @@ Adapters only fetch and normalise. They never classify, filter by location, or
 decide what is interesting; that is classify.py's job. Keeping that boundary is
 what makes the pipeline testable without a network.
 
+`extra["employment"]` carries the board's own full-time / part-time field, as
+the board words it, wherever the listing payload has one (checked against live
+boards, 21 Oct 2026): Lever, Ashby, SmartRecruiters, Workable, BambooHR,
+Recruitee, Breezy, UKG, Oracle. Greenhouse doesn't say, so the title and
+description decide there (classify.employment()). Workday's job list doesn't
+either, nor does it carry a description or every location ("3 Locations"):
+its postings carry `extra["detail_url"]`, and crawl.py reads that page
+(workday_detail()) for the relevant ones.
+
 Platforms:
   greenhouse, lever, ashby, smartrecruiters, workday     (ported from the IB tracker)
   workable, bamboohr, recruitee, breezy                  (common at small media companies)
@@ -36,6 +45,7 @@ class RawPosting:
     url: str
     description: str = ""
     posted_at: str | None = None
+    # e.g. {"workplace": "remote", "employment": "Full-time", "via": "Adzuna"}
     extra: dict[str, Any] = field(default_factory=dict)
 
 
@@ -130,7 +140,9 @@ def fetch_lever(client, emp: dict) -> list[RawPosting]:
             description=strip_html(j.get("descriptionPlain") or j.get("description", ""))[:3000],
             posted_at=None,
             extra={"team": cats.get("team"), "commitment": cats.get("commitment"),
-                   "workplace": j.get("workplaceType")},
+                   "workplace": j.get("workplaceType"),
+                   # "Full-time", "Part-time", "Temporary Full Time"...
+                   "employment": cats.get("commitment")},
         ))
     return out
 
@@ -150,6 +162,7 @@ def fetch_ashby(client, emp: dict) -> list[RawPosting]:
             company=emp["name"], location_raw=loc, url=j.get("jobUrl", ""),
             description=strip_html(j.get("descriptionPlain", ""))[:3000],
             posted_at=j.get("publishedAt"),
+            extra={"employment": j.get("employmentType")},      # FullTime / PartTime / Intern / Contract / Temporary
         ))
     return out
 
@@ -180,11 +193,13 @@ def _sr_query(client, emp: dict, token: str, q: str) -> list[RawPosting]:
             where = _join(loc.get("city"), loc.get("region"), loc.get("country", "").upper())
             if loc.get("remote"):
                 where = _join(where, "Remote")
+            toe = j.get("typeOfEmployment") or {}          # {"id": "permanent", "label": "Full-time"}
             out.append(RawPosting(
                 source_id=emp["id"], job_id=str(j.get("id")), title=j.get("name", ""),
                 company=emp["name"], location_raw=where,
                 url=f"https://jobs.smartrecruiters.com/{token}/{j.get('id')}",
                 posted_at=j.get("releasedDate"),
+                extra={"employment": toe.get("label") or toe.get("id")},
             ))
         offset += len(content)
         if offset >= data.get("totalFound", 0) or offset > 3000:
@@ -204,6 +219,9 @@ def _sr_query(client, emp: dict, token: str, q: str) -> list[RawPosting]:
 WORKDAY_QUERIES = ("editor", "editorial", "writer", "reporter", "journalist", "producer",
                    "content", "social media", "copywriter", "communications",
                    "public relations", "marketing coordinator", "fellow")
+# Postings read per search at most (20 a page). A search that hits this is too
+# broad for the board: give the row narrower `queries`.
+WORKDAY_MAX_PER_QUERY = 300
 
 _WD_REQ = re.compile(r"_([A-Za-z0-9][A-Za-z0-9.-]*?)(?:-\d{1,2})?$")
 
@@ -228,10 +246,14 @@ def fetch_workday(client, emp: dict) -> list[RawPosting]:
     queries = emp.get("queries") or WORKDAY_QUERIES
     seen: dict[str, RawPosting] = {}
     for q in queries:
-        offset = 0
+        offset, total = 0, None
         while True:
             data = _post(client, endpoint, {"appliedFacets": {}, "limit": 20,
                                             "offset": offset, "searchText": q}).json()
+            # Workday gives the search's total on the first page only; later
+            # pages say 0. Reading it from every page stopped each search after
+            # 40 postings (Seminole Hard Rock: 200 read of 576, 21 Oct 2026).
+            total = data.get("total") or total
             posts = data.get("jobPostings", [])
             if not posts:
                 break
@@ -239,19 +261,51 @@ def fetch_workday(client, emp: dict) -> list[RawPosting]:
                 jid = workday_job_id(j)
                 if jid in seen:
                     continue
+                path = j.get("externalPath", "") or ""
                 seen[jid] = RawPosting(
                     source_id=emp["id"], job_id=jid, title=j.get("title", ""),
                     company=emp["name"], location_raw=j.get("locationsText", "") or "",
-                    url=(f"{base}/recruiting/{tenant}/{site}{j.get('externalPath', '')}"
+                    url=(f"{base}/recruiting/{tenant}/{site}{path}"
                          if "myworkdaysite" in base else
-                         f"{base}/en-US/{site}{j.get('externalPath', '')}"),
+                         f"{base}/en-US/{site}{path}"),
                     posted_at=j.get("postedOn"),
+                    # The job's own page: description, every location, full-time or not.
+                    extra={"detail_url": f"{base}/wday/cxs/{tenant}/{site}{path}"},
                 )
             offset += 20
-            if offset >= data.get("total", 0) or offset >= 200:
+            if ((total is not None and offset >= total) or len(posts) < 20
+                    or offset >= WORKDAY_MAX_PER_QUERY):
                 break
             time.sleep(0.3)
     return list(seen.values())
+
+
+def workday_detail(client, url: str) -> dict:
+    """One Workday job's own page (the JSON behind it), for what the job list
+    leaves out. Shape checked on Chewy's board, 21 Oct 2026: jobPostingInfo has
+    location ("Hollywood, FL"), additionalLocations (["Richardson, TX"]),
+    timeType ("Full time"), remoteType (often missing; each employer words it:
+    "Hybrid", "Remote Position", "In-Office Position") and jobDescription
+    (HTML). The description is kept long: the "3+ years" line is usually in
+    the qualifications near the end."""
+    info = _get(client, url, retries=0, headers={"Accept": "application/json"}).json().get("jobPostingInfo") or {}
+    locs = [info.get("location"), *(info.get("additionalLocations") or [])]
+    return {"description": strip_html(info.get("jobDescription") or "")[:12000],
+            "location_raw": " / ".join(str(x).strip() for x in locs if x and str(x).strip()),
+            "employment": info.get("timeType"), "workplace": _workplace(info.get("remoteType"))}
+
+
+def _workplace(s: str | None) -> str | None:
+    """A board's own remote / hybrid / in-office wording -> remote / hybrid /
+    onsite (what classify.work_mode() takes), None when it says nothing."""
+    t = (s or "").lower()
+    if "hybrid" in t:
+        return "hybrid"
+    if "remote" in t:
+        return "remote"
+    if re.search(r"\b(in[- ]?office|on[- ]?site|in[- ]person)\b", t):
+        return "onsite"
+    return None
 
 
 # --- Workable ------------------------------------------------------------------
@@ -280,6 +334,7 @@ def fetch_workable(client, emp: dict) -> list[RawPosting]:
             url=j.get("url") or j.get("application_url") or f"https://apply.workable.com/{token}/j/{sc}/",
             description=strip_html(j.get("description", ""))[:3000],
             posted_at=j.get("published_on") or j.get("created_at"),
+            extra={"employment": j.get("employment_type")},     # "Full-time", "Contract"...
         )
     return list(merged.values())
 
@@ -301,7 +356,8 @@ def fetch_bamboohr(client, emp: dict) -> list[RawPosting]:
             source_id=emp["id"], job_id=str(j.get("id")), title=j.get("jobOpeningName", ""),
             company=emp["name"], location_raw=where,
             url=f"https://{token}.bamboohr.com/careers/{j.get('id')}",
-            extra={"department": j.get("departmentLabel"), "type": j.get("employmentStatusLabel")},
+            extra={"department": j.get("departmentLabel"), "type": j.get("employmentStatusLabel"),
+                   "employment": j.get("employmentStatusLabel")},  # "Full-Time", "Part-Time", "Contractor"...
         ))
     return out
 
@@ -321,6 +377,7 @@ def fetch_recruitee(client, emp: dict) -> list[RawPosting]:
             company=emp["name"], location_raw=where, url=j.get("careers_url", ""),
             description=strip_html(j.get("description", ""))[:3000],
             posted_at=j.get("published_at"),
+            extra={"employment": j.get("employment_type_code")},  # "fulltime_permanent", "fulltime_fixed_term"...
         ))
     return out
 
@@ -340,10 +397,12 @@ def fetch_breezy(client, emp: dict) -> list[RawPosting]:
                                          country.get("name") if isinstance(country, dict) else country)
         if loc.get("is_remote"):
             where = _join(where, "Remote")
+        typ = j.get("type")                                # {"id": "fullTime", "name": "Full-Time"}
         out.append(RawPosting(
             source_id=emp["id"], job_id=str(j.get("id")), title=j.get("name", ""),
             company=emp["name"], location_raw=where, url=j.get("url", ""),
             posted_at=j.get("published_date"),
+            extra={"employment": typ.get("name") if isinstance(typ, dict) else typ},
         ))
     return out
 
@@ -380,7 +439,10 @@ def fetch_oracle(client, emp: dict) -> list[RawPosting]:
                     url=f"https://{host}/hcmUI/CandidateExperience/en/sites/{site}/job/{jid}",
                     description=strip_html(j.get("ShortDescriptionStr", ""))[:3000],
                     posted_at=j.get("PostedDate"),
-                    extra={"organization": j.get("Organization")})
+                    # JobSchedule ("Full time" / "Part time") is in every row
+                    # but empty on JPMorgan's and Hearst's boards (21 Oct 2026);
+                    # read anyway for a tenant that fills it.
+                    extra={"organization": j.get("Organization"), "employment": j.get("JobSchedule")})
             offset += len(reqs)
             if not reqs or offset >= (items[0].get("TotalJobsCount") or 0):
                 break
@@ -413,12 +475,16 @@ def fetch_ukg(client, emp: dict) -> list[RawPosting]:
                 locs.append(_join(a.get("City"), st.get("Code") if isinstance(st, dict) else st)
                             or l.get("LocalizedDescription") or "")
             jid = str(j.get("Id"))
+            # FullTime is a yes/no; on McClatchy's board every "no" is a
+            # part-time or freelance job ("Merchandiser - PT").
+            ft = j.get("FullTime")
             out.append(RawPosting(
                 source_id=emp["id"], job_id=jid, title=j.get("Title", ""), company=emp["name"],
                 location_raw=" / ".join(x for x in locs if x),
                 url=f"{board}/OpportunityDetail?opportunityId={jid}",
                 description=strip_html(j.get("BriefDescription", ""))[:3000],
-                posted_at=j.get("PostedDate")))
+                posted_at=j.get("PostedDate"),
+                extra={"employment": None if ft is None else ("Full-time" if ft else "Part-time")}))
         skip += len(opps)
         if not opps or skip >= (data.get("totalCount") or 0) or skip > 1000:
             break
@@ -439,12 +505,19 @@ ADAPTERS = {
     "ukg": fetch_ukg,
 }
 
+# Platforms whose job list leaves out what classify() needs, and the function
+# that reads one job's own page (crawl.py calls it for relevant postings that
+# carry extra["detail_url"]).
+DETAILS = {"workday": workday_detail}
+
 # Platforms with no adapter. Those employers are listed on the dashboard's
 # "Who I’m watching" page with a link (and their careers page is watched for
-# changes) instead of silently missing.
+# changes) instead of silently missing. Every `ats:` in employers.yaml is
+# either here or in ADAPTERS (a test checks), so a typo can't hide a row.
 MANUAL = {"none", "unknown", "bespoke", "linkedin", "icims", "adp", "paylocity",
           "taleo", "successfactors", "dayforce", "jazzhr", "email", "avature", "teamtailor",
-          "jobvite", "eightfold"}
+          "jobvite", "eightfold", "phenom", "xanterra", "prismhr", "hrmdirect", "ukg-ready",
+          "trinet", "peoplesoft", "teamworkonline"}
 
 
 def detect_from_url(url: str) -> dict:

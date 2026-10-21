@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import os
 import re
 import sys
@@ -32,10 +33,40 @@ import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src import adapters, aggregators, inbox, store, watch  # noqa: E402
-from src.classify import Rules, classify, fit, remote_in_head, visible, work_mode  # noqa: E402
+from src.classify import (EMPLOYMENT_LABELS, Rules, beats, classify, employment, fit,  # noqa: E402
+                          fit_labels, remote_in_head, visible, work_mode)
 
 ROOT = store.ROOT
 AGGREGATOR_CLOSE_DAYS = 7
+# Job pages read per employer per run, for boards whose job list leaves out
+# the description and the full location (Workday: "3 Locations"). The rest
+# wait for the next run; each posting's page is read once.
+ENRICH_PER_RUN = 25
+ENRICH_PAUSE_S = 0.5
+_N_LOCATIONS = re.compile(r"\d+ locations", re.I)
+_YEARS_FLAG = re.compile(r"\d+\+ yrs asked")
+
+# What classify() reads. A posting enriched from its job page keeps that
+# verdict on later runs (the list has no description to redo it from) only
+# while these config blocks and its employer's row are unchanged: after a rule
+# edit its page is read again.
+_RULE_KEYS = ("locations", "roles", "seniority", "fit", "employment", "topics",
+              "topics_description_min_words", "languages")
+_ROW_KEYS = ("name", "home", "industry", "topics", "spanish", "miami_match")
+
+
+def rules_fingerprint(cfg: dict, emp: dict | None) -> str:
+    blob = json.dumps([[cfg.get(k) for k in _RULE_KEYS], {k: (emp or {}).get(k) for k in _ROW_KEYS}],
+                      sort_keys=True, default=str)
+    return hashlib.sha1(blob.encode()).hexdigest()[:12]
+
+
+def derived(v) -> dict:
+    """The fields of a posting that classify() decides."""
+    return {"relevant": v.relevant, "reason": v.reason, "family": v.family, "tier": v.tier,
+            "seniority": v.seniority, "location": v.location, "years": v.years, "flags": v.flags,
+            "work_mode": v.work_mode, "fit": v.fit, "remote_offered": v.remote_offered,
+            "employment": v.employment, "topics": v.topics, "spanish": v.spanish}
 
 
 def load_yaml(name: str) -> dict:
@@ -106,7 +137,8 @@ def employer_matcher(employers: list[dict]):
 
 
 def run(only: str | None = None, dry_run: bool = False, state_path: str = store.STATE_PATH,
-        radar_path: str = store.RADAR_PATH, fetchers=None) -> dict:
+        radar_path: str = store.RADAR_PATH, fetchers=None, client=None) -> dict:
+    """`fetchers` (ats or aggregator id -> function) and `client` are for tests."""
     cfg = load_yaml("config.yaml")
     employers = load_employers()
     boards = (load_yaml("boards.yaml") or {}).get("boards", []) if os.path.exists(
@@ -147,8 +179,8 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
 
     headers = {"User-Agent": cfg["crawl"]["user_agent"],
                "Accept": "application/json, text/plain, */*"}
-    client = httpx.Client(headers=headers, timeout=cfg["crawl"]["timeout_seconds"],
-                          follow_redirects=True)
+    client = client or httpx.Client(headers=headers, timeout=cfg["crawl"]["timeout_seconds"],
+                                    follow_redirects=True)
     delay = 1.0 / max(cfg["crawl"]["requests_per_second"], 0.1)
     match_employer = employer_matcher(employers)
     emp_by_id = {e["id"]: e for e in employers}
@@ -161,8 +193,11 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
     counts = {"new_relevant": 0, "closed": 0, "sources_ok": 0, "sources_failed": 0}
     seen_now: dict[str, set] = {}
 
-    def ingest(source_id: str, kind: str, raws: list, emp: dict | None = None) -> tuple[int, int]:
-        ids, n_rel, n_new = set(), 0, 0
+    def ingest(source_id: str, kind: str, raws: list, emp: dict | None = None) -> tuple[int, int, int]:
+        """(relevant, new relevant, job pages read)."""
+        ids, rows, todo = set(), [], []
+        detail = adapters.DETAILS.get(emp.get("ats")) if kind == "employer" and emp else None
+        fp = rules_fingerprint(cfg, emp) if detail else None
         for r in raws:
             pid = pid_for(source_id, r.job_id)
             if pid in ids:
@@ -171,33 +206,83 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
             emp_id = source_id if kind == "employer" else match_employer(r.company)
             # `home: MIAMI` in employers.yaml: a posting with no location at a
             # Miami-only employer is a Miami job (aggregator finds included).
-            home = (emp or emp_by_id.get(emp_id) or {}).get("home")
+            # The row also says whether it is a PR agency and what its beat is.
+            erow = emp or emp_by_id.get(emp_id) or {}
             v = classify(r.title, r.location_raw, r.description, rules,
-                         default_location=home, workplace_hint=r.extra.get("workplace"))
+                         default_location=erow.get("home"), workplace_hint=r.extra.get("workplace"),
+                         employer=erow, company=r.company, employment_hint=r.extra.get("employment"))
             p = state["postings"].get(pid)
             is_new = p is None
             if is_new:
                 p = {"pid": pid, "first_seen": ts, "emailed_at": None}
                 state["postings"][pid] = p
             was_closed = p.get("status") == "closed"
+            # Read from its job page on an earlier run: the list has no
+            # description, so years, fit, kind of job and the full location
+            # stay as that page made them (while the rules are unchanged).
+            keep = bool(fp) and not is_new and bool(p.get("enriched")) and \
+                p.get("enriched_rules") == fp and not r.description
             p.update({
                 "source_id": source_id, "kind": kind, "employer_id": emp_id,
                 "job_id": r.job_id, "title": r.title.strip(), "company": r.company,
-                "location_raw": r.location_raw, "url": r.url, "posted_at": r.posted_at,
+                "url": r.url, "posted_at": r.posted_at,
                 "last_seen": ts, "status": "open", "closed_at": None,
-                "relevant": v.relevant, "reason": v.reason, "family": v.family,
-                "tier": v.tier, "seniority": v.seniority, "location": v.location,
-                "years": v.years, "flags": v.flags, "work_mode": v.work_mode, "fit": v.fit,
-                "remote_offered": v.remote_offered,
             })
+            if keep:
+                p.update({"family": v.family, "tier": v.tier, "seniority": v.seniority})    # title only
+                if not _N_LOCATIONS.fullmatch((r.location_raw or "").strip()):
+                    p["location_raw"] = r.location_raw
+            else:
+                p.update(derived(v))
+                p["location_raw"] = r.location_raw
+                if detail and v.relevant and r.extra.get("detail_url"):
+                    todo.append((p, r, erow))
             if was_closed:
                 p["reopened_at"] = ts
-            if v.relevant:
-                n_rel += 1
-                if is_new:
-                    n_new += 1
+            rows.append((p, is_new))
+        n_read = enrich(todo, detail, fp) if todo else 0
         seen_now[source_id] = ids
-        return n_rel, n_new
+        n_rel = sum(1 for p, _ in rows if p.get("relevant"))
+        return n_rel, sum(1 for p, new in rows if new and p.get("relevant")), n_read
+
+    def enrich(todo: list, detail, fp: str) -> int:
+        """Read the job pages of relevant postings whose list entry is thin
+        (Workday), and classify them again with the description, every
+        location, and the board's full-time / remote fields. At most
+        ENRICH_PER_RUN per employer, Miami / remote / "3 Locations" ones
+        first; a page that fails is skipped (tried again next run) and never
+        fails the board."""
+        def first(item):
+            p = item[0]
+            return not (_N_LOCATIONS.fullmatch((p.get("location_raw") or "").strip())
+                        or p.get("location") == "UNKNOWN"
+                        or visible(p.get("location"), p.get("work_mode"), cfg["locations"], p.get("remote_offered")))
+        n_read, fails = 0, 0
+        for p, r, erow in sorted(todo, key=first)[:ENRICH_PER_RUN]:
+            if fails >= 3:
+                print("   job pages aren't answering; the rest wait for the next run", flush=True)
+                break
+            try:
+                d = detail(client, r.extra["detail_url"])
+            except Exception as ex:  # noqa: BLE001
+                fails += 1
+                print(f"   job page not read ({r.title[:50]}): {str(ex)[:120]}", flush=True)
+                time.sleep(ENRICH_PAUSE_S)
+                continue
+            fails = 0
+            n_read += 1
+            loc_raw = r.location_raw
+            if _N_LOCATIONS.fullmatch((loc_raw or "").strip()) and d.get("location_raw"):
+                loc_raw = d["location_raw"]
+            v = classify(r.title, loc_raw, d.get("description") or "", rules,
+                         default_location=erow.get("home"),
+                         workplace_hint=d.get("workplace") or r.extra.get("workplace"),
+                         employer=erow, company=r.company,
+                         employment_hint=d.get("employment") or r.extra.get("employment"))
+            p.update(derived(v))
+            p.update({"location_raw": loc_raw, "enriched": ts, "enriched_rules": fp})
+            time.sleep(ENRICH_PAUSE_S)
+        return n_read
 
     def record(source_id: str, name: str, kind: str, ats: str, ok: bool, err: str,
                n_total: int, n_rel: int) -> None:
@@ -225,10 +310,11 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
                 raws = [r for r in raws if rx.search(" ".join(
                     [r.title, r.description, str(r.extra.get("departments") or ""),
                      str(r.extra.get("organization") or "")]))]
-            n_rel, n_new = ingest(e["id"], "employer", raws, e)
+            n_rel, n_new, n_read = ingest(e["id"], "employer", raws, e)
             record(e["id"], e["name"], "employer", e["ats"], True, "", len(raws), n_rel)
             counts["new_relevant"] += n_new
-            prog.step(f"{e['name']}: {len(raws)} jobs, {n_rel} relevant, {n_new} new")
+            prog.step(f"{e['name']}: {len(raws)} jobs, {n_rel} relevant, {n_new} new"
+                      + (f" ({n_read} job pages read)" if n_read else ""))
         except Exception as ex:  # noqa: BLE001  one board never stops the run
             msg = str(ex) if isinstance(ex, adapters.AdapterError) else f"{type(ex).__name__}: {ex}"
             record(e["id"], e["name"], "employer", e["ats"], False, msg[:300], 0, 0)
@@ -240,7 +326,7 @@ def run(only: str | None = None, dry_run: bool = False, state_path: str = store.
         fn = fetchers.get(a["id"]) or a["fetch"]
         try:
             raws = fn(client, a["cfg"])
-            n_rel, n_new = ingest(a["id"], "aggregator", raws)
+            n_rel, n_new, _ = ingest(a["id"], "aggregator", raws)
             record(a["id"], a["name"], "aggregator", a["id"], True, "", len(raws), n_rel)
             counts["new_relevant"] += n_new
             prog.step(f"{a['name']}: {len(raws)} jobs, {n_rel} relevant, {n_new} new")
@@ -363,10 +449,12 @@ def mark_duplicates(state: dict) -> None:
 def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], path: str) -> None:
     """Write data/radar.json — everything the dashboard page shows, and nothing
     it doesn't (no irrelevant postings, no descriptions, nothing outside
-    Miami / fully remote)."""
+    Miami / fully remote, nothing that isn't full-time)."""
     keep_closed = cfg["crawl"]["keep_closed_days"]
     rules = Rules(cfg)
     loc = cfg["locations"]
+    emp_cfg = cfg.get("employment") or {"show": list(EMPLOYMENT_LABELS)}
+    emp_by_id = {e["id"]: e for e in employers}
     posts = []
     for p in state["postings"].values():
         if not p.get("relevant") or p.get("dupe_of"):
@@ -377,14 +465,28 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
             "pid", "title", "company", "employer_id", "kind", "source_id", "location",
             "location_raw", "url", "first_seen", "last_seen", "status", "closed_at",
             "family", "tier", "seniority", "years", "flags", "posted_at",
-            "work_mode", "fit", "remote_offered")}
+            "work_mode", "fit", "remote_offered", "employment", "topics", "spanish")}
         # Rows written before these fields existed (closed ones are never
         # re-read): fill them from what state has. Descriptions aren't kept,
-        # so the work mode comes from the head alone.
+        # so the work mode comes from the head alone, and the kind of job,
+        # beats and Spanish from the title, company and employer row.
         row["work_mode"] = row["work_mode"] or work_mode(row["location_raw"], row["title"], "")
         if row["remote_offered"] is None:
             row["remote_offered"] = remote_in_head(row["location_raw"], row["title"])
         row["fit"] = row["fit"] or fit(row["seniority"], row["years"], row["title"], "", rules)
+        if row["years"] is not None:
+            # Years decide the fit, by today's numbers: a closed row from
+            # before Ari's answers can still say "stretch" and "3+ yrs asked"
+            # for a 3-year ask, which is a good fit now.
+            row["fit"] = fit(row["seniority"], row["years"], row["title"], "", rules)
+            row["flags"] = [f for f in (row["flags"] or []) if not _YEARS_FLAG.fullmatch(f)]
+            if row["years"] > rules.early_max_years:
+                row["flags"].append(f"{row['years']}+ yrs asked")
+        row["employment"] = row["employment"] or employment(row["title"], "", None, rules)
+        if row["topics"] is None or row["spanish"] is None:
+            t, sp = beats(row["title"], row["company"], "", emp_by_id.get(row["employer_id"]), rules)
+            row["topics"] = t if row["topics"] is None else row["topics"]
+            row["spanish"] = sp if row["spanish"] is None else row["spanish"]
         posts.append(row)
     targets = {e["id"]: e for e in employers if e.get("target")}
     for p in posts:
@@ -394,15 +496,22 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
                       else f"{p['title']} {p['company']}", re.I)))
     posts.sort(key=lambda p: p["first_seen"] or "", reverse=True)
 
-    # What Ari sees: Miami, fully remote, or "<city> or Remote". The rest is
-    # counted (so the Stats tab can say how much is elsewhere) but not shown.
-    shown = [p for p in posts if visible(p["location"], p["work_mode"], loc, p["remote_offered"])]
+    # What Ari sees: Miami, fully remote, or "<city> or Remote", and full-time
+    # (or not stated). The rest is counted (so the Stats tab can say how much
+    # is elsewhere, or part-time) but not shown.
+    where_ok = [p for p in posts if visible(p["location"], p["work_mode"], loc, p["remote_offered"])]
+    shown = [p for p in where_ok if visible(p["location"], p["work_mode"], loc, p["remote_offered"],
+                                            employment=p["employment"], emp_cfg=emp_cfg)]
     open_posts = [p for p in posts if p["status"] == "open"]
     by_loc: dict[str, int] = {}
     for p in open_posts:
         by_loc[p["location"]] = by_loc.get(p["location"], 0) + 1
+    n_shown = sum(1 for p in shown if p["status"] == "open")
     totals = {"open_all": len(open_posts),
-              "open_shown": sum(1 for p in shown if p["status"] == "open"),
+              "open_shown": n_shown,
+              # Open, relevant, in Miami / remote, but hidden as part-time,
+              # freelance, contract or internship.
+              "open_not_fulltime": sum(1 for p in where_ok if p["status"] == "open") - n_shown,
               "by_location_all": dict(sorted(by_loc.items(), key=lambda kv: -kv[1]))}
     for p in shown:
         if p["location"] not in loc["show"]:
@@ -452,11 +561,17 @@ def export(state: dict, cfg: dict, employers: list[dict], boards: list[dict], pa
                       for b in loc["show"]],
         "work_modes": [{"id": "remote", "label": "Remote"}, {"id": "hybrid", "label": "Hybrid"},
                        {"id": "onsite", "label": "In person"}, {"id": "unknown", "label": "Not stated"}],
-        "fits": [{"id": "early", "label": "Early career"},
-                 {"id": "open", "label": "Experience not stated"},
-                 {"id": "stretch", "label": "Stretch (3–4 years, or a manager role)"}],
+        "fit_years": rules.early_max_years,
+        "fits": fit_labels(cfg),
         "families": [{"id": f["id"], "label": f["label"], "tier": f["tier"]}
                      for f in cfg["roles"]["families"]],
+        "topics": [{"id": t["id"], "label": t["label"]} for t in (cfg.get("topics") or [])],
+        "preferred_location": loc.get("preferred"),
+        "employment": {"show": list(emp_cfg.get("show", [])), "labels": dict(EMPLOYMENT_LABELS)},
+        # So the page can say when the summary email comes ("every morning").
+        "email": {"digest": cfg["alerts"].get("digest", "each_run"),
+                  "after_hour": cfg["alerts"].get("send_after_local_hour"),
+                  "timezone": cfg["owner"].get("timezone")},
         "inbox": {"url": inbox.topic_url(cfg), **inbox.public(state)} if inbox.topic_url(cfg) else None,
         "totals": totals,
         "postings": shown,

@@ -10,7 +10,8 @@ Terms, checked 19 Oct 2026 (see README "Sources"):
   Adzuna   free key; personal use allowed; listings must credit Adzuna.
   JSearch  RapidAPI key; Google for Jobs data (LinkedIn/Indeed postings included).
   Remotive public API; credit Remotive and link to the posting; max ~4 calls/day.
-  RSS      We Work Remotely asks for attribution; NAHJ feed is public.
+  RSS      We Work Remotely asks for attribution; the NAHJ and NABJ career
+           centre feeds are public.
 The dashboard shows "via <source>" on every aggregator posting for that reason.
 """
 
@@ -51,11 +52,19 @@ def fetch_adzuna(client, c: dict) -> list[RawPosting]:
                     company=strip_html((j.get("company") or {}).get("display_name", "")),
                     location_raw=(j.get("location") or {}).get("display_name", "") or where,
                     url=j.get("redirect_url", ""), description=strip_html(j.get("description", "")),
-                    posted_at=j.get("created"), extra={"via": "Adzuna"}))
+                    posted_at=j.get("created"), extra={"via": "Adzuna", "employment": _adzuna_kind(j)}))
             if len(res) < 50:
                 break
             time.sleep(2.5)          # 25 calls/minute limit
     return out
+
+
+def _adzuna_kind(j: dict) -> str | None:
+    """contract_type ("permanent" / "contract") and contract_time ("full_time" /
+    "part_time"): a contract is a contract whatever its hours."""
+    if j.get("contract_type") == "contract":
+        return "contract"
+    return j.get("contract_time") or j.get("contract_type")
 
 
 # --- JSearch (RapidAPI) ----------------------------------------------------------
@@ -76,13 +85,15 @@ def fetch_jsearch(client, c: dict) -> list[RawPosting]:
             loc = _join(j.get("job_city"), j.get("job_state"), j.get("job_country"))
             if j.get("job_is_remote"):
                 loc = _join(loc, "Remote")
+            # "FULLTIME" / "PARTTIME" / "CONTRACTOR" / "INTERN" (a list in newer responses)
+            kind = j.get("job_employment_type") or next(iter(j.get("job_employment_types") or []), None)
             out.append(RawPosting(
                 source_id="jsearch", job_id=str(j.get("job_id")), title=j.get("job_title", ""),
                 company=j.get("employer_name", ""), location_raw=loc,
                 url=j.get("job_apply_link") or j.get("job_google_link", ""),
                 description=(j.get("job_description") or "")[:3000],
                 posted_at=j.get("job_posted_at_datetime_utc"),
-                extra={"via": f"JSearch / {j.get('job_publisher') or 'Google Jobs'}"}))
+                extra={"via": f"JSearch / {j.get('job_publisher') or 'Google Jobs'}", "employment": kind}))
         time.sleep(1.5)
     return out
 
@@ -99,36 +110,62 @@ def fetch_remotive(client, c: dict) -> list[RawPosting]:
                 company=j.get("company_name", ""),
                 location_raw=f"Remote ({j.get('candidate_required_location') or 'anywhere'})",
                 url=j.get("url", ""), description=strip_html(j.get("description", ""))[:3000],
-                posted_at=j.get("publication_date"), extra={"via": "Remotive"}))
+                posted_at=j.get("publication_date"),
+                extra={"via": "Remotive", "employment": j.get("job_type")}))   # full_time / contract / freelance...
         time.sleep(31)               # they block more than 2 calls a minute
     return out
 
 
 # --- Generic RSS ----------------------------------------------------------------
 
+def _ym_title(title: str) -> str:
+    """YM Careers feeds (NAHJ, NABJ) send the page's URL slug as the title:
+    "Director---Vice-President,-Sales" -> "Director – Vice President, Sales",
+    "Senior-News-Reporter-(NY-or-DC)" -> "Senior News Reporter (NY or DC)"."""
+    return " ".join(title.replace("---", " – ").replace("-", " ").split())
+
+
+def _ym_head(raw_desc: str) -> tuple[str, str]:
+    """(city, company) from the start of a YM Careers description,
+    "Washington, U.S. News & World Report<br/>...". The city may be blank
+    (", WCVB TV"); the company may hold a comma ("Reno, University of Nevada, Reno")."""
+    city, _, company = raw_desc.split("<br", 1)[0].partition(",")
+    return strip_html(city), strip_html(company)
+
+
 def fetch_rss(client, feed: dict) -> list[RawPosting]:
+    """title_format: "title" (as is), "company: title" (We Work Remotely), or
+    "ymcareers" (the NAHJ / NABJ career centres: slug titles, and the city and
+    company at the start of the description)."""
     r = _get(client, feed["url"], headers={"Accept": "application/rss+xml, application/xml, text/xml"})
     try:
         root = ET.fromstring(r.content)
     except ET.ParseError as e:
         raise AdapterError(f"not an RSS feed ({e})") from e
+    fmt = feed.get("title_format")
     out = []
     for it in root.iter("item"):
         title = (it.findtext("title") or "").strip()
         link = (it.findtext("link") or "").strip()
         guid = (it.findtext("guid") or link or title).strip()
-        company = ""
-        if feed.get("title_format") == "company: title" and ":" in title:
+        raw_desc = it.findtext("description") or ""
+        company, city = "", ""
+        if fmt == "company: title" and ":" in title:
             company, title = (x.strip() for x in title.split(":", 1))
-        desc = strip_html(it.findtext("description") or "")
-        loc = it.findtext("region") or it.findtext("location") or feed.get("default_location", "")
+        elif fmt == "ymcareers":
+            title = _ym_title(title)
+            city, company = _ym_head(raw_desc)
+        desc = strip_html(raw_desc)
+        loc = it.findtext("region") or it.findtext("location") or city or feed.get("default_location", "")
         if not loc:
             m = re.search(r"\b(?:Location|Headquarters)\s*:?\s*([A-Z][\w .'-]+,\s*[A-Z]{2})\b", desc)
             loc = m.group(1) if m else ""
         out.append(RawPosting(
             source_id=f"rss_{feed['id']}", job_id=guid, title=title, company=company,
             location_raw=loc, url=link, description=desc[:3000],
-            posted_at=it.findtext("pubDate"), extra={"via": feed["name"]}))
+            posted_at=it.findtext("pubDate"),
+            # We Work Remotely: <type>Full-Time</type> / <type>Contract</type>
+            extra={"via": feed["name"], "employment": (it.findtext("type") or "").strip() or None}))
     return out
 
 

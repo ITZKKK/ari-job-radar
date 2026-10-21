@@ -27,6 +27,18 @@
 #   home        MIAMI = this employer's jobs can only be in Miami, so a posting
 #               that states no location is treated as Miami. Opt-in: set it only
 #               on Miami-only rows (not on a parent with boards in 30 markets).
+#   miami_match regex over the job's location text: location text that means Miami
+#               at this employer, e.g. a hotel name ('surf club' at Four Seasons, a
+#               casino at Seminole Hard Rock). Those jobs count as Miami jobs.
+#   industry    pr = a PR or marketing agency: "Account Coordinator / Account
+#               Executive" there is an entry-level PR job (elsewhere it is sales).
+#   topics      Ari's beats that EVERY job here is on, e.g. [travel, hospitality]
+#               for a cruise line (ids from config.yaml `topics`). Leave it out for
+#               an employer with all kinds of jobs: then each job's title decides.
+#               `group` is never read for beats; it is only shown under the name.
+#   spanish     true = a Spanish-language employer: every job here gets the
+#               Spanish badge. Leave it out otherwise (a job that mentions Spanish,
+#               bilingual or has a Spanish title gets the badge anyway).
 #   note        anything Ari should know
 #
 # Ari and Itz can also add a company from the dashboard ("Add a company" opens
@@ -53,6 +65,7 @@ employers:
   - id: the-infatuation
     name: The Infatuation
     group: Restaurant media (owned by JPMorgan Chase)
+    topics: [food]
     city: New York / national
     target: true
     ats: oracle
@@ -89,6 +102,7 @@ employers:
   - id: time-out
     name: Time Out (Time Out Miami)
     group: City guides & events
+    topics: [culture, food, lifestyle]
     city: Miami / New York
     target: true
     ats: teamtailor
@@ -105,7 +119,7 @@ employers:
     ats: email
     careers_url: https://www.miaminewtimes.com/about/careers/
     note: Posts openings on its own careers page and takes applications by email; often freelance calls.
-    aliases: [Miami New Times, Voice Media Group, New Times]
+    aliases: [Miami New Times, New Times]     # "Voice Media Group" is the parent's own row
 
   - id: voice-media-group
     name: Voice Media Group (Miami New Times' parent)
@@ -118,6 +132,7 @@ employers:
   - id: haute-living
     name: Haute Living
     group: Luxury lifestyle (Haute Media Group)
+    topics: [lifestyle, fashion]
     city: Miami / New York
     target: true
     ats: none
@@ -128,6 +143,7 @@ employers:
   - id: world-red-eye
     name: World Red Eye
     group: Miami nightlife & society media
+    topics: [culture, lifestyle]
     city: Miami
     home: MIAMI
     target: true
@@ -140,6 +156,7 @@ employers:
   - id: ocean-drive
     name: Ocean Drive Magazine
     group: Miami luxury magazine
+    topics: [lifestyle, fashion, culture]
     city: Miami
     home: MIAMI
     target: true
@@ -151,6 +168,7 @@ employers:
   - id: modern-luxury
     name: Modern Luxury (Modern Luxury Miami)
     group: Luxury city magazines
+    topics: [lifestyle, fashion]
     city: Miami / national
     target: true
     ats: none
@@ -195,6 +213,7 @@ employers:
   - id: televisaunivision
     name: TelevisaUnivision
     group: Spanish-language TV & digital (HQ'd in Miami/Doral)
+    spanish: true     # every job here is in Spanish-language media
     city: Miami / New York
     ats: workday
     ats_token: univision
@@ -234,6 +253,7 @@ employers:
   - id: fever
     name: Fever (Secret Miami / Secret Media Network)
     group: Events & city-guide media
+    topics: [culture]
     city: Miami / New York / global
     ats: greenhouse
     ats_token: feverup
@@ -400,6 +420,7 @@ employers:
   - id: michelin-guide
     name: Michelin Guide
     group: Restaurant & hotel guide
+    topics: [food, travel, hospitality]
     city: New York / global
     ats: workday
     ats_token: michelinhr
@@ -414,6 +435,7 @@ employers:
   - id: opentable
     name: OpenTable
     group: Restaurant tech (content & social roles)
+    topics: [food]
     city: San Francisco / New York
     ats: greenhouse
     ats_token: opentable
@@ -424,6 +446,7 @@ employers:
   - id: atlas-obscura
     name: Atlas Obscura
     group: Travel media
+    topics: [travel]
     city: New York / remote
     ats: none
     careers_url: https://www.atlasobscura.com/jobs
@@ -448,6 +471,7 @@ employers:
   - id: resy
     name: Resy (American Express)
     group: Restaurant tech & editorial
+    topics: [food]
     city: New York / Miami
     ats: eightfold
     watch: false
@@ -476,6 +500,7 @@ employers:
   - id: static-media
     name: Static Media (Tasting Table, Mashed, The List…)
     group: Digital media
+    topics: [food]
     city: Remote
     ats: none
     watch: false
@@ -485,7 +510,815 @@ employers:
   - id: cultured
     name: Cultured Magazine
     group: Art & culture magazine
+    topics: [culture]
     city: Miami / New York
     ats: none
     watch: false
     aliases: [Cultured, Cultured Magazine]
+
+# ---------------------------------------------------------------------------
+# Travel & hospitality (Miami)
+# Added 21 Oct 2026 for Ari's beats (food, hospitality, travel, fashion,
+# lifestyle, culture). Cruise lines run their marketing, PR and content teams
+# from Miami / Doral / Plantation.
+# ---------------------------------------------------------------------------
+
+  - id: nclh
+    name: Norwegian Cruise Line Holdings (NCL, Oceania, Regent)
+    group: Cruise line (travel & hospitality), Miami HQ
+    topics: [travel, hospitality]
+    city: Miami
+    ats: workday
+    ats_token: "nclh"
+    ats_dc: "wd108"
+    ats_site: "NCL_Shoreside_Careers"
+    queries: [writer, editor, content, "social media", communications, copywriter, marketing, "public relations", producer, bilingual]
+    verified: true
+    careers_url: "https://nclh.wd108.myworkdayjobs.com/NCL_Shoreside_Careers"
+    aliases: [Norwegian Cruise Line Holdings, NCLH, Norwegian Cruise Line, NCL, Oceania Cruises, Regent Seven Seas Cruises]
+
+  - id: virgin-voyages
+    name: "Virgin Voyages"
+    group: Cruise line (travel & hospitality), Plantation HQ
+    topics: [travel, hospitality]
+    city: Plantation (Fort Lauderdale area)
+    ats: workday
+    ats_token: "red"
+    ats_dc: "wd1"
+    ats_site: "VV"
+    queries: [""]   # small board; read it all
+    verified: true
+    home: MIAMI     # shoreside jobs are at the Plantation HQ ("Plantation - FL")
+    careers_url: "https://red.wd1.myworkdayjobs.com/en-US/VV"
+    aliases: [Virgin Voyages, Virgin Voyages Ltd]
+
+  - id: seminole-hard-rock
+    name: Seminole Hard Rock (Hard Rock International)
+    group: Hotels, casinos & entertainment (hospitality), Hollywood/Davie HQ
+    topics: [hospitality, travel]
+    city: Hollywood / Davie (Fort Lauderdale area)
+    ats: workday
+    ats_token: "seminolehardrock"
+    ats_dc: "wd503"
+    ats_site: "SeminoleHardRockCareers"
+    queries: [marketing, communications, "public relations", "social media", content, writer, copywriter, entertainment]
+    verified: true
+    careers_url: "https://seminolehardrock.wd503.myworkdayjobs.com/en-US/SeminoleHardRockCareers"
+    # Its board names properties, not cities. Not Hollywood, CA or West Hollywood.
+    miami_match: '(?<!west )\bhollywood\b(?!,?\s*(ca|california)\b)|\bdavie\b|support services headquarters'
+    note: "Its board names properties, not cities (Seminole Hard Rock Hotel & Casino Hollywood; Support Services Headquarters Building = Davie HQ)."
+    aliases: [Seminole Hard Rock, Hard Rock International, Hard Rock, Seminole Hard Rock Hotel & Casino, Seminole Gaming]
+
+  - id: four-seasons
+    name: Four Seasons (Miami, Surf Club, Fort Lauderdale, Palm Beach)
+    group: Luxury hotels (hospitality); South Florida properties
+    topics: [hospitality, travel]
+    city: Miami / Surfside / Fort Lauderdale / Palm Beach
+    ats: workday
+    ats_token: "fourseasons"
+    ats_dc: "wd3"
+    ats_site: "search"
+    queries: ["Four Seasons Miami", "Corporate Office, Miami", "Surf Club", "Fort Lauderdale", "Palm Beach"]   # 1,900-job global board: ask for the South Florida properties only
+    verified: true
+    miami_match: 'surf club'     # Four Seasons Hotel at The Surf Club, Surfside
+    careers_url: "https://fourseasons.wd3.myworkdayjobs.com/search"
+    aliases: [Four Seasons, Four Seasons Hotels and Resorts, Four Seasons Hotels, Four Seasons Hotel Miami, Four Seasons Surf Club]
+
+  - id: carnival
+    name: Carnival Corporation (Carnival Cruise Line, Princess, Holland America…)
+    group: Cruise lines (travel & hospitality), Doral HQ
+    topics: [travel, hospitality]
+    city: Miami (Doral)
+    ats: oracle
+    ats_token: eicl.fa.em5.oraclecloud.com
+    ats_site: CORP
+    queries: [""]   # ~220 shoreside jobs; read them all
+    verified: true
+    careers_url: https://jobs.carnivalcorp.com/
+    aliases: [Carnival Corporation, Carnival Corporation & plc, Carnival Cruise Line, Carnival, Princess Cruises, Holland America Line, Seabourn, Costa Cruises, Cunard]
+
+  - id: royal-caribbean
+    name: Royal Caribbean Group (Royal Caribbean, Celebrity, Silversea)
+    group: Cruise lines (travel & hospitality), Miami HQ
+    topics: [travel, hospitality]
+    city: Miami
+    ats: successfactors
+    watch: false
+    careers_url: https://jobs.royalcaribbeangroup.com/
+    note: Its SuccessFactors board can't be read automatically; search "marketing", "communications" or "content" and pick Miami.
+    aliases: [Royal Caribbean Group, Royal Caribbean, Royal Caribbean International, Royal Caribbean Cruises, Celebrity Cruises, Silversea Cruises, RCG]
+
+  - id: msc-cruises
+    name: MSC Cruises USA
+    group: Cruise line (travel & hospitality), Fort Lauderdale office
+    topics: [travel, hospitality]
+    city: Fort Lauderdale
+    ats: phenom
+    watch: false
+    careers_url: https://careers.msccruises.com/gb/en/msccruises/all-jobs
+    note: Phenom careers site (not readable automatically); filter Location to Fort Lauderdale.
+    aliases: [MSC Cruises, MSC Cruises USA, MSC Group, Explora Journeys]
+
+  - id: azamara
+    name: Azamara
+    group: Cruise line (travel & hospitality), Miami HQ
+    topics: [travel, hospitality]
+    city: Miami
+    home: MIAMI
+    ats: paylocity
+    watch: false
+    careers_url: https://recruiting.paylocity.com/recruiting/jobs/All/b5ac96ed-2336-4d31-b367-2dd7e0fbcffe/Azamara-Cruises
+    note: Shoreside jobs are on Paylocity (not readable automatically); the link opens the full list.
+    aliases: [Azamara, Azamara Cruises, Azamara Club Cruises]
+
+  - id: windstar
+    name: Windstar Cruises
+    group: Cruise line (travel & hospitality)
+    topics: [travel, hospitality]
+    city: Seattle / Miami
+    ats: xanterra
+    watch: false
+    careers_url: https://www.xanterrajobs.com/main/windstar-cruises/home
+    note: Office jobs are on its parent Xanterra's job site (not readable automatically).
+    aliases: [Windstar Cruises, Windstar, Xanterra]
+
+  - id: gmcvb
+    name: Greater Miami Convention & Visitors Bureau
+    group: Tourism board (travel), Miami
+    topics: [travel, hospitality]
+    city: Miami
+    home: MIAMI
+    ats: none
+    careers_url: https://www.gmcvb.com/gmcvb-jobs
+    note: Posts its own openings on this page (marketing, communications, tourism). The radar watches it for changes.
+    aliases: [Greater Miami Convention & Visitors Bureau, Greater Miami Convention and Visitors Bureau, GMCVB, Miami & the Beaches, Miami and the Beaches]
+
+  - id: soho-house
+    name: "Soho House"
+    group: Members clubs & hotels (hospitality, lifestyle); Soho Beach House Miami
+    topics: [hospitality, travel]
+    city: Miami Beach / global
+    ats: greenhouse
+    ats_token: "sohohouseco"
+    verified: true
+    careers_url: "https://job-boards.greenhouse.io/sohohouseco"
+    aliases: [Soho House, Soho House & Co, Soho House & Co., Soho Beach House, Soho Beach House Miami, Soho Works]
+
+  - id: sh-hotels
+    name: "SH Hotels & Resorts (1 Hotels, Baccarat, Treehouse)"
+    group: Hotels (hospitality, lifestyle); 1 Hotels HQ in Miami Beach
+    topics: [hospitality, travel]
+    city: Miami Beach / national
+    ats: workday
+    ats_token: "shhotelsandresorts"
+    ats_dc: "wd12"
+    ats_site: "SHG"
+    queries: [marketing, communications, "public relations", "social media", content, writer, editor, copywriter]
+    verified: true
+    # The Miami Beach head office ("Starwood Hotels - Florida"); not its
+    # California office ("Starwood Hotels - California").
+    miami_match: 'starwood hotels\s*[-–,]\s*florida|^florida$'
+    careers_url: "https://shhotelsandresorts.wd12.myworkdayjobs.com/SHG"
+    note: "Locations are hotel names (1 Hotel South Beach); its Miami Beach head-office jobs say Starwood Hotels - Florida."
+    aliases: [SH Hotels & Resorts, SH Hotels, Starwood Hotels, 1 Hotels, 1 Hotel South Beach, Baccarat Hotels, Treehouse Hotels]
+
+  - id: loews-hotels
+    name: "Loews Hotels"
+    group: Hotels (hospitality); Loews Miami Beach and Loews Coral Gables
+    topics: [hospitality, travel]
+    city: Miami Beach / Coral Gables / national
+    ats: workday
+    ats_token: "loewshotels"
+    ats_dc: "wd5"
+    ats_site: "loewshotels"
+    queries: [marketing, communications, "public relations", "social media", content, writer, editor, copywriter]
+    verified: true
+    careers_url: "https://loewshotels.wd5.myworkdayjobs.com/loewshotels"
+    aliases: [Loews Hotels, Loews Hotels & Co, Loews Miami Beach Hotel, Loews Coral Gables]
+
+  - id: accor-ennismore
+    name: Accor & Ennismore in Miami (Delano, SLS, Mondrian, Hyde, Fairmont)
+    group: Hotels & nightlife (hospitality, lifestyle); Miami properties
+    topics: [hospitality, travel]
+    city: Miami Beach / Brickell
+    ats: smartrecruiters
+    ats_token: AccorHotel
+    queries: [Miami]   # 6,000+ jobs worldwide; its search matches the city, so ask for Miami only
+    verified: true
+    careers_url: https://careers.smartrecruiters.com/AccorHotel
+    aliases: [Accor, Ennismore, Delano South Beach, Delano, SLS South Beach, SLS Brickell, Mondrian South Beach, Hyde Beach, Fairmont, Sofitel]
+
+  - id: fontainebleau
+    name: Fontainebleau Miami Beach
+    group: Resort & nightlife (hospitality, lifestyle), Miami Beach
+    topics: [hospitality, travel]
+    city: Miami Beach
+    home: MIAMI
+    ats: icims
+    watch: false
+    careers_url: https://careers-fontainebleau.icims.com/jobs/search
+    note: iCIMS board (not readable automatically); search "marketing", "social" or "communications".
+    aliases: [Fontainebleau, Fontainebleau Miami Beach, Fontainebleau Florida Hotel, Fontainebleau Development, LIV, LIV Miami]
+
+  - id: faena
+    name: Faena Hotel Miami Beach (Faena Group)
+    group: Luxury hotel & arts district (hospitality, culture), Miami Beach
+    topics: [hospitality, travel]
+    city: Miami Beach
+    home: MIAMI
+    ats: adp
+    watch: false
+    careers_url: "https://workforcenow.adp.com/mascsr/default/mdf/recruitment/recruitment.html?cid=2d231bbb-cde1-4d01-8b00-77c30ffe614e"
+    note: ADP board (not readable automatically). Faena is now part of Ennismore (Accor).
+    aliases: [Faena, Faena Hotel Miami Beach, Faena Group, Faena District, Faena Forum]
+
+  - id: acqualina
+    name: Acqualina Resort & Residences
+    group: Luxury resort (hospitality), Sunny Isles Beach
+    topics: [hospitality, travel]
+    city: Sunny Isles Beach
+    home: MIAMI
+    ats: prismhr
+    watch: false
+    careers_url: https://acqualina-management-llc.prismhr-hire.com/
+    note: PrismHR board (not readable automatically).
+    aliases: [Acqualina, Acqualina Resort, Acqualina Resort & Residences, Acqualina Management]
+
+  - id: discover-palm-beaches
+    name: Discover The Palm Beaches
+    group: Tourism board (travel), West Palm Beach
+    topics: [travel, hospitality]
+    city: West Palm Beach
+    ats: none
+    watch: false
+    careers_url: https://www.thepalmbeaches.com/careers-discover-palm-beaches
+    note: Lists its own openings (marketing, communications, tourism) on this page; the site blocks automated reads, so open it by hand.
+    aliases: [Discover The Palm Beaches, The Palm Beaches, Palm Beach County Convention and Visitors Bureau]
+
+# ---------------------------------------------------------------------------
+# Food & restaurant groups
+# Miami is the US head office for Burger King / Popeyes (RBI), Subway, Pollo
+# Tropical and Bacardi's North America business.
+# ---------------------------------------------------------------------------
+
+  - id: rbi
+    name: Restaurant Brands International (Burger King, Popeyes, Tim Hortons, Firehouse Subs)
+    group: Restaurant brands (food), Miami HQ
+    topics: [food]
+    city: Miami
+    ats: workday
+    ats_token: "rbi"
+    ats_dc: "wd3"
+    ats_site: "RBI_External_Career_Site"
+    queries: [marketing, communications, "public relations", "social media", content, writer, editor, copywriter, brand]
+    verified: true
+    careers_url: "https://rbi.wd3.myworkdayjobs.com/RBI_External_Career_Site"
+    aliases: [Restaurant Brands International, RBI, Burger King, Popeyes, Popeyes Louisiana Kitchen, Tim Hortons, Firehouse Subs]
+
+  - id: bacardi
+    name: "Bacardi"
+    group: Spirits & cocktails (food & drink, lifestyle); North America HQ in Coral Gables
+    topics: [food]
+    city: Coral Gables / global
+    ats: workday
+    ats_token: "bacardi"
+    ats_dc: "wd3"
+    ats_site: "jobs_bacardi"
+    queries: [marketing, communications, "public relations", "social media", content, writer, editor, copywriter, brand]
+    verified: true
+    careers_url: "https://bacardi.wd3.myworkdayjobs.com/jobs_bacardi"
+    aliases: [Bacardi, Bacardi Limited, Bacardi USA, Bacardi North America, Patrón, Grey Goose, Bombay Sapphire]
+
+  - id: pollo-tropical
+    name: "Pollo Tropical"
+    group: Restaurant chain (food), Miami HQ
+    topics: [food]
+    city: Miami / Florida
+    ats: workday
+    ats_token: "frgi"
+    ats_dc: "wd1"
+    ats_site: "PolloTropical"
+    queries: [marketing, communications, "social media", content, brand, culinary]
+    verified: true
+    careers_url: "https://frgi.wd1.myworkdayjobs.com/PolloTropical"
+    aliases: [Pollo Tropical, Fiesta Restaurant Group, Pollo Operations]
+
+  - id: subway
+    name: Subway (Miami head office)
+    group: Restaurant chain (food), dual HQ in Miami
+    city: Miami / Shelton CT
+    ats: none
+    careers_url: https://careers.subway.com/en/jobs
+    note: Its own careers site (no readable board); the radar watches the job list for changes.
+    aliases: [Subway, Subway Restaurants, Subway IP, Doctor's Associates]
+
+  - id: groot-hospitality
+    name: Groot Hospitality (Komodo, Swan, Gekkō, The Goodtime Hotel)
+    group: Restaurants & nightlife (food, hospitality), Miami Beach
+    city: Miami
+    home: MIAMI
+    ats: paylocity
+    watch: false
+    careers_url: https://recruiting.paylocity.com/recruiting/jobs/All/44e72011-c1d0-4551-b271-797844607092/Groot-Hospitality
+    note: Paylocity board (not readable automatically); marketing / events roles show up there among venue jobs.
+    aliases: [Groot Hospitality, Komodo, Swan, Gekko, Gekkō, Papi Steak, The Goodtime Hotel, Strawberry Moon, Mila]
+
+# ---------------------------------------------------------------------------
+# Fashion, lifestyle & brands
+# Miami-based fashion, beauty, wellness and consumer brands with content,
+# social and PR teams.
+# ---------------------------------------------------------------------------
+  - id: perry-ellis
+    name: "Perry Ellis International"
+    group: Fashion & apparel (Perry Ellis, Original Penguin, Farah), Miami HQ
+    topics: [fashion]
+    city: Miami (Doral)
+    home: MIAMI
+    ats: greenhouse
+    ats_token: "perryellisinternational"
+    verified: true
+    careers_url: "https://job-boards.greenhouse.io/perryellisinternational"
+    aliases: [Perry Ellis International, Perry Ellis, Original Penguin, Farah, Laundry by Shelli Segal, Cubavera]
+
+  - id: celsius
+    name: Celsius (Celsius, Alani Nu)
+    group: Energy-drink & wellness brands (lifestyle), Boca Raton HQ
+    topics: [lifestyle]
+    city: Boca Raton
+    ats: workable
+    ats_token: "celsius"
+    verified: true
+    careers_url: "https://apply.workable.com/celsius/"
+    aliases: [Celsius, Celsius Holdings, Celsius Holdings Inc, Alani Nu, Rockstar Energy]
+
+# ---------------------------------------------------------------------------
+# Arts, culture, music & entertainment
+# Miami Beach is the Latin music industry's US base (Warner Music Latina,
+# Sony Music Latin, Universal Music Latin, the Latin Recording Academy).
+# ---------------------------------------------------------------------------
+  - id: live-nation-miami
+    name: Live Nation (Miami)
+    group: Concerts & festivals (music, culture); Miami office, Fillmore Miami Beach
+    topics: [culture]
+    city: Miami / Miami Beach
+    ats: workday
+    ats_token: livenation
+    ats_dc: wd503
+    ats_site: LNExternalSite
+    queries: [Miami, "Miami Beach", "Fort Lauderdale", "West Palm Beach"]   # 1,300-job national board: ask for South Florida only
+    verified: true
+    careers_url: https://livenation.wd503.myworkdayjobs.com/LNExternalSite
+    aliases: [Live Nation, Live Nation Entertainment, Live Nation Concerts, Ticketmaster, Insomniac, Fillmore Miami Beach, Live Nation Latin]
+
+  - id: warner-music
+    name: Warner Music Group (incl. Warner Music Latina, Miami Beach)
+    group: Record label (music, culture); Latin office in Miami Beach
+    topics: [culture]
+    city: Miami Beach / New York / Los Angeles
+    ats: workday
+    ats_token: wmg
+    ats_dc: wd1
+    ats_site: WMGUS
+    queries: [""]   # ~40 US jobs; read them all
+    verified: true
+    careers_url: https://wmg.wd1.myworkdayjobs.com/WMGUS
+    aliases: [Warner Music Group, WMG, Warner Music Latina, Warner Records, Atlantic Records, Warner Music Latin]
+
+  - id: universal-music
+    name: Universal Music Group (US, incl. Universal Music Latin)
+    group: Record label (music, culture); Latin office in Miami Beach
+    topics: [culture]
+    city: Los Angeles / New York / Miami Beach
+    ats: workday
+    ats_token: umusic
+    ats_dc: wd5
+    ats_site: UMGUS
+    queries: [""]   # small US board; read it all
+    verified: true
+    careers_url: https://umusic.wd5.myworkdayjobs.com/UMGUS
+    aliases: [Universal Music Group, UMG, Universal Music Latin Entertainment, Universal Music Latino, Republic Records, Interscope]
+
+  - id: recording-academy
+    name: Recording Academy & Latin Recording Academy (GRAMMYs, Latin GRAMMYs)
+    group: Music industry bodies (music, culture); the Latin Recording Academy is in Miami (Doral)
+    topics: [culture]
+    city: Santa Monica / Miami / remote
+    ats: workday
+    ats_token: grammy
+    ats_dc: wd5
+    ats_site: The_Recording_Academy_Career_Site
+    queries: [""]   # small board; read it all
+    verified: true
+    careers_url: https://grammy.wd5.myworkdayjobs.com/The_Recording_Academy_Career_Site
+    aliases: [Recording Academy, The Recording Academy, Latin Recording Academy, The Latin Recording Academy, GRAMMYs, Latin GRAMMYs, Latin GRAMMY Cultural Foundation, MusiCares]
+
+  - id: iheartmedia
+    name: iHeartMedia (incl. iHeart South Florida)
+    group: Radio, podcasts & music (culture, entertainment); South Florida stations in Pembroke Pines
+    topics: [culture]
+    city: Pembroke Pines / national
+    ats: workday
+    ats_token: iheartmedia
+    ats_dc: wd5
+    ats_site: External_IHM
+    # Workday's search also reads descriptions: "producer", "marketing" and
+    # "podcast" each paged through ~300 postings (45 s) and found no relevant
+    # job these don't (21 Oct 2026).
+    queries: [writer, editor, content, "social media", communications, bilingual]
+    verified: true
+    careers_url: https://iheartmedia.wd5.myworkdayjobs.com/External_IHM
+    aliases: [iHeartMedia, iHeartRadio, iHeart, iHeartMedia Miami, iHeart South Florida]
+
+  - id: sony-music
+    name: Sony Music (incl. Sony Music Latin, Miami Beach)
+    group: Record label (music, culture); Latin office in Miami Beach
+    topics: [culture]
+    city: Miami Beach / New York
+    ats: workday
+    ats_token: sonyglobal
+    ats_dc: wd1
+    ats_site: SonyGlobalCareers
+    queries: [Miami, "Miami Beach", Latin, Spanish, bilingual]   # Sony's global board (every Sony company): ask for the Miami / Latin jobs only
+    verified: true
+    careers_url: https://sonyglobal.wd1.myworkdayjobs.com/SonyGlobalCareers
+    aliases: [Sony Music, Sony Music Entertainment, Sony Music Latin, Sony Music US Latin, Sony Music Publishing, Columbia Records, RCA Records]
+
+  - id: the-bass
+    name: The Bass (Miami Beach contemporary art museum)
+    group: Art museum (arts & culture), Miami Beach
+    topics: [culture]
+    city: Miami Beach
+    home: MIAMI
+    ats: none
+    careers_url: https://thebass.org/jobs/
+    note: Lists its openings in full on this page (social media, communications, education); the radar watches it for changes.
+    aliases: [The Bass, Bass Museum, Bass Museum of Art, The Bass Museum of Art]
+
+  - id: arsht-center
+    name: Adrienne Arsht Center for the Performing Arts
+    group: Performing-arts center (arts & culture), Miami
+    topics: [culture]
+    city: Miami
+    home: MIAMI
+    ats: none
+    careers_url: https://www.arshtcenter.org/about-us/jobs/
+    note: Lists its openings on this page (marketing, communications, development); the radar watches it for changes.
+    aliases: [Adrienne Arsht Center, Arsht Center, The Arsht, Adrienne Arsht Center for the Performing Arts of Miami-Dade County]
+
+  - id: miami-city-ballet
+    name: Miami City Ballet
+    group: Ballet company (arts & culture), Miami Beach
+    topics: [culture]
+    city: Miami Beach
+    home: MIAMI
+    ats: none
+    careers_url: https://www.miamicityballet.org/about/careers/
+    aliases: [Miami City Ballet, MCB]
+
+  - id: frost-science
+    name: Phillip and Patricia Frost Museum of Science
+    group: Science museum (culture), Miami
+    topics: [culture]
+    city: Miami
+    home: MIAMI
+    ats: hrmdirect
+    careers_url: https://www.frostscience.org/careers/
+    watch_url: https://miamisci.hrmdirect.com/employment/job-openings.php?cust_sort1=42038
+    note: Jobs are on an HRMDirect list (not a readable board); the radar watches that list for changes.
+    aliases: [Frost Science, Frost Museum of Science, Phillip and Patricia Frost Museum of Science, Miami Science Museum]
+
+  - id: art-basel
+    name: Art Basel (Art Basel Miami Beach, MCH Group)
+    group: Art fair (arts & culture); Miami Beach edition every December
+    topics: [culture]
+    city: Miami Beach / Basel / New York
+    ats: none
+    careers_url: https://www.artbasel.com/about/careers
+    note: Openings are listed on this page and applied for through MCH Group's portal; the radar watches the page.
+    aliases: [Art Basel, Art Basel Miami Beach, MCH Group, Art Basel Cities]
+
+  - id: pamm
+    name: Pérez Art Museum Miami (PAMM)
+    group: Art museum (arts & culture), Miami
+    topics: [culture]
+    city: Miami
+    home: MIAMI
+    ats: ukg-ready
+    watch: false
+    careers_url: https://secure.saashr.com/ta/5CET.careers?CareersSearch
+    note: Jobs are on UKG Ready (not readable automatically, and pamm.org blocks automated visits); the link opens the list.
+    aliases: [Pérez Art Museum Miami, Perez Art Museum Miami, PAMM]
+
+# ---------------------------------------------------------------------------
+# Spanish-language & Latin media
+# Miami is the US capital of Spanish-language TV, radio and digital media.
+# (Telemundo, TelevisaUnivision and el Nuevo Herald are under "Miami media".)
+# ---------------------------------------------------------------------------
+  - id: wbd-latin
+    name: Warner Bros. Discovery (CNN en Español, WBD Latin America)
+    group: Spanish-language TV news & entertainment; CNN en Español in Doral
+    city: Miami (Doral) / Atlanta
+    ats: workday
+    ats_token: warnerbros
+    ats_dc: wd5
+    ats_site: global
+    queries: [Miami, "CNN en Español", Spanish, bilingual]   # huge global board: ask for the Miami / Spanish-language jobs only
+    verified: true
+    careers_url: https://careers.wbd.com/global/en
+    aliases: [Warner Bros. Discovery, WBD, CNN en Español, CNN en Espanol, Warner Bros. Discovery Latin America, HBO Max Latin America, Discovery Latin America]
+
+  - id: sony-pictures
+    name: Sony Pictures Entertainment (incl. Sony Pictures Television Latin America)
+    group: TV & film (entertainment); Latin America TV business in Miami
+    city: Culver City / New York / Miami
+    ats: workday
+    ats_token: spe
+    ats_dc: wd1
+    ats_site: SonyPicturesEntertainment
+    queries: [Miami, Latin, Spanish, writer, editor, "social media", content, publicity, communications, marketing]
+    verified: true
+    careers_url: https://spe.wd1.myworkdayjobs.com/SonyPicturesEntertainment
+    aliases: [Sony Pictures Entertainment, Sony Pictures, Sony Pictures Television, Sony Pictures Television Latin America, Crunchyroll, Sony Pictures Television Networks]
+
+  - id: spanish-broadcasting-system
+    name: Spanish Broadcasting System (Mega TV, La Mega, El Zol)
+    group: Spanish-language radio & TV, Miami HQ
+    city: Miami / New York / Los Angeles / Chicago
+    ats: none
+    careers_url: https://www.spanishbroadcasting.com/careers
+    note: Posts openings on its own careers page by city; the radar watches it for changes.
+    aliases: [Spanish Broadcasting System, SBS, Mega TV, La Mega, El Zol, LaMusica, Mega 94.9]
+
+# ---------------------------------------------------------------------------
+# Local news & magazines (South Florida)
+# ---------------------------------------------------------------------------
+  - id: the-real-deal
+    name: The Real Deal (incl. TRD Miami)
+    group: Real-estate news (lifestyle); Miami bureau
+    city: New York / Miami
+    ats: lever
+    ats_token: therealdeal
+    verified: true
+    careers_url: https://jobs.lever.co/therealdeal
+    aliases: [The Real Deal, TRD, The Real Deal Miami, TRD Miami]
+
+  - id: wsvn
+    name: WSVN 7News (Sunbeam Television)
+    group: TV news, Miami
+    city: Miami (North Bay Village)
+    home: MIAMI
+    ats: none
+    careers_url: https://wsvn.com/employment/
+    note: Posts every opening on this page (reporters, social media producers, associate producers); the radar watches it for changes.
+    aliases: [WSVN, WSVN 7News, 7News Miami, Sunbeam Television, Deco Drive]
+
+  - id: 6am-city
+    name: 6AM City (MIA Today and other city newsletters)
+    group: Local newsletters (Miami edition)
+    city: Remote / Miami
+    ats: trinet
+    careers_url: https://6amcity.com/careers
+    note: Openings are listed on this page and applied for on TriNet Hire; the radar watches the page.
+    aliases: [6AM City, 6AMCity, MIA Today, MIAtoday]
+
+  - id: gannett
+    name: Gannett / USA TODAY Co. (Palm Beach Post, Naples Daily News, USA TODAY)
+    group: Newspapers & digital news; Florida papers incl. the Palm Beach Post
+    city: West Palm Beach / national
+    ats: dayforce
+    watch: false
+    careers_url: https://jobs.dayforcehcm.com/en-US/gannett/CANDIDATEPORTAL
+    note: Dayforce board (not readable automatically); search "Florida" or "Palm Beach".
+    aliases: [Gannett, USA TODAY Co., USA Today Network, Palm Beach Post, The Palm Beach Post, Naples Daily News, Treasure Coast Newspapers]
+
+# ---------------------------------------------------------------------------
+# Universities & institutions (Miami)
+# University communications offices hire writers, editors and social media staff.
+# ---------------------------------------------------------------------------
+  - id: university-of-miami
+    name: University of Miami
+    group: University (communications, marketing & School of Communication roles), Coral Gables
+    city: Coral Gables / Miami
+    home: MIAMI
+    ats: workday
+    ats_token: umiami
+    ats_dc: wd1
+    ats_site: UMCareerStaff
+    # 1,700-job board, mostly medical: ask for comms roles only. Workday's
+    # search also reads descriptions, so "writer", "content" and "journalism"
+    # returned 390 postings and nothing these don't find (21 Oct 2026);
+    # "editor" is one page and the only way to a magazine editor job here.
+    queries: ["communications coordinator", "communications specialist", "marketing coordinator", "social media", editor, "public relations", "media relations"]
+    verified: true
+    careers_url: https://umiami.wd1.myworkdayjobs.com/UMCareerStaff
+    aliases: [University of Miami, UMiami, Miami Hurricanes, University of Miami Health System, UHealth]
+
+  - id: fiu
+    name: Florida International University (FIU)
+    group: University (communications & marketing roles), Miami
+    city: Miami
+    home: MIAMI
+    ats: peoplesoft
+    watch: false
+    careers_url: https://go.fiu.edu/Prospective-Employees
+    note: PeopleSoft job site (not readable automatically); use "View Jobs Posted in Last 10 Days".
+    aliases: [Florida International University, FIU, FIU Panthers]
+
+  - id: miami-dade-college
+    name: Miami Dade College
+    group: College (communications & marketing roles), Miami
+    city: Miami
+    home: MIAMI
+    ats: peoplesoft
+    watch: false
+    careers_url: "https://recruitment.mdc.edu/psc/MYMDHPRD/RECRUIT/JOBS/c/HRS_HRAM_FL.HRS_CG_SEARCH_FL.GBL?Page=HRS_CAREERS_FL&Action=U&FOCUS=Applicant&SiteId=1000"
+    note: PeopleSoft job site (not readable automatically); open "View All Jobs".
+    aliases: [Miami Dade College, MDC, Miami-Dade College]
+
+# ---------------------------------------------------------------------------
+# PR & marketing agencies
+# `industry: pr` tells the classifier that "Account Coordinator / Account
+# Executive" at these employers is a PR job (elsewhere it usually means sales).
+# ---------------------------------------------------------------------------
+
+  - id: 5wpr
+    name: "5WPR"
+    group: PR agency (consumer, lifestyle, beauty & food PR); Miami office
+    city: Miami / New York
+    industry: pr
+    ats: greenhouse
+    ats_token: "5wpr"
+    verified: true
+    miami_match: '^florida$'     # its Miami office is listed as just "Florida"
+    careers_url: "https://job-boards.greenhouse.io/5wpr"
+    note: "Its board says just Florida for the Miami office."
+    aliases: [5WPR, 5W Public Relations, 5W PR]
+
+  - id: zubi
+    name: "Zubi Advertising"
+    group: Hispanic advertising & marketing agency (Spanish-language), Coral Gables
+    city: Coral Gables
+    home: MIAMI
+    industry: pr
+    ats: greenhouse
+    ats_token: "zubiad"
+    verified: true
+    careers_url: "https://job-boards.greenhouse.io/zubiad"
+    aliases: [Zubi Advertising, Zubi, Zubi Advertising Services]
+
+  - id: ogilvy
+    name: Ogilvy (incl. Ogilvy PR, Ogilvy Miami)
+    group: Advertising & PR network (WPP); Miami office
+    city: New York / Miami / global
+    industry: pr
+    ats: greenhouse
+    ats_token: "ogilvy"
+    verified: true
+    careers_url: "https://job-boards.greenhouse.io/ogilvy"
+    aliases: [Ogilvy, Ogilvy PR, Ogilvy Public Relations, Ogilvy Miami, Ogilvy Health, WPP]
+
+  - id: edelman
+    name: "Edelman"
+    group: PR agency (world's largest); Miami office
+    city: New York / Chicago / Miami
+    industry: pr
+    ats: workday
+    ats_token: "djeholdings"
+    ats_dc: "wd5"
+    ats_site: "edelman-careers-E200"
+    queries: ["account coordinator", "account executive", "account supervisor", "social media", content, writer, editor, communications, "public relations", Miami]
+    verified: true
+    careers_url: "https://www.edelman.com/careers/discover-our-roles"
+    aliases: [Edelman, Daniel J. Edelman Holdings, Edelman Smithfield, DJE Holdings]
+
+  - id: max-borges
+    name: "Max Borges Agency"
+    group: PR agency (consumer tech & lifestyle products), Miami HQ
+    city: Miami
+    industry: pr
+    ats: workable
+    ats_token: "max-borges-agency"
+    verified: true
+    careers_url: "https://apply.workable.com/max-borges-agency/"
+    aliases: [Max Borges Agency, Max Borges]
+
+  - id: rbb-communications
+    name: rbb Communications
+    group: PR & marketing agency (consumer, hospitality, healthcare), Coral Gables
+    city: Coral Gables
+    home: MIAMI
+    industry: pr
+    ats: none
+    careers_url: https://rbbcommunications.com/join/
+    note: Lists openings on its "Join" page (account coordinators and executives); the radar watches it for changes.
+    aliases: [rbb Communications, rbb, RBB Communications, rbb Public Relations]
+
+  - id: duree-and-company
+    name: Durée & Company
+    group: PR agency (hospitality, lifestyle, food & travel PR), Fort Lauderdale
+    city: Fort Lauderdale
+    home: MIAMI
+    industry: pr
+    ats: none
+    careers_url: https://dureeandcompany.com/careers-internships/
+    aliases: [Durée & Company, Duree & Company, Durée and Company, Duree and Company, Durée & Co]
+
+  - id: boardroompr
+    name: BoardroomPR
+    group: PR agency (real estate, lifestyle, hospitality), Fort Lauderdale / Miami
+    city: Fort Lauderdale / Miami
+    home: MIAMI
+    industry: pr
+    ats: none
+    careers_url: https://boardroompr.com/careers/
+    aliases: [BoardroomPR, Boardroom PR, Boardroom Communications]
+
+  - id: j-public-relations
+    name: J Public Relations (JPR)
+    group: PR agency (hospitality, travel & lifestyle PR); Miami / New York / San Diego
+    city: New York / Miami / San Diego
+    industry: pr
+    ats: jazzhr
+    careers_url: https://jpr.applytojob.com/
+    note: JazzHR board (no readable feed); the radar watches its job list for changes.
+    aliases: [J Public Relations, JPR, J PR]
+
+  - id: nike-communications
+    name: Nike Communications
+    group: PR agency (luxury, fashion, beauty & travel PR), New York
+    city: New York
+    industry: pr
+    ats: jazzhr
+    careers_url: https://nikecommunicationsinc.applytojob.com/
+    note: JazzHR board (no readable feed); the radar watches its job list for changes.
+    aliases: [Nike Communications, Nike Communications Inc, NikeComm]
+
+  - id: zimmerman
+    name: Zimmerman Advertising
+    group: Advertising & marketing agency (Omnicom), Fort Lauderdale
+    city: Fort Lauderdale
+    home: MIAMI
+    industry: pr
+    ats: none
+    careers_url: https://zimmerman.com/careers/
+    aliases: [Zimmerman Advertising, Zimmerman, Zimmerman Agency]
+
+  - id: publicis
+    name: Publicis Groupe (incl. Publicis Miami, MSL, Conill)
+    group: Advertising & PR network; Miami offices
+    city: New York / Miami / global
+    industry: pr
+    ats: icims
+    watch: false
+    careers_url: https://careers.publicisgroupe.com/jobs
+    note: iCIMS board (not readable automatically); type "Miami" in the location box.
+    aliases: [Publicis Groupe, Publicis, Publicis Miami, MSL, Conill, Saatchi & Saatchi, Leo Burnett, Digitas]
+
+# ---------------------------------------------------------------------------
+# Sports, entertainment & other Miami brands
+# ---------------------------------------------------------------------------
+  - id: miami-heat
+    name: Miami HEAT (Kaseya Center)
+    group: Sports & entertainment (culture); content, social and communications teams
+    city: Miami
+    home: MIAMI
+    ats: ukg
+    ats_token: https://recruiting.ultipro.com/MIA1004MHLP/JobBoard/b34868a3-6ce1-4a28-b8fb-afb1cd5be9d3
+    verified: true
+    careers_url: https://www.nba.com/heat/careers
+    aliases: [Miami HEAT, Miami Heat, Heat Group, Basketball Properties Ltd, Kaseya Center]
+
+  - id: chewy
+    name: "Chewy"
+    group: Pet e-commerce (lifestyle); content, social & Chewy Studios teams; HQ in Plantation / Dania Beach
+    city: Plantation / Dania Beach (Fort Lauderdale area)
+    ats: workday
+    ats_token: "chewy"
+    ats_dc: "wd5"
+    ats_site: "External"
+    queries: [writer, editor, content, "social media", communications, copywriter, marketing, "public relations", studios, producer]
+    verified: true
+    careers_url: "https://careers.chewy.com/us/en/corporate-careers"
+    aliases: [Chewy, Chewy Inc, Chewy.com, Chewy Studios]
+
+  - id: inter-miami
+    name: Inter Miami CF
+    group: Soccer club (sports & culture); content, social and communications teams
+    city: Fort Lauderdale / Miami
+    home: MIAMI
+    ats: paylocity
+    watch: false
+    careers_url: https://recruiting.paylocity.com/recruiting/jobs/All/4ec3259e-b119-41ed-9958-51fba03e38ab/Inter-Miami-CF-LLC
+    note: Paylocity board (not readable automatically); the link opens the full list.
+    aliases: [Inter Miami CF, Inter Miami, Club Internacional de Fútbol Miami, Miami Freedom Park]
+
+  - id: hard-rock-stadium
+    name: Hard Rock Stadium & Miami Dolphins (incl. F1 Miami Grand Prix, Miami Open)
+    group: Sports & events (culture, entertainment), Miami Gardens
+    city: Miami Gardens
+    home: MIAMI
+    ats: teamworkonline
+    watch: false
+    careers_url: https://www.teamworkonline.com/multiple-properties/hardrock-stadium-jobs/hard-rock-stadium-jobs
+    note: TeamWork Online board (not readable automatically). It covers the Dolphins, the stadium, the F1 Miami Grand Prix and the Miami Open.
+    aliases: [Hard Rock Stadium, Miami Dolphins, Dolphins, Formula 1 Crypto.com Miami Grand Prix, F1 Miami Grand Prix, Miami Open, South Florida Stadium LLC]

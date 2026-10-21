@@ -1,10 +1,10 @@
 # Ari's Job Radar
 
-Watches job boards for writer / editor / reporter / editorial-coordinator /
-content-creator roles (plus social media, PR, marketing and copywriting) in
-Miami or fully remote (a New York job that says "or Remote" counts). It emails
-Ari when something new appears and keeps a dashboard she can open from any
-phone or laptop.
+Watches job boards for full-time writer / editor / reporter / content-creator /
+PR / marketing roles (plus social media) in Miami, or fully remote (a New York
+job that says "or Remote" counts), with Miami first. It emails Ari one summary
+first thing each morning when something new has come in, and keeps a dashboard
+she can open from any phone or laptop.
 
 It's built like Itz's IB tracker (same adapters-not-scrapers design, same
 "closed only when a board was read successfully" rule, same page watcher),
@@ -13,10 +13,10 @@ GitHub Pages hosts the dashboard and Resend sends the email. Nothing runs on
 Ari's or Itz's Mac, and it costs nothing.
 
 ```
-GitHub Actions (7:20am, 1:20pm, 7:20pm New York time)
-  ├─ src/crawl.py    reads 22 employer job boards + job-search APIs,
-  │                  watches 11 careers pages, keeps history in data/state.json
-  ├─ src/notify.py   emails Ari the NEW matching jobs (via Resend)
+GitHub Actions (three times a day: about 7am, 1pm and 7pm New York time in summer, an hour earlier in winter)
+  ├─ src/crawl.py    reads 53 employer job boards + job-search APIs,
+  │                  watches 27 careers pages, keeps history in data/state.json
+  ├─ src/notify.py   the morning run emails Ari a summary of the NEW matching jobs (via Resend)
   ├─ commits data/   (git history = audit log of every crawl)
   └─ publishes site/ + data/radar.json to GitHub Pages  →  https://<user>.github.io/ari-job-radar/
 ```
@@ -69,11 +69,11 @@ Names must match exactly.
 
 | Secret | Value | Needed? |
 |---|---|---|
-| `RESEND_API_KEY` | the key Ari sends you (starts `re_`) | yes, for email |
-| `ALERT_TO` | **the exact email Ari signed up to Resend with** | yes, for email |
+| `RESEND_API_KEY` | Ariella's Resend API key (starts `re_`, **Sending access** only) | yes, for email |
+| `ALERT_TO` | **the exact email Ariella's Resend account was created with** (the free sender delivers only there) | yes, for email |
 | `ADZUNA_APP_ID` | from developer.adzuna.com (step 5) | optional, paid |
 | `ADZUNA_APP_KEY` | same place | optional, paid |
-| `JSEARCH_RAPIDAPI_KEY` | from rapidapi.com (step 6) | recommended (free) |
+| `JSEARCH_RAPIDAPI_KEY` | from rapidapi.com (step 6) | recommended (free), but **not subscribed yet**, see step 6 |
 
 With no email secrets the radar still crawls and the dashboard still updates;
 it just doesn't email.
@@ -95,10 +95,17 @@ pay on developer.adzuna.com, then add the Application ID and Key as
 LinkedIn and Indeed forbid automated reading, so the radar never touches them.
 JSearch resells Google for Jobs results, which include LinkedIn and Indeed
 postings. That puts the legal exposure on the vendor, not on you. The free plan
-gives 200 calls/month, and the radar uses 3 a day (about 90 a month).
+gives 200 calls/month, and the radar uses 5 a day (about 150 a month), all Miami
+searches on her role types, Spanish roles and her beats.
 
 1. rapidapi.com → sign up → search **JSearch** (by OpenWeb Ninja / letscrape) → **Pricing** → **Basic (free)** → Subscribe.
 2. Copy the **X-RapidAPI-Key** shown on the endpoint page → secret `JSEARCH_RAPIDAPI_KEY`.
+
+**Status, 21 Oct 2026: JSearch is switched off.** The key in the secret isn't
+subscribed to JSearch (every call answers 403 "You are not subscribed to this
+API"), so `config.yaml` → `aggregators.jsearch.enabled` is `false`. To fix: do
+step 1 with the same RapidAPI account the key belongs to, then set `enabled:
+true`. The searches are already written; it works from the next run.
 
 ### 7. First run
 
@@ -111,7 +118,12 @@ The push in step 2 already started one. Open the repo's **Actions** tab:
 
 If the first run happened before the secrets existed, just click **Run workflow**
 once more. The first run that has email credentials sends Ari a single
-"your radar is live" email. Later emails list only jobs that are new since then.
+"your radar is live" email. After that she gets **one summary first thing each
+morning** (the first run after 6am New York time: around 7am in summer, 6am in
+winter) listing what's new since the last one; a morning with nothing new sends
+nothing, and jobs found by the afternoon and evening runs wait for the next
+morning. To send one right away: **Actions** → **radar** → **Run workflow** →
+tick **email_now**.
 
 ### 8. Send Ari the link
 
@@ -149,11 +161,22 @@ knowing the topic name is not enough to add anything. Already set up:
 
 ## What Ari gets
 
-- **Only Miami or fully remote.** Jobs elsewhere in the US are still collected (the Stats tab says how many) but not shown or emailed. A job in another city whose listing itself says "or Remote" is shown as Remote; a remote job that turns out to be hybrid is not. To widen it again, edit `config.yaml` → `locations.show` / `locations.email`.
-- **Email**: sent only after a crawl finds something new that matches, so a few times a week rather than daily. Each email lists the new jobs with links, her own employers (★) first, then early-career roles, then Miami, then remote. It also flags when a watched careers page changes (e.g. Haute Living adds an editor role).
+Built on what Ariella told us on 21 Oct 2026 (recorded in `config.yaml` → `owner`):
+3 years of work, 2 in newsrooms, graduated July 2025; Miami, in person or hybrid
+preferred, remote OK but last; full-time only; writer, editor, reporter, content
+creator, PR, marketing; beats food, hospitality, travel, fashion, lifestyle,
+culture; native Spanish; one summary email each morning.
+
+- **Miami first, remote last.** Only Miami & South Florida or fully remote jobs are shown or emailed. Jobs elsewhere in the US are still collected (the Stats tab says how many). A job in another city whose listing itself says "or Remote" is shown as Remote; a remote job that turns out to be hybrid is not. Miami jobs come before remote ones everywhere: home page, All jobs, and the email, where remote jobs have their own section. To widen it again, edit `config.yaml` → `locations.show` / `locations.email`; the order comes from `locations.preferred`.
+- **Full-time only.** Each job is read as full-time, part-time, freelance, contract / temporary, internship or not stated: from the board's own field where it has one (Lever, Ashby, Workable, SmartRecruiters, UKG, Recruitee, Breezy, BambooHR, Workday, Adzuna, Remotive, We Work Remotely), else the title ("Freelance Writer", "Part-time…", "PT", "On Call", "(Contract)"), else clear phrases in the description ("This is a part-time position"). Only full-time and not-stated jobs are shown or emailed; the rest are counted on Stats as hidden. Fellowships are full-time jobs with an end date: kept, and labelled **Fellowship**.
+- **Her beats.** Jobs on food, hospitality, travel, fashion, lifestyle or culture get a badge (e.g. **Food & dining**) and rank higher. The title decides, plus the company name a job-search source gives ("Eater"), plus `topics:` on the rows in `employers.yaml` whose every job is on a beat (cruise lines, hotels, restaurant groups, museums, record labels…). The employer's `group` text is not read.
+- **Spanish.** A job that mentions Spanish, bilingual, español, Hispanic, Latino / Latina, Latin music or Latin America, Telemundo or Univision, or has a Spanish title (redactora, periodista, coordinador de mercadeo, comunicaciones…) gets a **Spanish** badge and ranks a little higher; so does every job at a row marked `spanish: true` (TelevisaUnivision). Spanish titles count like their English ones.
+- **Good fit.** Every job is labelled **Good fit** (says entry level, or asks for up to 3 years), nothing (experience not stated), or **Stretch** (asks for 4–5 years, or a manager title). Jobs asking for 6+ years are hidden.
+- **PR agencies.** At employers marked `industry: pr` in `employers.yaml`, "Account Coordinator / Account Executive" counts as a PR job (it is the entry-level PR title there); everywhere else an Account Executive is a sales job and stays out.
+- **Email**: one summary first thing each morning (around 7am in summer, 6am in winter), listing everything new since the last one; skipped on a morning with nothing new. Miami first, then remote in its own section; within each section, companies on her list (★) first, then jobs on her beats, then good fits. It also flags when a watched careers page changes (e.g. Haute Living adds an editor role). The one-off "your radar is ready" email doesn't replace that morning's summary, and the jobs it counted aren't sent again as new.
 - **Dashboard** (written to talk to Ari, not like a data tool):
-  - **For you** is the home page: a greeting, new roles at her own companies (★), then everything else new this week, early-career first, then Miami, then remote.
-  - **All jobs** has search, plus filters tucked behind a button: where, kind of role, how you'd work (remote / hybrid / in person), early-career only. Every job is labelled **Early career** (says entry level, or asks for up to 2 years), nothing, or **Stretch** (asks for 3–4 years, or a manager title).
+  - **For you** is the home page: a greeting, new roles at her own companies (★), then new Miami jobs this week, then new remote jobs, then what's still open in Miami.
+  - **All jobs** has search, plus filters tucked behind a button: where, kind of role, how you'd work (remote / hybrid / in person), good fit only, my beats only, Spanish roles only.
   - **Saved** and **Applied** are her own tracking, with a notes box on each job. On an applied job she picks where it stands (Applied, Heard back, Phone screen, Interview, Offer, Rejected…), and the Applied tab groups by that.
   - **Stats** counts what she sees: open jobs, new this week, how many are elsewhere in the US, a 30-day chart, her application pipeline, and whether the radar itself is healthy.
   - **Who I'm watching** explains which companies are checked automatically, which pages are watched and which to check herself, with an **Add a company** button.
@@ -163,21 +186,15 @@ knowing the topic name is not enough to add anything. Already set up:
 
 ## What it covers, and what it doesn't
 
-**Read automatically (22 employers, verified 19 Oct 2026):** The Drum, The
-Infatuation (JPMorgan's board, filtered), Penske Media (Eater, Thrillist,
-Billboard, Robb Report, WWD, Variety…), Axios (incl. Axios Miami), Miami Herald
-/ el Nuevo Herald, NBCUniversal (Telemundo, NBC 6), TelevisaUnivision, Fever
-(Secret Miami), Vox Media, Hearst, People Inc., Bustle Digital Group, Business
-Insider, Morning Brew, Forbes, Semafor, The New York Times, Dow Jones, Red
-Ventures (The Points Guy), Ad Age (Crain), Michelin Guide, OpenTable.
+**Read automatically (53 employers; 22 checked 19 Oct 2026, 31 added 21 Oct 2026):** The Drum, The Infatuation (JPMorgan's board, filtered), Penske Media (Eater, Thrillist, Billboard, Robb Report, WWD, Variety…), Axios (incl. Axios Miami), Miami Herald / el Nuevo Herald, NBCUniversal (Telemundo, NBC 6), TelevisaUnivision, Fever (Secret Miami), Vox Media, Hearst, People Inc., Bustle Digital Group, Business Insider, Morning Brew, Forbes, Semafor, The New York Times, Dow Jones, Red Ventures (The Points Guy), Ad Age (Crain), Michelin Guide, OpenTable. New on Ari's beats: travel and hospitality — Norwegian Cruise Line Holdings, Carnival Corporation, Virgin Voyages, Four Seasons (its South Florida hotels), Soho House, SH Hotels (1 Hotels), Loews Hotels, Accor & Ennismore in Miami (Delano, SLS, Mondrian), Seminole Hard Rock; food and drink — Restaurant Brands International (Burger King, Popeyes), Bacardi, Pollo Tropical; fashion and lifestyle — Perry Ellis, Celsius, Chewy, The Real Deal; music and entertainment — Live Nation (Miami), Warner Music (incl. Warner Music Latina), Sony Music (Latin), Universal Music, the Recording Academy and Latin Recording Academy, iHeartMedia, Sony Pictures, the Miami HEAT; Spanish-language — Warner Bros. Discovery (CNN en Español); PR and marketing agencies — Edelman, Ogilvy, 5WPR, Max Borges Agency, Zubi; and the University of Miami.
 
-**Careers page watched for changes:** Haute Living, Miami New Times and Voice
-Media Group, Modern Luxury, Time Out, WLRN, WPLG Local 10, Atlas Obscura,
-Digiday, Puck, theSkimm.
+**Careers page watched for changes:** Haute Living, Miami New Times and Voice Media Group, Modern Luxury, Time Out, WLRN, WPLG Local 10, Atlas Obscura, Digiday, Puck, theSkimm, plus the Greater Miami Convention & Visitors Bureau, Subway, The Bass, the Arsht Center, Miami City Ballet, Frost Science, Art Basel, Spanish Broadcasting System, WSVN 7News, 6AM City (MIA Today), and the PR agencies rbb Communications, Durée & Company, BoardroomPR, J Public Relations, Nike Communications and Zimmerman.
 
-**Job-search sources:** JSearch (Google for Jobs, free key), Adzuna (optional,
-paid), Remotive (remote writing and marketing), We Work Remotely
-(marketing), the NAHJ career centre feed.
+**Board unreadable (link on the dashboard), new:** Royal Caribbean Group, MSC Cruises, Azamara, Windstar, Fontainebleau, Faena, Acqualina, Groot Hospitality, Discover The Palm Beaches, PAMM, Gannett / Palm Beach Post, FIU, Miami Dade College, Publicis, Inter Miami, and Hard Rock Stadium (Dolphins, F1 Miami Grand Prix, Miami Open). The existing "no public board" and "board unreadable" rows (VICE, BuzzFeed, Condé Nast, CBS News Miami, Bloomberg, Resy, World Red Eye, Ocean Drive, Cultured, Static Media) stay as they were.
+
+**Job-search sources:** JSearch (Google for Jobs, free key; off until the key
+is subscribed, see setup step 6), Adzuna (optional, paid), Remotive (remote writing and marketing), We Work Remotely
+(marketing), the NAHJ and NABJ career centre feeds.
 
 **Not read automatically, by design:**
 - **LinkedIn, Indeed, JournalismJobs, Mediabistro.** Their terms forbid
@@ -186,10 +203,6 @@ paid), Remotive (remote writing and marketing), We Work Remotely
 - **No public board:** World Red Eye, Ocean Drive, Cultured, Static Media. Ari
   should follow them on LinkedIn; the job-search sources catch them when they
   post elsewhere.
-- **Board unreadable:** VICE (no public board found), BuzzFeed (Greenhouse board
-  removed), Condé Nast (Workday board redirected to an error page on
-  19 Oct 2026), CBS News Miami (SuccessFactors), Bloomberg (Avature), Resy (Amex
-  Eightfold). Each has a link on the dashboard.
 
 **Ownership changes found while building this:** Vox Media sold Eater and
 Thrillist to Penske Media in June 2026, and NYMag/Vox.com went to Lupa Systems
@@ -207,9 +220,20 @@ couple of minutes.
 | To… | Edit |
 |---|---|
 | add an employer | the dashboard's **Add a company** (lands in `data/inbox_employers.yaml`), or edit `employers.yaml`, or run `python scripts/add_employer.py "Name" "<careers URL>"` |
-| change locations (Miami / remote only), role types, seniority, early-career rules, years cap | `config.yaml` |
+| change locations (Miami / remote only), role types, seniority, years cap | `config.yaml` → `locations`, `roles`, `seniority` |
+| change which place comes first (Miami) | `config.yaml` → `locations.preferred` |
+| change "Good fit" (up to 3 years) | `config.yaml` → `fit.early_max_years` (labels follow the number) |
+| show part-time / freelance / contract jobs too | `config.yaml` → `employment.show` (e.g. add `part_time`) |
+| change her beats or what counts as one | `config.yaml` → `topics`, `topics_description_min_words` |
+| give an employer whose every job is on a beat its beats (a cruise line, a museum) | `employers.yaml` → `topics: [travel, hospitality]` on its row |
+| mark a Spanish-language employer (every job gets the Spanish badge) | `employers.yaml` → `spanish: true` on its row |
+| make an employer's own place names count as Miami ("Four Seasons Surf Club") | `employers.yaml` → `miami_match: 'surf club'` on its row |
+| mark a PR / marketing agency (Account Coordinator = PR job) | `employers.yaml` → `industry: pr`; the titles are in `config.yaml` → `roles.agency_titles` |
+| change what counts as a Spanish job | `config.yaml` → `languages.spanish_markers` |
 | change the inbox topic or passcode | `config.yaml` → `inbox.ntfy_topic`; secret `RADAR_PASSCODE` |
-| change who gets email / when | secrets (`ALERT_TO`) and `config.yaml` → `alerts` |
+| change who gets email | secret `ALERT_TO` |
+| change when the email goes: daily or after every crawl, the hour, empty mornings, remote section | `config.yaml` → `alerts.digest`, `send_after_local_hour`, `send_when_empty`, `remote_last` |
+| send an email right now | **Actions** → **radar** → **Run workflow** → tick **email_now** |
 | change the crawl times | `.github/workflows/radar.yml` → `cron` (UTC) |
 | add a "More places to look" link | `boards.yaml` |
 
@@ -225,8 +249,9 @@ GitHub emails you.
 cd ~/Desktop/"Ari's tracker"/ari-job-radar
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt pytest
-python -m pytest -q                                   # 103 tests, no network needed
+python -m pytest -q                                   # 248 tests, no network needed
 python src/crawl.py --only "the-drum" --dry-run       # one employer, writes nothing
+python src/notify.py --preview                        # writes data/email_preview.html, sends nothing
 cp .env.example .env    # fill in to test email locally
 python src/notify.py --test
 ```
@@ -242,6 +267,22 @@ The crawl prints a percentage and the time remaining on every line.
   unseen, because keyword searches can drop a job that's still open.
 - The role filter reads **titles**. Anything ambiguous is kept and flagged
   rather than dropped, e.g. *video / photo editing* or *4+ yrs asked*.
+- **Full-time** is only as good as the listing. Greenhouse boards don't say,
+  so there it comes from the title and the description; a part-time job that
+  never says so anywhere is shown (as "not stated"), never the other way round.
+- **Workday** job lists give no description and sometimes just "3 Locations",
+  so the crawl opens the job's own page for each relevant one (full-time or
+  not, every location, the years asked for), at most 25 per employer per run;
+  the rest are read on the next runs. After a rule change in `config.yaml`
+  those pages are read again.
+- **Beats** come from the title (and a job-search source's company name), plus
+  `topics:` on the employer's row. An employer with every kind of job (Penske
+  Media, Hearst) gets no row beats: its Eater jobs are food jobs because the
+  title says Eater.
+- **The morning email** follows GitHub's schedule: the 11:21 UTC run, around
+  7am New York time in summer and 6am in winter (cron doesn't move for
+  daylight saving), and GitHub sometimes starts scheduled runs late at busy
+  times. A crawl started from the dashboard before 6am doesn't email.
 - Resend's free sender only delivers to the address that owns the Resend
   account. To email two people (say Ari and you), verify a domain in Resend and
   set the `RESEND_FROM` secret to an address on it; `ALERT_TO` accepts a
@@ -255,16 +296,16 @@ employers.yaml       the employer list (single source of truth)
 boards.yaml          the "More places to look" links
 src/adapters.py      one adapter per job-board platform (Greenhouse, Lever, Workday, Oracle, UKG, Workable…)
 src/aggregators.py   Adzuna, JSearch, Remotive, RSS feeds
-src/classify.py      role family, seniority, location bucket, work mode, early-career fit, relevant or not
+src/classify.py      role family, seniority, location bucket, work mode, fit, full-time or not, beats, Spanish, relevant or not
 src/crawl.py         the crawl and its state machine; writes data/state.json + data/radar.json
 src/watch.py         careers-page change watcher
-src/notify.py        the email
+src/notify.py        the morning summary email
 scripts/add_employer.py       add a row to employers.yaml from a URL (CLI and the function behind the button)
 site/index.html      the dashboard (one static page)
 .github/workflows/radar.yml      schedule + publish
 .github/workflows/inbox.yml   every 15 min: a note in the inbox? start a crawl
 src/inbox.py                  reads the dashboard's inbox (ntfy.sh) and adds the companies
 data/inbox_employers.yaml     companies Ari added from the dashboard (written by the crawl)
-tests/test_tracker.py         103 tests, incl. real job titles from 19 Oct 2026
-ARI_SETUP.md         Ari's part: Resend in 5 minutes, alerts to subscribe to, questions
+tests/test_tracker.py         248 tests, incl. real job titles from 19 Oct 2026
+ARI_SETUP.md         Ari's part: Resend (done), alerts to subscribe to, what she told us
 ```
