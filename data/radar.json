@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-10-28T17:22:12+00:00",
+ "generated_at": "2026-10-28T21:52:42+00:00",
  "owner": "Ari",
  "last_run": {
-  "started_at": "2026-10-28T17:13:23+00:00",
-  "finished_at": "2026-10-28T17:22:12+00:00",
-  "duration_s": 528,
+  "started_at": "2026-10-28T21:45:33+00:00",
+  "finished_at": "2026-10-28T21:52:41+00:00",
+  "duration_s": 429,
   "first_run": false,
-  "new_relevant": 5,
-  "closed": 1,
-  "sources_ok": 57,
+  "new_relevant": 3,
+  "closed": 4,
+  "sources_ok": 53,
   "sources_failed": 0,
   "inbox": {
    "received": 0,
@@ -21,16 +21,6 @@
   }
  },
  "runs": [
-  {
-   "closed": 0,
-   "duration_s": 114,
-   "finished_at": "2026-10-19T22:04:27+00:00",
-   "first_run": false,
-   "new_relevant": 0,
-   "sources_failed": 1,
-   "sources_ok": 22,
-   "started_at": "2026-10-19T22:02:33+00:00"
-  },
   {
    "closed": 1,
    "duration_s": 115,
@@ -537,13 +527,32 @@
    "started_at": "2026-10-28T02:26:04+00:00"
   },
   {
-   "started_at": "2026-10-28T17:13:23+00:00",
-   "finished_at": "2026-10-28T17:22:12+00:00",
-   "duration_s": 528,
-   "first_run": false,
-   "new_relevant": 5,
    "closed": 1,
+   "duration_s": 528,
+   "finished_at": "2026-10-28T17:22:12+00:00",
+   "first_run": false,
+   "inbox": {
+    "added": 0,
+    "error": "",
+    "failed": 0,
+    "received": 0,
+    "refresh": 0,
+    "rejected": 0,
+    "updated": 0
+   },
+   "new_relevant": 5,
+   "sources_failed": 0,
    "sources_ok": 57,
+   "started_at": "2026-10-28T17:13:23+00:00"
+  },
+  {
+   "started_at": "2026-10-28T21:45:33+00:00",
+   "finished_at": "2026-10-28T21:52:41+00:00",
+   "duration_s": 429,
+   "first_run": false,
+   "new_relevant": 3,
+   "closed": 4,
+   "sources_ok": 53,
    "sources_failed": 0,
    "inbox": {
     "received": 0,
@@ -683,14 +692,14 @@
   "rejected": {}
  },
  "totals": {
-  "open_all": 286,
-  "open_shown": 54,
+  "open_all": 283,
+  "open_shown": 52,
   "open_not_fulltime": 16,
   "by_location_all": {
    "OTHER_US": 105,
    "NYC": 82,
-   "MIAMI": 42,
-   "UNKNOWN": 25,
+   "MIAMI": 40,
+   "UNKNOWN": 24,
    "REMOTE": 24,
    "FLORIDA": 8
   }
@@ -736,7 +745,7 @@
    "location_raw": "Miami, FL",
    "url": "https://univision.wd1.myworkdayjobs.com/en-US/External/job/Miami-FL/Writer_R021210",
    "first_seen": "2026-10-27T21:23:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -764,7 +773,7 @@
    "location_raw": "Miami, Florida",
    "url": "https://nclh.wd108.myworkdayjobs.com/en-US/NCL_Shoreside_Careers/job/Miami-Florida/Consumer-Mktg-Specialist-Int-l_JR02306",
    "first_seen": "2026-10-27T21:23:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -795,7 +804,7 @@
    "location_raw": "Remote",
    "url": "https://mcclatchy.rec.pro.ukg.net/MCC1008MCLTC/JobBoard/ff11d963-22db-4278-a2b7-709f3b882262/OpportunityDetail?opportunityId=d5b927f9-2728-40e5-8feb-d65301e78c16",
    "first_seen": "2026-10-27T21:23:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -856,7 +865,7 @@
    "location_raw": "Miami, FL, United States",
    "url": "https://eicl.fa.em5.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CORP/job/14226",
    "first_seen": "2026-10-27T16:45:01+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -887,7 +896,7 @@
    "location_raw": "Miami, FL",
    "url": "https://univision.wd1.myworkdayjobs.com/en-US/External/job/Miami-FL/Assignment-Desk-Editor_R021319-1",
    "first_seen": "2026-10-27T02:10:26+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -915,7 +924,7 @@
    "location_raw": "Fort Lauderdale, FL, United States",
    "url": "https://eicl.fa.em5.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CORP/job/14263",
    "first_seen": "2026-10-27T02:10:26+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -946,7 +955,7 @@
    "location_raw": "Coral Gables, FL",
    "url": "https://umiami.wd1.myworkdayjobs.com/en-US/UMCareerStaff/job/Coral-Gables-FL/Social-Media-Specialist_R100102246",
    "first_seen": "2026-10-23T15:47:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1003,7 +1012,7 @@
    "location_raw": "Miami, Florida",
    "url": "https://nclh.wd108.myworkdayjobs.com/en-US/NCL_Shoreside_Careers/job/Miami-Florida/Casino-Marketing-Specialist_JR02450",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1034,7 +1043,7 @@
    "location_raw": "Miami, FL, United States",
    "url": "https://eicl.fa.em5.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CORP/job/13917",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1065,7 +1074,7 @@
    "location_raw": "Hollywood, FL / Richardson, TX",
    "url": "https://chewy.wd5.myworkdayjobs.com/en-US/External/job/Hollywood-FL/CS-Social-Media-Specialist_R29663",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1073,7 +1082,7 @@
    "seniority": "mid",
    "years": null,
    "flags": [],
-   "posted_at": "Posted 30+ Days Ago",
+   "posted_at": "Posted Today",
    "work_mode": "unknown",
    "fit": "open",
    "remote_offered": false,
@@ -1093,7 +1102,7 @@
    "location_raw": "Boca Raton, Florida, United States / Louisville, Kentucky, United States",
    "url": "https://apply.workable.com/j/2919631993",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1123,7 +1132,7 @@
    "location_raw": "Four Seasons Palm Beach",
    "url": "https://fourseasons.wd3.myworkdayjobs.com/en-US/search/job/Four-Seasons-Palm-Beach/Communications-Coordinator_REQ10390301",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -1185,7 +1194,7 @@
    "location_raw": "Soho Beach House Miami, 4385 Collins Ave, Miami Beach, FL 33140",
    "url": "https://job-boards.eu.greenhouse.io/sohohouseco/jobs/4987871101",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1216,7 +1225,7 @@
    "location_raw": "Starwood Hotels - Florida",
    "url": "https://shhotelsandresorts.wd12.myworkdayjobs.com/en-US/SHG/job/Starwood-Hotels---Florida/Social-Media-Manager--Treehouse-Hotels_JR105737-1",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1249,7 +1258,7 @@
    "location_raw": "Seminole Hard Rock Hotel & Casino Hollywood",
    "url": "https://seminolehardrock.wd503.myworkdayjobs.com/en-US/SeminoleHardRockCareers/job/Seminole-Hard-Rock-Hotel--Casino-Hollywood/Marketing-Specialist_R13580",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1281,7 +1290,7 @@
    "location_raw": "Miami, FL, USA",
    "url": "https://livenation.wd503.myworkdayjobs.com/en-US/LNExternalSite/job/Miami-FL-USA/Insomniac---Social-Media-Manager_JR-93158-2",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1311,7 +1320,7 @@
    "location_raw": "United States - Business Locations",
    "url": "https://jobs.lever.co/therealdeal/63da817b-1094-403d-b59c-5a1329949c5e",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -1371,7 +1380,7 @@
    "location_raw": "Support Services Headquarters Building",
    "url": "https://seminolehardrock.wd503.myworkdayjobs.com/en-US/SeminoleHardRockCareers/job/Support-Services-Headquarters-Building/Brand-Management---Marketing-Manager_R8573",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1402,7 +1411,7 @@
    "location_raw": "Miami, Florida",
    "url": "https://nclh.wd108.myworkdayjobs.com/en-US/NCL_Shoreside_Careers/job/Miami-Florida/Trade-Marketing-Specialist_JR02576",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1433,7 +1442,7 @@
    "location_raw": "Miami, Florida, United States, Remote / New York, New York, United States, Remote",
    "url": "https://apply.workable.com/j/745BCDF136",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1491,7 +1500,7 @@
    "location_raw": "Four Seasons Palm Beach",
    "url": "https://fourseasons.wd3.myworkdayjobs.com/en-US/search/job/Four-Seasons-Palm-Beach/Communications-Specialist_REQ10391877",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -1523,7 +1532,7 @@
    "location_raw": "Los Angeles",
    "url": "https://jobs.lever.co/therealdeal/ea5b3af1-a1ae-46b0-88a4-97c1745fa5e9",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -1551,7 +1560,7 @@
    "location_raw": "Corp - Miami Corporate Office",
    "url": "https://rbi.wd3.myworkdayjobs.com/en-US/RBI_External_Career_Site/job/Corp---Miami-Corporate-Office/Manager--Marketing-Communications--LAC_R3997",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -1583,7 +1592,7 @@
    "location_raw": "Support Services Headquarters Building",
    "url": "https://seminolehardrock.wd503.myworkdayjobs.com/en-US/SeminoleHardRockCareers/job/Support-Services-Headquarters-Building/Specialist--Integrated-Marketing_R8302",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1614,7 +1623,7 @@
    "location_raw": "United States, Remote",
    "url": "https://apply.workable.com/j/22EA0C2003",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -1673,7 +1682,7 @@
    "location_raw": "Miami, Florida, United States",
    "url": "https://job-boards.greenhouse.io/perryellisinternational/jobs/4707703006",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1703,7 +1712,7 @@
    "location_raw": "USA - Miami - 555 Washington Avenue",
    "url": "https://wmg.wd1.myworkdayjobs.com/en-US/WMGUS/job/USA---Miami---555-Washington-Avenue/Manager--Corporate-Communications--Latin-America-_R-027842",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -1734,8 +1743,8 @@
    "url": "https://apply.workable.com/j/060170B586",
    "first_seen": "2026-10-21T17:06:46+00:00",
    "last_seen": "2026-10-28T17:13:23+00:00",
-   "status": "open",
-   "closed_at": null,
+   "status": "closed",
+   "closed_at": "2026-10-28T21:45:33+00:00",
    "family": "social",
    "tier": "also",
    "seniority": "entry",
@@ -1763,7 +1772,7 @@
    "location_raw": "Coral Gables, FL",
    "url": "https://umiami.wd1.myworkdayjobs.com/en-US/UMCareerStaff/job/Coral-Gables-FL/Digital-Content-Specialist---Cardiac---Vascular-Services_R100101760",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "content",
@@ -1791,7 +1800,7 @@
    "location_raw": "Plantation, FL",
    "url": "https://chewy.wd5.myworkdayjobs.com/en-US/External/job/Plantation-FL/Digital-Content-Creator_R30732",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "content",
@@ -1821,7 +1830,7 @@
    "location_raw": "Los Angeles, California, United States, Remote / Portland, Oregon, United States, Remote / Kansas City, Kansas, United States, Remote",
    "url": "https://apply.workable.com/j/240E3B79B1",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1851,7 +1860,7 @@
    "location_raw": "Miami, Florida, United States",
    "url": "https://job-boards.greenhouse.io/perryellisinternational/jobs/4707696006",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1881,7 +1890,7 @@
    "location_raw": "Miami, FL, United States",
    "url": "https://eicl.fa.em5.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CORP/job/13983",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1913,8 +1922,8 @@
    "url": "https://shhotelsandresorts.wd12.myworkdayjobs.com/en-US/SHG/job/1-Hotel-South-Beach/Marketing-Manager_JR106169-2",
    "first_seen": "2026-10-21T17:06:46+00:00",
    "last_seen": "2026-10-28T17:13:23+00:00",
-   "status": "open",
-   "closed_at": null,
+   "status": "closed",
+   "closed_at": "2026-10-28T21:45:33+00:00",
    "family": "marketing_copy",
    "tier": "core",
    "seniority": "mid",
@@ -1974,7 +1983,7 @@
    "location_raw": "Remote - USA",
    "url": "https://job-boards.greenhouse.io/thenewyorktimes/jobs/4706618005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2004,7 +2013,7 @@
    "location_raw": "Remote",
    "url": "https://job-boards.greenhouse.io/axios/jobs/8120449",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2061,7 +2070,7 @@
    "location_raw": "Semafor - Remote",
    "url": "https://job-boards.greenhouse.io/semafor/jobs/4717606005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2089,7 +2098,7 @@
    "location_raw": "New York, NY",
    "url": "https://jobs.lever.co/morningbrew/c7237d4d-414c-4fc0-949f-53642081b054",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2117,7 +2126,7 @@
    "location_raw": "Miami, FL",
    "url": "https://univision.wd1.myworkdayjobs.com/en-US/External/job/Miami-FL/Digital-Marketing-Specialist_R021166",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -2174,7 +2183,7 @@
    "location_raw": "California - Los Angeles Office; Florida - Miami Office",
    "url": "https://www.pmc.com/join-our-team/?gh_jid=4733474005#/jobs/4733474005",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2261,7 +2270,7 @@
    "location_raw": "Miami, Florida, US",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000148580789",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -2317,7 +2326,7 @@
    "location_raw": "Miami, Florida, United States / New York, New York, United States",
    "url": "https://apply.workable.com/j/AE03E4894D",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2345,7 +2354,7 @@
    "location_raw": "Miami, Florida, United States",
    "url": "https://apply.workable.com/j/C593903BEC",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2430,7 +2439,7 @@
    "location_raw": "Remote (US Only)",
    "url": "http://boards.greenhouse.io/voxmedia/jobs/8259059?gh_jid=8259059",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -2486,7 +2495,7 @@
    "location_raw": "Miami, Florida, US",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000150722598",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2514,7 +2523,7 @@
    "location_raw": "Palm Beach Gardens, FL, United States",
    "url": "https://eevd.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/2023828",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
+   "last_seen": "2026-10-28T21:45:33+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2604,7 +2613,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 1,
-   "board_total": 25,
+   "board_total": 24,
    "error": "",
    "failures": 0,
    "page": null
@@ -2660,7 +2669,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://careers.timeout.com/jobs",
     "error": ""
    }
@@ -2689,7 +2698,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.miaminewtimes.com/about/careers/",
     "error": ""
    }
@@ -2718,7 +2727,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.voicemediagroup.com/open-positions/",
     "error": ""
    }
@@ -2749,7 +2758,7 @@
     "status": "error",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://hauteliving.com/careers",
     "error": "HTTP 404"
    }
@@ -2824,7 +2833,7 @@
     "status": "error",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.modernluxury.com/careers",
     "error": "HTTP 404"
    }
@@ -2898,7 +2907,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 2,
-   "board_total": 392,
+   "board_total": 385,
    "error": "",
    "failures": 0,
    "page": null
@@ -2922,7 +2931,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 3,
-   "board_total": 58,
+   "board_total": 59,
    "error": "",
    "failures": 0,
    "page": null
@@ -2951,7 +2960,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.wlrn.org/jobs",
     "error": ""
    }
@@ -3003,12 +3012,12 @@
    "error": null,
    "failures": 0,
    "page": {
-    "status": "blocked",
+    "status": "empty",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.local10.com/careers/",
-    "error": "HTTP 403"
+    "error": ""
    }
   },
   {
@@ -3058,7 +3067,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 1,
-   "board_total": 19,
+   "board_total": 20,
    "error": "",
    "failures": 0,
    "page": null
@@ -3245,7 +3254,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 1,
-   "board_total": 8,
+   "board_total": 9,
    "error": "",
    "failures": 0,
    "page": null
@@ -3267,7 +3276,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 16,
+   "board_total": 17,
    "error": "",
    "failures": 0,
    "page": null
@@ -3314,7 +3323,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 1,
-   "board_total": 147,
+   "board_total": 146,
    "error": "",
    "failures": 0,
    "page": null
@@ -3364,7 +3373,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 60,
+   "board_total": 61,
    "error": "",
    "failures": 0,
    "page": null
@@ -3432,7 +3441,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 118,
+   "board_total": 119,
    "error": "",
    "failures": 0,
    "page": null
@@ -3460,7 +3469,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.atlasobscura.com/jobs",
     "error": ""
    }
@@ -3490,7 +3499,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://jobs.jobvite.com/everyday-health-consumer/jobs",
     "error": ""
    }
@@ -3521,7 +3530,7 @@
     "added": [
      "Current Openings"
     ],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://pucknews.applytojob.com",
     "error": ""
    }
@@ -3594,7 +3603,7 @@
     "status": "error",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://careers.digiday.com",
     "error": "ConnectError: [Errno -2] Name or service not known"
    }
@@ -3713,7 +3722,7 @@
    "mode": "read",
    "note": "Its board names properties, not cities (Seminole Hard Rock Hotel & Casino Hollywood; Support Services Headquarters Building = Davie HQ).",
    "open_relevant": 3,
-   "board_total": 598,
+   "board_total": 603,
    "error": "",
    "failures": 0,
    "page": null
@@ -3738,7 +3747,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 2,
-   "board_total": 181,
+   "board_total": 179,
    "error": "",
    "failures": 0,
    "page": null
@@ -3767,7 +3776,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 4,
-   "board_total": 224,
+   "board_total": 220,
    "error": "",
    "failures": 0,
    "page": null
@@ -3896,7 +3905,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.gmcvb.com/gmcvb-jobs",
     "error": ""
    }
@@ -3922,7 +3931,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 1,
-   "board_total": 442,
+   "board_total": 435,
    "error": "",
    "failures": 0,
    "page": null
@@ -3948,8 +3957,8 @@
    "ats": "workday",
    "mode": "read",
    "note": "Locations are hotel names (1 Hotel South Beach); its Miami Beach head-office jobs say Starwood Hotels - Florida.",
-   "open_relevant": 2,
-   "board_total": 39,
+   "open_relevant": 1,
+   "board_total": 38,
    "error": "",
    "failures": 0,
    "page": null
@@ -3973,7 +3982,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 128,
+   "board_total": 126,
    "error": "",
    "failures": 0,
    "page": null
@@ -4128,7 +4137,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 1,
-   "board_total": 125,
+   "board_total": 126,
    "error": "",
    "failures": 0,
    "page": null
@@ -4213,7 +4222,7 @@
      "Administrative Assistant",
      "Showing 1-12 of 56 jobs by relevance"
     ],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://careers.subway.com/en/jobs",
     "error": ""
    }
@@ -4292,7 +4301,7 @@
    "ats": "workable",
    "mode": "read",
    "note": null,
-   "open_relevant": 4,
+   "open_relevant": 3,
    "board_total": 53,
    "error": "",
    "failures": 0,
@@ -4372,7 +4381,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 36,
+   "board_total": 35,
    "error": "",
    "failures": 0,
    "page": null
@@ -4483,7 +4492,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://thebass.org/jobs/",
     "error": ""
    }
@@ -4514,7 +4523,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.arshtcenter.org/about-us/jobs/",
     "error": ""
    }
@@ -4543,7 +4552,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.miamicityballet.org/about/careers/",
     "error": ""
    }
@@ -4574,7 +4583,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://miamisci.hrmdirect.com/employment/job-openings.php?cust_sort1=42038",
     "error": ""
    }
@@ -4605,7 +4614,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.artbasel.com/about/careers",
     "error": ""
    }
@@ -4715,7 +4724,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://www.spanishbroadcasting.com/careers",
     "error": ""
    }
@@ -4773,7 +4782,7 @@
     "added": [
      "On-Line-6:30pm Producer (2026-67)"
     ],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://wsvn.com/employment/",
     "error": ""
    }
@@ -4806,7 +4815,7 @@
     "added": [
      "No open positions right now — check back soon."
     ],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://6amcity.com/careers",
     "error": ""
    }
@@ -5053,7 +5062,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://rbbcommunications.com/join/",
     "error": ""
    }
@@ -5085,7 +5094,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://dureeandcompany.com/careers-internships/",
     "error": ""
    }
@@ -5115,7 +5124,7 @@
     "status": "ok",
     "changed_at": "2026-10-21T17:22:48+00:00",
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://boardroompr.com/careers/",
     "error": ""
    }
@@ -5145,7 +5154,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://jpr.applytojob.com/",
     "error": ""
    }
@@ -5175,7 +5184,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://nikecommunicationsinc.applytojob.com/",
     "error": ""
    }
@@ -5205,7 +5214,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-10-28T17:13:23+00:00",
+    "checked_at": "2026-10-28T21:45:33+00:00",
     "url": "https://zimmerman.com/careers/",
     "error": ""
    }
@@ -5282,7 +5291,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 2,
-   "board_total": 144,
+   "board_total": 145,
    "error": "",
    "failures": 0,
    "page": null
