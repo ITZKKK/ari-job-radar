@@ -1,15 +1,15 @@
 {
- "generated_at": "2026-11-27T20:20:28+00:00",
+ "generated_at": "2026-11-28T05:01:21+00:00",
  "owner": "Ari",
  "last_run": {
-  "started_at": "2026-11-27T20:03:47+00:00",
-  "finished_at": "2026-11-27T20:20:27+00:00",
-  "duration_s": 1000,
+  "started_at": "2026-11-28T04:47:22+00:00",
+  "finished_at": "2026-11-28T05:01:21+00:00",
+  "duration_s": 839,
   "first_run": false,
-  "new_relevant": 2,
-  "closed": 0,
-  "sources_ok": 32,
-  "sources_failed": 25,
+  "new_relevant": 1,
+  "closed": 1,
+  "sources_ok": 35,
+  "sources_failed": 21,
   "inbox": {
    "received": 0,
    "added": 0,
@@ -21,25 +21,6 @@
   }
  },
  "runs": [
-  {
-   "closed": 4,
-   "duration_s": 701,
-   "finished_at": "2026-11-13T18:48:11+00:00",
-   "first_run": false,
-   "inbox": {
-    "added": 0,
-    "error": "",
-    "failed": 0,
-    "received": 0,
-    "refresh": 0,
-    "rejected": 0,
-    "updated": 0
-   },
-   "new_relevant": 1,
-   "sources_failed": 2,
-   "sources_ok": 55,
-   "started_at": "2026-11-13T18:36:29+00:00"
-  },
   {
    "closed": 2,
    "duration_s": 414,
@@ -573,14 +554,33 @@
    "started_at": "2026-11-27T05:10:12+00:00"
   },
   {
-   "started_at": "2026-11-27T20:03:47+00:00",
-   "finished_at": "2026-11-27T20:20:27+00:00",
-   "duration_s": 1000,
-   "first_run": false,
-   "new_relevant": 2,
    "closed": 0,
-   "sources_ok": 32,
+   "duration_s": 1000,
+   "finished_at": "2026-11-27T20:20:27+00:00",
+   "first_run": false,
+   "inbox": {
+    "added": 0,
+    "error": "",
+    "failed": 0,
+    "received": 0,
+    "refresh": 0,
+    "rejected": 0,
+    "updated": 0
+   },
+   "new_relevant": 2,
    "sources_failed": 25,
+   "sources_ok": 32,
+   "started_at": "2026-11-27T20:03:47+00:00"
+  },
+  {
+   "started_at": "2026-11-28T04:47:22+00:00",
+   "finished_at": "2026-11-28T05:01:21+00:00",
+   "duration_s": 839,
+   "first_run": false,
+   "new_relevant": 1,
+   "closed": 1,
+   "sources_ok": 35,
+   "sources_failed": 21,
    "inbox": {
     "received": 0,
     "added": 0,
@@ -719,19 +719,50 @@
   "rejected": {}
  },
  "totals": {
-  "open_all": 285,
-  "open_shown": 53,
+  "open_all": 284,
+  "open_shown": 54,
   "open_not_fulltime": 13,
   "by_location_all": {
    "OTHER_US": 111,
    "NYC": 81,
-   "MIAMI": 33,
+   "MIAMI": 34,
    "REMOTE": 28,
-   "UNKNOWN": 23,
-   "FLORIDA": 9
+   "UNKNOWN": 22,
+   "FLORIDA": 8
   }
  },
  "postings": [
+  {
+   "pid": "4c252a267003e57d",
+   "title": "Specialist, Public Affairs",
+   "company": "Carnival Corporation (Carnival Cruise Line, Princess, Holland America…)",
+   "employer_id": "carnival",
+   "kind": "employer",
+   "source_id": "carnival",
+   "location": "MIAMI",
+   "location_raw": "Miami, FL, United States",
+   "url": "https://eicl.fa.em5.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CORP/job/14428",
+   "first_seen": "2026-11-28T04:47:22+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
+   "status": "open",
+   "closed_at": null,
+   "family": "pr_comms",
+   "tier": "core",
+   "seniority": "mid",
+   "years": null,
+   "flags": [],
+   "posted_at": "2026-11-27",
+   "work_mode": "unknown",
+   "fit": "open",
+   "remote_offered": false,
+   "employment": "unknown",
+   "topics": [
+    "hospitality",
+    "travel"
+   ],
+   "spanish": false,
+   "target": false
+  },
   {
    "pid": "71e4934759fccba1",
    "title": "Social Media Community & Influencer Coordinator",
@@ -743,7 +774,7 @@
    "location_raw": "Boca Raton, Florida, United States / Irvine, California, United States",
    "url": "https://apply.workable.com/j/12A69BC4C6",
    "first_seen": "2026-11-25T20:31:34+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -773,7 +804,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/brex-field-marketing-coordinator-upmarket",
    "first_seen": "2026-11-25T20:31:34+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -802,7 +833,7 @@
    "location_raw": "Los Angeles, CA, USA / Miami, FL, USA / New York, NY, USA",
    "url": "https://livenation.wd503.myworkdayjobs.com/en-US/LNExternalSite/job/Los-Angeles-CA-USA/Marketing-Manager--North-America_JR-94359-1",
    "first_seen": "2026-11-25T05:31:20+00:00",
-   "last_seen": "2026-11-27T05:10:12+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -810,7 +841,7 @@
    "seniority": "mid",
    "years": 3,
    "flags": [],
-   "posted_at": "Posted 2 Days Ago",
+   "posted_at": "Posted 3 Days Ago",
    "work_mode": "unknown",
    "fit": "early",
    "remote_offered": false,
@@ -889,7 +920,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/jetbrains-regional-field-marketing-manager-us",
    "first_seen": "2026-11-21T18:05:48+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -918,7 +949,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/sweat-pants-agency-ppc-marketing-specialist-remote",
    "first_seen": "2026-11-21T18:05:48+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -947,7 +978,7 @@
    "location_raw": "Miami, Florida, US",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000162829484",
    "first_seen": "2026-11-21T04:03:59+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -975,7 +1006,7 @@
    "location_raw": "Miami, Florida, United States, Remote",
    "url": "https://apply.workable.com/j/2AB20A290A",
    "first_seen": "2026-11-21T04:03:59+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1005,7 +1036,7 @@
    "location_raw": "New York, New York, United States, Remote",
    "url": "https://apply.workable.com/j/48AA098400",
    "first_seen": "2026-11-21T04:03:59+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1035,7 +1066,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/beyondtrust-field-partner-marketing-manager-public-sector",
    "first_seen": "2026-11-20T19:10:02+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1064,7 +1095,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/twilio-communications-specialist",
    "first_seen": "2026-11-20T19:10:02+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -1093,7 +1124,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/tailscale-abm-campaign-manager-1",
    "first_seen": "2026-11-19T19:31:55+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1155,7 +1186,7 @@
    "location_raw": "Miramar, Florida, US",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000162390248",
    "first_seen": "2026-11-19T04:16:09+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -1183,7 +1214,7 @@
    "location_raw": "Sacramento, CA, US, Remote",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000162365299",
    "first_seen": "2026-11-18T19:26:52+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -1211,7 +1242,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/coinstats-social-media-manager-for-x",
    "first_seen": "2026-11-16T21:07:01+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1240,7 +1271,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/pavago-seo-digital-marketing-specialist",
    "first_seen": "2026-11-14T03:23:29+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1269,7 +1300,7 @@
    "location_raw": "Remote - USA",
    "url": "https://job-boards.greenhouse.io/thenewyorktimes/jobs/4637331005",
    "first_seen": "2026-11-14T03:23:29+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -1390,7 +1421,7 @@
    "location_raw": "Florida",
    "url": "https://job-boards.greenhouse.io/5wpr/jobs/5476001008",
    "first_seen": "2026-11-07T02:56:31+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -1418,7 +1449,7 @@
    "location_raw": "Miami Beach, FL, US",
    "url": "https://jobs.smartrecruiters.com/AccorHotel/744000160254539",
    "first_seen": "2026-11-06T18:08:10+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1449,7 +1480,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/ace-stainless-supply-social-media-seo-manager-2",
    "first_seen": "2026-11-06T18:08:10+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1478,7 +1509,7 @@
    "location_raw": "Bali",
    "url": "https://weworkremotely.com/remote-jobs/convertibles-google-youtube-ads-specialist-ecommerce-remote-full-time-asia",
    "first_seen": "2026-11-06T03:29:14+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -1538,7 +1569,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/teamswell-marketing-assistant",
    "first_seen": "2026-11-05T18:50:56+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1628,7 +1659,7 @@
    "location_raw": "Miramar, Florida, US",
    "url": "https://jobs.smartrecruiters.com/NBCUniversal3/744000159448534",
    "first_seen": "2026-11-03T18:29:54+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -1686,7 +1717,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/forward-push-law-firm-marketing-marketing-specialist",
    "first_seen": "2026-11-02T20:50:39+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -1715,7 +1746,7 @@
    "location_raw": "Anywhere in the World",
    "url": "https://weworkremotely.com/remote-jobs/socure-technical-content-marketing-manager",
    "first_seen": "2026-11-02T20:50:39+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "content",
@@ -2006,7 +2037,7 @@
    "location_raw": "Miami, FL, United States",
    "url": "https://eicl.fa.em5.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CORP/job/14226",
    "first_seen": "2026-10-27T16:45:01+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -2336,7 +2367,7 @@
    "location_raw": "Starwood Hotels - Florida",
    "url": "https://shhotelsandresorts.wd12.myworkdayjobs.com/en-US/SHG/job/Starwood-Hotels---Florida/Social-Media-Manager--Treehouse-Hotels_JR105737-1",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-11-24T06:58:58+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -2401,7 +2432,7 @@
    "location_raw": "Miami, FL, USA",
    "url": "https://livenation.wd503.myworkdayjobs.com/en-US/LNExternalSite/job/Miami-FL-USA/Insomniac---Social-Media-Manager_JR-93158-2",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-11-27T05:10:12+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -2431,7 +2462,7 @@
    "location_raw": "United States - Business Locations",
    "url": "https://jobs.lever.co/therealdeal/63da817b-1094-403d-b59c-5a1329949c5e",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2585,7 +2616,7 @@
    "location_raw": "Los Angeles",
    "url": "https://jobs.lever.co/therealdeal/ea5b3af1-a1ae-46b0-88a4-97c1745fa5e9",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -2645,7 +2676,7 @@
    "location_raw": "Atlanta, Georgia, United States, Remote",
    "url": "https://apply.workable.com/j/1311924240",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "marketing_copy",
@@ -2706,7 +2737,7 @@
    "location_raw": "United States, Remote",
    "url": "https://apply.workable.com/j/22EA0C2003",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "pr_comms",
@@ -2784,36 +2815,6 @@
    "target": false
   },
   {
-   "pid": "bd23ba0b4372ffdc",
-   "title": "Influencer Coordinator - Alani Nu",
-   "company": "Celsius (Celsius, Alani Nu)",
-   "employer_id": "celsius",
-   "kind": "employer",
-   "source_id": "celsius",
-   "location": "MIAMI",
-   "location_raw": "Boca Raton, Florida, United States / Louisville, Kentucky, United States",
-   "url": "https://apply.workable.com/j/060170B586",
-   "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
-   "status": "closed",
-   "closed_at": "2026-10-28T21:45:33+00:00",
-   "family": "social",
-   "tier": "also",
-   "seniority": "entry",
-   "years": 2,
-   "flags": [],
-   "posted_at": "2026-10-20",
-   "work_mode": "onsite",
-   "fit": "early",
-   "remote_offered": false,
-   "employment": "full_time",
-   "topics": [
-    "lifestyle"
-   ],
-   "spanish": false,
-   "target": false
-  },
-  {
    "pid": "cf7f03db09a8d27e",
    "title": "TikTok Growth and Social E-Commerce Manager- Perry Ellis",
    "company": "Perry Ellis International",
@@ -2824,7 +2825,7 @@
    "location_raw": "Miami, Florida, United States",
    "url": "https://job-boards.greenhouse.io/perryellisinternational/jobs/4707701006",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -2912,7 +2913,7 @@
    "location_raw": "Miami, Florida, United States",
    "url": "https://job-boards.greenhouse.io/perryellisinternational/jobs/4707696006",
    "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "social",
@@ -2963,39 +2964,6 @@
    "target": false
   },
   {
-   "pid": "f9bad68888372803",
-   "title": "Marketing Manager",
-   "company": "SH Hotels & Resorts (1 Hotels, Baccarat, Treehouse)",
-   "employer_id": "sh-hotels",
-   "kind": "employer",
-   "source_id": "sh-hotels",
-   "location": "MIAMI",
-   "location_raw": "1 Hotel South Beach",
-   "url": "https://shhotelsandresorts.wd12.myworkdayjobs.com/en-US/SHG/job/1-Hotel-South-Beach/Marketing-Manager_JR106169-2",
-   "first_seen": "2026-10-21T17:06:46+00:00",
-   "last_seen": "2026-10-28T17:13:23+00:00",
-   "status": "closed",
-   "closed_at": "2026-10-28T21:45:33+00:00",
-   "family": "marketing_copy",
-   "tier": "core",
-   "seniority": "mid",
-   "years": 4,
-   "flags": [
-    "4+ yrs asked"
-   ],
-   "posted_at": "Posted 8 Days Ago",
-   "work_mode": "unknown",
-   "fit": "stretch",
-   "remote_offered": false,
-   "employment": "full_time",
-   "topics": [
-    "hospitality",
-    "travel"
-   ],
-   "spanish": false,
-   "target": false
-  },
-  {
    "pid": "51ccac298e73e3e2",
    "title": "Associate Editor, Breaking News",
    "company": "Axios (incl. Axios Miami)",
@@ -3006,7 +2974,7 @@
    "location_raw": "Remote (West Coast preferred)",
    "url": "https://job-boards.greenhouse.io/axios/jobs/8304074",
    "first_seen": "2026-10-20T20:43:28+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -3263,7 +3231,7 @@
    "location_raw": "Remote",
    "url": "https://job-boards.greenhouse.io/axios/jobs/8132318",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -3575,7 +3543,7 @@
    "location_raw": "Palm Beach Gardens, FL, United States",
    "url": "https://eevd.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/2023828",
    "first_seen": "2026-10-19T21:47:16+00:00",
-   "last_seen": "2026-11-27T20:03:47+00:00",
+   "last_seen": "2026-11-28T04:47:22+00:00",
    "status": "open",
    "closed_at": null,
    "family": "editorial",
@@ -3721,7 +3689,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://careers.timeout.com/jobs",
     "error": ""
    }
@@ -3748,12 +3716,11 @@
    "failures": 0,
    "page": {
     "status": "ok",
-    "changed_at": "2026-11-25T20:31:34+00:00",
+    "changed_at": "2026-11-28T04:47:22+00:00",
     "added": [
-     "Social Media Editor",
-     "This full-time union position has a salary range of 58K-62K depending on experience, will be based in our Miami newsroom and will report to the executive editor. This role may involve night and/or weekend work."
+     "Join our team: Miami New Times is hiring a social media editor"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.miaminewtimes.com/about/careers/",
     "error": ""
    }
@@ -3782,7 +3749,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.voicemediagroup.com/open-positions/",
     "error": ""
    }
@@ -3813,7 +3780,7 @@
     "status": "error",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://hauteliving.com/careers",
     "error": "HTTP 404"
    }
@@ -3888,7 +3855,7 @@
     "status": "error",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.modernluxury.com/careers",
     "error": "HTTP 404"
    }
@@ -3962,7 +3929,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 4,
-   "board_total": 496,
+   "board_total": 492,
    "error": "",
    "failures": 0,
    "page": null
@@ -3988,7 +3955,7 @@
    "open_relevant": 3,
    "board_total": 67,
    "error": "POST failed https://univision.wd1.myworkdayjobs.com/wday/cxs/univision/External/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -4015,7 +3982,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.wlrn.org/jobs",
     "error": ""
    }
@@ -4070,7 +4037,7 @@
     "status": "empty",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.local10.com/careers/",
     "error": ""
    }
@@ -4096,7 +4063,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 597,
+   "board_total": 599,
    "error": "",
    "failures": 0,
    "page": null
@@ -4214,7 +4181,7 @@
    "open_relevant": 0,
    "board_total": 29,
    "error": "POST failed https://meredith.wd5.myworkdayjobs.com/wday/cxs/meredith/EXT/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -4406,7 +4373,7 @@
    "open_relevant": 0,
    "board_total": 147,
    "error": "POST failed https://dowjones.wd1.myworkdayjobs.com/wday/cxs/dowjones/Dow_Jones_Career/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -4477,7 +4444,7 @@
    "open_relevant": 0,
    "board_total": 4,
    "error": "POST failed https://michelinhr.wd3.myworkdayjobs.com/wday/cxs/michelinhr/Michelin/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -4526,7 +4493,7 @@
     "added": [
      "Social Media Intern"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.atlasobscura.com/jobs",
     "error": ""
    }
@@ -4558,7 +4525,7 @@
     "added": [
      "Email Marketing Coordinator"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://jobs.jobvite.com/everyday-health-consumer/jobs",
     "error": ""
    }
@@ -4589,7 +4556,7 @@
     "added": [
      "Current Openings"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://pucknews.applytojob.com",
     "error": ""
    }
@@ -4662,7 +4629,7 @@
     "status": "error",
     "changed_at": null,
     "added": null,
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://careers.digiday.com",
     "error": "ConnectError: [Errno -2] Name or service not known"
    }
@@ -4736,7 +4703,7 @@
    "open_relevant": 2,
    "board_total": 104,
    "error": "POST failed https://nclh.wd108.myworkdayjobs.com/wday/cxs/nclh/NCL_Shoreside_Careers/jobs: None",
-   "failures": 24,
+   "failures": 25,
    "page": null
   },
   {
@@ -4783,7 +4750,7 @@
    "open_relevant": 2,
    "board_total": 617,
    "error": "POST failed https://seminolehardrock.wd503.myworkdayjobs.com/wday/cxs/seminolehardrock/SeminoleHardRockCareers/jobs: None",
-   "failures": 24,
+   "failures": 25,
    "page": null
   },
   {
@@ -4808,7 +4775,7 @@
    "open_relevant": 2,
    "board_total": 269,
    "error": "POST failed https://fourseasons.wd3.myworkdayjobs.com/wday/cxs/fourseasons/search/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -4834,8 +4801,8 @@
    "ats": "oracle",
    "mode": "read",
    "note": null,
-   "open_relevant": 1,
-   "board_total": 280,
+   "open_relevant": 2,
+   "board_total": 272,
    "error": "",
    "failures": 0,
    "page": null
@@ -4964,7 +4931,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.gmcvb.com/gmcvb-jobs",
     "error": ""
    }
@@ -4990,7 +4957,7 @@
    "mode": "read",
    "note": null,
    "open_relevant": 0,
-   "board_total": 248,
+   "board_total": 249,
    "error": "",
    "failures": 0,
    "page": null
@@ -5014,12 +4981,12 @@
     "Treehouse Hotels"
    ],
    "ats": "workday",
-   "mode": "failing",
+   "mode": "read",
    "note": "Locations are hotel names (1 Hotel South Beach); its Miami Beach head-office jobs say Starwood Hotels - Florida.",
    "open_relevant": 1,
-   "board_total": 42,
-   "error": "POST failed https://shhotelsandresorts.wd12.myworkdayjobs.com/wday/cxs/shhotelsandresorts/SHG/jobs: None",
-   "failures": 7,
+   "board_total": 44,
+   "error": "",
+   "failures": 0,
    "page": null
   },
   {
@@ -5043,7 +5010,7 @@
    "open_relevant": 0,
    "board_total": 119,
    "error": "POST failed https://loewshotels.wd5.myworkdayjobs.com/wday/cxs/loewshotels/loewshotels/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -5198,7 +5165,7 @@
    "open_relevant": 1,
    "board_total": 130,
    "error": "POST failed https://rbi.wd3.myworkdayjobs.com/wday/cxs/rbi/RBI_External_Career_Site/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -5225,7 +5192,7 @@
    "open_relevant": 0,
    "board_total": 133,
    "error": "POST failed https://bacardi.wd3.myworkdayjobs.com/wday/cxs/bacardi/jobs_bacardi/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -5248,7 +5215,7 @@
    "open_relevant": 0,
    "board_total": 4,
    "error": "POST failed https://frgi.wd1.myworkdayjobs.com/wday/cxs/frgi/PolloTropical/jobs: None",
-   "failures": 5,
+   "failures": 6,
    "page": null
   },
   {
@@ -5281,7 +5248,7 @@
      "Administrative Assistant",
      "Showing 1-12 of 56 jobs by relevance"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://careers.subway.com/en/jobs",
     "error": ""
    }
@@ -5385,12 +5352,12 @@
     "Live Nation Latin"
    ],
    "ats": "workday",
-   "mode": "failing",
+   "mode": "read",
    "note": null,
    "open_relevant": 2,
    "board_total": 17,
-   "error": "POST failed https://livenation.wd503.myworkdayjobs.com/wday/cxs/livenation/LNExternalSite/jobs: None",
-   "failures": 1,
+   "error": "",
+   "failures": 0,
    "page": null
   },
   {
@@ -5416,7 +5383,7 @@
    "open_relevant": 1,
    "board_total": 58,
    "error": "POST failed https://wmg.wd1.myworkdayjobs.com/wday/cxs/wmg/WMGUS/jobs: None",
-   "failures": 5,
+   "failures": 6,
    "page": null
   },
   {
@@ -5442,7 +5409,7 @@
    "open_relevant": 0,
    "board_total": 48,
    "error": "POST failed https://umusic.wd5.myworkdayjobs.com/wday/cxs/umusic/UMGUS/jobs: None",
-   "failures": 3,
+   "failures": 4,
    "page": null
   },
   {
@@ -5470,7 +5437,7 @@
    "open_relevant": 0,
    "board_total": 11,
    "error": "POST failed https://grammy.wd5.myworkdayjobs.com/wday/cxs/grammy/The_Recording_Academy_Career_Site/jobs: None",
-   "failures": 3,
+   "failures": 4,
    "page": null
   },
   {
@@ -5495,7 +5462,7 @@
    "open_relevant": 1,
    "board_total": 275,
    "error": "POST failed https://iheartmedia.wd5.myworkdayjobs.com/wday/cxs/iheartmedia/External_IHM/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -5522,7 +5489,7 @@
    "open_relevant": 0,
    "board_total": 50,
    "error": "POST failed https://sonyglobal.wd1.myworkdayjobs.com/wday/cxs/sonyglobal/SonyGlobalCareers/jobs: None",
-   "failures": 5,
+   "failures": 6,
    "page": null
   },
   {
@@ -5558,7 +5525,7 @@
      "with “Development Assistant, Corporate Partnerships” in the subject line.",
      "→ DEVELOPMENT ASSISTANT, CORPORATE PARTNERSHIPS"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://thebass.org/jobs/",
     "error": ""
    }
@@ -5591,7 +5558,7 @@
     "added": [
      "Community Engagement Coordinator"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.arshtcenter.org/about-us/jobs/",
     "error": ""
    }
@@ -5633,7 +5600,7 @@
      "Job Title: DIRECTOR OF DIGITAL STRATEGY & CONTENT",
      "Job Title: Director of Marketing"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.miamicityballet.org/about/careers/",
     "error": ""
    }
@@ -5664,7 +5631,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://miamisci.hrmdirect.com/employment/job-openings.php?cust_sort1=42038",
     "error": ""
    }
@@ -5695,7 +5662,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.artbasel.com/about/careers",
     "error": ""
    }
@@ -5747,7 +5714,7 @@
    "open_relevant": 0,
    "board_total": 8,
    "error": "POST failed https://warnerbros.wd5.myworkdayjobs.com/wday/cxs/warnerbros/global/jobs: None",
-   "failures": 3,
+   "failures": 4,
    "page": null
   },
   {
@@ -5773,7 +5740,7 @@
    "open_relevant": 0,
    "board_total": 51,
    "error": "POST failed https://spe.wd1.myworkdayjobs.com/wday/cxs/spe/SonyPicturesEntertainment/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -5807,7 +5774,7 @@
     "added": [
      "Part-Time Promotions Assistant"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://www.spanishbroadcasting.com/careers",
     "error": ""
    }
@@ -5865,7 +5832,7 @@
     "added": [
      "Production Assistant/Satellite Coordinator (2026-73)"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://wsvn.com/employment/",
     "error": ""
    }
@@ -5898,7 +5865,7 @@
     "added": [
      "No open positions right now — check back soon."
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://6amcity.com/careers",
     "error": ""
    }
@@ -5952,7 +5919,7 @@
    "open_relevant": 2,
    "board_total": 502,
    "error": "POST failed https://umiami.wd1.myworkdayjobs.com/wday/cxs/umiami/UMCareerStaff/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -6094,7 +6061,7 @@
    "open_relevant": 0,
    "board_total": 123,
    "error": "POST failed https://djeholdings.wd5.myworkdayjobs.com/wday/cxs/djeholdings/edelman-careers-E200/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -6145,7 +6112,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://rbbcommunications.com/join/",
     "error": ""
    }
@@ -6177,7 +6144,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://dureeandcompany.com/careers-internships/",
     "error": ""
    }
@@ -6197,19 +6164,19 @@
     "Boardroom Communications"
    ],
    "ats": "none",
-   "mode": "check",
+   "mode": "watched",
    "note": null,
    "open_relevant": 0,
    "board_total": null,
    "error": null,
    "failures": 0,
    "page": {
-    "status": "error",
+    "status": "ok",
     "changed_at": "2026-10-21T17:22:48+00:00",
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://boardroompr.com/careers/",
-    "error": "ConnectTimeout: timed out"
+    "error": ""
    }
   },
   {
@@ -6237,7 +6204,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://jpr.applytojob.com/",
     "error": ""
    }
@@ -6269,7 +6236,7 @@
     "added": [
      "Assistant Account Executive - Travel"
     ],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://nikecommunicationsinc.applytojob.com/",
     "error": ""
    }
@@ -6299,7 +6266,7 @@
     "status": "ok",
     "changed_at": null,
     "added": [],
-    "checked_at": "2026-11-27T20:03:47+00:00",
+    "checked_at": "2026-11-28T04:47:22+00:00",
     "url": "https://zimmerman.com/careers/",
     "error": ""
    }
@@ -6378,7 +6345,7 @@
    "open_relevant": 1,
    "board_total": 143,
    "error": "POST failed https://chewy.wd5.myworkdayjobs.com/wday/cxs/chewy/External/jobs: None",
-   "failures": 23,
+   "failures": 24,
    "page": null
   },
   {
@@ -6447,29 +6414,29 @@
   {
    "id": "rss_nabj",
    "name": "NABJ Career Center",
-   "ok": false,
-   "error": "AdapterError: GET failed https://nabjcareers.org/listing-feeds/?feedId=10: Client error '415 Unsupported Media Type' for url 'https://nabjcareers.org/listing-feeds/?feedId=10'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415",
-   "last_ok": "2026-11-26T05:12:22+00:00",
+   "ok": true,
+   "error": "",
+   "last_ok": "2026-11-28T04:47:22+00:00",
    "count_total": 20,
    "count_relevant": 7,
-   "consecutive_failures": 3
+   "consecutive_failures": 0
   },
   {
    "id": "rss_nahj",
    "name": "NAHJ Career Center",
-   "ok": false,
-   "error": "AdapterError: GET failed https://nahjcareers.org/listing-feeds/?feedId=10: Client error '415 Unsupported Media Type' for url 'https://nahjcareers.org/listing-feeds/?feedId=10'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415",
-   "last_ok": "2026-11-26T05:12:22+00:00",
+   "ok": true,
+   "error": "",
+   "last_ok": "2026-11-28T04:47:22+00:00",
    "count_total": 20,
    "count_relevant": 6,
-   "consecutive_failures": 3
+   "consecutive_failures": 0
   },
   {
    "id": "rss_wwr_marketing",
    "name": "We Work Remotely (marketing)",
    "ok": true,
    "error": "",
-   "last_ok": "2026-11-27T20:03:47+00:00",
+   "last_ok": "2026-11-28T04:47:22+00:00",
    "count_total": 358,
    "count_relevant": 18,
    "consecutive_failures": 0
